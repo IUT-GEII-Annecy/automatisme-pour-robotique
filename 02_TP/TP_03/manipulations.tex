@@ -1,0 +1,102 @@
+\section{Manipulations}
+\label{sec:manipulations}
+\subsection{Squelette du programme}
+\label{subsect:squelette_du_programme}
+
+Dans notre commande hiérarchisée, un programme principal \texttt{GM\_Gmma} aura pour rôle de gérer les différents modes de marche du robot. C'est celui-ci qui autorisera ou non chaque mode de marche. Pour cela, on utilisera une section par mode de marche. Chacune des sections sera conditionnée à une variable booléenne commandée par le programme principal.
+
+Le Gmma sera mis en oeuvre à l'aide de trois sections exécutés dans l'ordre suivant :
+\begin{enumerate}
+    \item \texttt{GM\_Gmma\_Init}
+          \begin{itemize}
+              \item Lors du premier cycle automate :
+                    \begin{itemize}
+                        \item Initialisation du GMMA lors du premier cycle automate (à l'aide du bloc fonctionnel \texttt{InitChart}),
+                        \item Configuration de la période du bit de vie du robot à \SI{150}{ms} au sein de l'objet \texttt{staubliRobotScara},
+                    \end{itemize}
+              \item Mise en défaut du GMMA en cas d'erreur de communication.
+          \end{itemize}
+    \item \texttt{GM\_Gmma\_Main}
+          \begin{itemize}
+              \item Gestion des différents modes de marche du robot
+          \end{itemize}
+    \item \texttt{GM\_Gmma\_Post}
+          \begin{itemize}
+              \item Gestion des variables booléennes de chaque mode de marche,
+              \item Fournir l'état du GMMA à l'IHM (\texttt{hmiScara.m\_Outputs.m\_Screen.m\_intStateGmma}).
+          \end{itemize}
+\end{enumerate}
+
+\begin{UPSTIManipulation}[Préparation de la structure du programme]
+    Dans un premier temps, nous allons créer le squelette de notre programme avec les différentes sections qui seront complétées tout au long de ce TP.
+    \UPSTIetape{Créer les trois sections de gestion du GMMA.}
+    \UPSTIetape{Créer une section par mode de marche. Chaque section sera conditionnée à une variable booléenne correspondante. \texttt{Clic droit -> Caractéristiques -> Condition}}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}[Programmation du GMMA]
+    \UPSTIetape{Compléter la section \texttt{GM\_Gmma\_Init}}
+    \UPSTIetape{Compléter la section \texttt{GM\_Gmma\_Main}, les conditions pourront être écrites ulterieurement.}
+    \UPSTIetape{Compléter la section \texttt{GM\_Gmma\_Post}}
+\end{UPSTIManipulation}
+
+\subsection{Programmation des différents modes de marche}
+Pour chacun des modes de marches, on propose la démarche suivante :
+
+\begin{UPSTIinfor}{Démarche}
+    \begin{itemize}
+        \item Mode combinatoire :
+              \begin{enumerate}
+                  \item Réserver les éventuelles instances de blocs fonctionnels nécessaires
+                  \item Compléter la section correspondante en ST ou LADDER
+              \end{enumerate}
+        \item Mode séquentiel :
+                \begin{enumerate}
+                    \item Etablir le programme SFC de ce mode 
+                    \item Créer les actions P1 pour configurer les mouvements à réaliser dans les étapes correspondantes
+                    \item Compléter la section d'appel des blocs fonctionnels associés 
+                    \item Compléter la section \textit{post} pour exécuter les différentes actions. 
+                \end{enumerate}
+    \end{itemize}
+\end{UPSTIinfor}
+
+\begin{UPSTIManipulation}[Modes D1 et D2]
+    \UPSTIetape{Compléter le mode D1}
+    \UPSTIetape{Compléter le mode D2}
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Mode D1 et D2]
+    \UPSTIetape{Vérifier, compiler et téléverser le programme}
+    \UPSTIetape{\textbf{Faire vérifier par l'enseignant}}
+    \begin{itemize}[label=$\square$]
+        \item Voyant blanc allumé sur le pendantif de la CS9
+        \item Voyant blanc \texttt{Bras sous puissance} allumé sur l'IHM
+        \item Guichet interdit d'accès
+        \item Colonne lumineuse de l'IHM au jaune fixe pour le mode D2
+    \end{itemize}
+\end{UPSTIVerification}
+
+\begin{UPSTIManipulation}[Modes A5]
+    \UPSTIetape{Compléter le mode A5}
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Mode A5]
+    \UPSTIetape{Vérifier, compiler et téléverser le programme}
+    \UPSTIetape{\textbf{Faire vérifier par l'enseignant}}
+    \begin{itemize}[label=$\square$]
+        \item Guichet interdit d'accès
+        \item Colonne lumineuse de l'IHM au jaune clignotant à la fréquence de 1 Hz
+    \end{itemize}
+\end{UPSTIVerification}
+
+\begin{UPSTIManipulation}[Modes A6]
+    \UPSTIetape{Compléter le mode A6 en suivant la démarche proposée plus haut. }
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Mode A6]
+    \UPSTIetape{\textbf{Faire vérifier par l'enseignant avant tout versement sur l'automate}}
+    \UPSTIetape{Compiler, téléverser et vérifier le fonctionnement}
+\end{UPSTIVerification}
+
+\begin{UPSTIManipulation}[Mode A1]
+    \UPSTIetape{Compléter le mode A1 puis faire valider par l'enseignant}
+\end{UPSTIManipulation}

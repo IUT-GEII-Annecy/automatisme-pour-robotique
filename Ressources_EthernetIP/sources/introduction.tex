@@ -1,0 +1,38 @@
+\begin{center}
+    {\large Document ressource -- Aide-mémoire de conception}
+\end{center}
+
+Ce document est une ressource technique, pas un TP corrigé. Il rassemble les notions nécessaires pour \textbf{concevoir vous-même}, en TP, un système de communication EtherNet/IP entre un automate Codesys et un ou plusieurs équipements de terrain, intégré à une architecture logicielle orientée objet. Consultez-le pendant votre conception comme un aide-mémoire, pas comme un cours à lire linéairement.
+
+\subsection*{EtherNet/IP dans la famille CIP}
+\textbf{EtherNet/IP} (Ethernet Industrial Protocol) est un protocole de communication industriel qui transporte le protocole applicatif \textbf{CIP} (\emph{Common Industrial Protocol}) sur une infrastructure Ethernet standard (TCP/IP et UDP/IP). CIP est un protocole \emph{orienté objet} : tout équipement, toute donnée échangée est représenté par des objets, des instances, des attributs et des services -- une philosophie proche de celle que vous manipulez déjà en programmation orientée objet sous Codesys.
+
+CIP est également le protocole applicatif d'autres réseaux industriels (DeviceNet, ControlNet). EtherNet/IP n'est donc qu'un \emph{transport} particulier (Ethernet) pour ce même modèle objet.
+
+\begin{UPSTIinfor}{Pourquoi choisir EtherNet/IP ?}
+    EtherNet/IP est largement utilisé dans les cellules robotisées et les lignes de production automatisées, en particulier avec des équipements Rockwell/Allen-Bradley, des robots industriels (ABB, FANUC, Kuka, Stäubli...) ou des caméras de vision industrielle. Il permet à la fois des échanges cycliques rapides (E/S temps réel) et des échanges ponctuels riches (diagnostic, paramétrage, lecture d'attributs).
+\end{UPSTIinfor}
+
+\subsection*{Positionnement par rapport aux autres protocoles industriels}
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{4cm}|p{4cm}|p{4cm}|}
+        \hline
+        \textbf{Critère} & \textbf{Modbus TCP} & \textbf{PROFINET} & \textbf{EtherNet/IP} \\
+        \hline
+        Modèle de données & Registres bruts (adresses numériques) & Objets et modules GSD & Objets CIP (instances, attributs, services) \\
+        \hline
+        Échange cyclique & Requête/réponse maître-esclave, pas de connexion établie & Connexion RT établie, cyclique & Connexion établie (\emph{implicit messaging}), producteur/consommateur \\
+        \hline
+        Échange ponctuel & Lecture/écriture de registres & Acyclique (diagnostic, alarmes) & Messagerie explicite (services Get/Set Attribute) \\
+        \hline
+        Origine industrielle & Générique, très répandu & Siemens / PROFIBUS \& PROFINET International & Rockwell / ODVA \\
+        \hline
+        Complexité de mise en \oe uvre & Faible & Moyenne (fichiers GSDML) & Moyenne (fichiers EDS, modèle objet) \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIidee}{Ce que vous devez retenir}
+    Contrairement à Modbus TCP (simple lecture/écriture de registres numérotés, sans sémantique), EtherNet/IP structure les données autour d'\textbf{objets} identifiés par une classe, une instance et des attributs. Cette organisation est directement transposable à la conception orientée objet de votre application Codesys : chaque équipement de terrain peut être représenté, côté automate, par un objet logiciel qui encapsule sa communication CIP.
+\end{UPSTIidee}

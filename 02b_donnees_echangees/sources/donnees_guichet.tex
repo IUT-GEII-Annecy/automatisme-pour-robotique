@@ -1,0 +1,84 @@
+\section{Données du poste guichet (contrôleur PFC200)}
+\label{secDonneesGuichet}
+
+Le contrôleur PFC200, scruté sur le réseau \texttt{NOC\_ETHIP\_CONVOYEUR},
+se comporte comme un simple îlot d'entrées/sorties pour la commande du
+poste guichet. Les données qu'il produit et consomme sont de type
+\texttt{BOOL}, obtenues par un service d'IO-Scanning : elles sont non
+forçables et leur dynamique (front) n'est pas accessible.
+
+\subsection{Données produites (T->O) -- capteurs du guichet}
+
+\begin{center}
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Capteur} & \textbf{Référence} & \textbf{Information portée} \\
+\hline
+aid & \texttt{nixAid} & Capteur validant l'information du capteur de
+détection de gobelet \\
+\hline
+dgt & \texttt{nixDgt} & Capteur de détection de gobelet (information valide
+uniquement si \texttt{aid} est actif) \\
+\hline
+dpp & \texttt{nixDpp} & Capteur de détection d'une palette en poste \\
+\hline
+dpo & \texttt{nixDpo} & Capteur de détection que le poste est occupé \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{UPSTIremarque}[Codage de l'état de la palette]
+Le couple (aid, dgt) code l'état de la palette détectée : $(1,0)$ signifie
+que la palette est vide, $(1,1)$ signifie qu'elle porte un gobelet.
+\end{UPSTIremarque}
+
+Ces quatre informations occupent les bits 0 à 3 de l'octet~0 de la zone de
+données produites (\texttt{Guichet\_IN}). Les octets 1 à 3 sont réservés
+pour une utilisation future.
+
+\begin{UPSTIremarque}[Durée d'immobilisation des palettes pleines]
+Les octets 4 à 7 de cette même zone portent une donnée de type
+\texttt{TIME} codée en Little Endian, et les octets 8 à 11 la même
+information codée en Big Endian : il s'agit de la durée d'immobilisation
+des palettes pleines dans le guichet (valeur d'exemple : \texttt{T\#4s}).
+\end{UPSTIremarque}
+
+\subsection{Données consommées (O->T) -- actionneurs du guichet}
+
+\begin{center}
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Actionneur} & \textbf{Référence} & \textbf{Nature} \\
+\hline
+BE & \texttt{nqxBE} & Abaisser le bloqueur d'entrée (distributeur
+monostable) \\
+\hline
+BP & \texttt{nqxBP} & Abaisser le bloqueur du poste (distributeur
+monostable) \\
+\hline
+CR & \texttt{nqxCR} & Colonne lumineuse RVB -- composante rouge \\
+\hline
+CV & \texttt{nqxCV} & Colonne lumineuse RVB -- composante verte \\
+\hline
+CB & \texttt{nqxCB} & Colonne lumineuse RVB -- composante bleue \\
+\hline
+\end{tabular}
+\end{center}
+
+Ces cinq commandes occupent les bits 0 à 4 de l'octet~0 de la zone de
+données consommées (\texttt{Guichet\_OUT}). Les octets 1 à 3 sont réservés
+pour une utilisation future.
+
+\begin{UPSTIremarque}[Adresses mémoire non données]
+Les adresses \texttt{\%MW} de base de ces deux zones ne sont pas données
+ici : leur détermination, à partir de la cartographie mémoire des
+coupleurs \texttt{BMX~NOC~0401.2} (cf. document
+\texttt{02c\_configuration\_noc}), fait partie du travail demandé aux
+étudiants.
+\end{UPSTIremarque}
+
+\subsection{Volumétrie globale}
+
+Le contrôleur PFC200 produit 12 octets et consomme 4 octets, seul le
+premier octet de chaque zone étant significatif pour la commande du poste
+guichet.

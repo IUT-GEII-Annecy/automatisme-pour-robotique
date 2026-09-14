@@ -1,0 +1,44 @@
+\section{Étape 5 -- Vérification de la configuration}
+\label{secEtapeVerification}
+
+Avant tout téléchargement dans l'automate, la configuration établie doit
+être vérifiée.
+
+\subsection{Sauvegarde et compilation}
+
+Sauvegarder l'application, puis la compiler.
+
+\subsection{Contrôle de la cartographie mémoire}
+
+À l'aide de l'éditeur de données (variables dérivées), vérifier que les
+zones mémoire allouées à l'équipement ajouté correspondent à l'attendu,
+c'est-à-dire :
+
+\begin{itemize}
+    \item pour les données produites (\texttt{T->O}) : une variable du type
+    utilisateur créé pour l'équipement (par exemple \texttt{guichet\_IN} de
+    type \texttt{T\_guichet\_IN}), positionnée à l'adresse mémoire attendue
+    d'après la cartographie établie pour le coupleur ;
+    \item pour les données consommées (\texttt{O->T}) : de même, une
+    variable du type utilisateur correspondant (par exemple
+    \texttt{guichet\_OUT} de type \texttt{T\_guichet\_OUT}), à l'adresse
+    mémoire attendue.
+\end{itemize}
+
+\begin{UPSTIwarning}{Validation avant téléchargement}
+La configuration réalisée doit être vérifiée (par exemple par l'enseignant,
+en contexte pédagogique, ou par un pair en contexte professionnel) avant
+tout téléchargement dans l'automate. Une erreur de cartographie mémoire ou
+d'adressage IP peut en effet perturber le fonctionnement d'autres
+équipements présents sur le même réseau.
+\end{UPSTIwarning}
+
+\subsection{Configuration de la tâche}
+
+Une fois la configuration réseau validée, la tâche périodique de
+l'automate (dossier \texttt{MAST}) doit être paramétrée pour tenir compte
+du procédé piloté : période de scrutation et surveillance du temps de
+cycle (chien de garde), dont les valeurs sont déterminées à partir de
+l'analyse de la dynamique du procédé (cf. document
+\texttt{02b\_donnees\_echangees} pour la description des données
+échangées).

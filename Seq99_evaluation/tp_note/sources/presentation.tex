@@ -1,0 +1,62 @@
+Ce travail pratique porte sur la mise en œuvre d'une cellule robotisée industrielle exploitant la solution \textbf{UniVALplc} du constructeur Stäubli pour l'automatisation d'un robot Scara. L'objectif est de réaliser le transfert automatique de gobelets entre des palettes circulant sur un convoyeur et de leur faire subir un traitement de surface.
+
+Pour cela, vous serez amené, dans cette évaluation, à créer une partie du programme d'automatisme faisant se déplacer le robot puis à intégrer un pont roulant (nouvel élément) dans la cellule existante.
+
+\section{Présentation de la cellule robotisée}
+% \begin{center}
+%     \includegraphics[width=.8\textwidth]{architecture.png}
+% \end{center}
+
+
+
+
+\subsection{Rappels : Fonctionnement de la cellule}
+
+En fonctionnement normal, la cellule devra se comporter comme suit :
+
+\begin{enumerate}
+    \item \textbf{Attente en conditions initiales (A1)} :
+    \begin{itemize}
+        \item Robot positionné au-dessus du guichet : (X=90, Y=-410, Z=150, RX=-180, RY=0, RZ=0) dans le repère « world »
+        \item Flux de palettes passant (colonne verte)
+        \item Bras sous puissance
+    \end{itemize}
+
+    \item \textbf{Détection et saisie (F1)} :
+    \begin{itemize}
+        \item Lorsqu'un gobelet est détectée, la palette en question est arrêtée sur le poste et le robot s'en saisit.
+        \item Le robot dépose alors le gobelet sur la Cuve 0
+        \item Après une temporisation de \texttt{2 secondes}, le robot se saisit à nouveau du gobelet
+        \item Le robot dépose alors le gobelet sur la prochaine palette disponible. 
+    \end{itemize}
+\end{enumerate}
+
+
+\subsection{Organisation du projet}
+
+Les section d'un cycle automate sont organisées de la manière suivante :
+
+\begin{itemize}
+    \item \textbf{Sections de lecture} : \texttt{ReadEthIpRobot} (début de cycle API)
+    \begin{itemize}
+        \item \texttt{VAL\_ReadAxesGroup} : lecture état robot (CS9)
+        \item \texttt{FB\_ReadHmi} : lecture commandes pupitre (M221)
+    \end{itemize}
+    \item \textbf{Sections GEMMA} :
+    \begin{itemize}
+        \item \texttt{GM\_GmmaPre} : initialisation et configuration
+        \item \texttt{GM\_Gmma} (SFC) : graphe des modes de marche
+        \item \texttt{GM\_GmmaPost} : activation sections conditionnelles
+    \end{itemize}
+    \item \textbf{Sections des modes} (conditionnelles) :
+    \begin{itemize}
+        \item Graphes SFC : \texttt{D2\_Diagnostic}, \texttt{A5\_RemiseEnRoute}, \texttt{A6\_MiseEnCI}, \texttt{F1\_ProductionNormale}
+        \item Sections Post (ST) : actions combinatoires et scrutation des blocs fonctionnels
+        \item Utilisation de macro-étapes pour structurer les séquences complexes
+    \end{itemize}
+    \item \textbf{Sections d'écriture} : \texttt{WriteEthIpRobot} (fin de cycle API)
+    \begin{itemize}
+        \item \texttt{FB\_WriteHmi} : commande voyants et écran (M221)
+        \item \texttt{VAL\_WriteAxesGroup} : envoi commandes robot (CS9)
+    \end{itemize}
+\end{itemize}

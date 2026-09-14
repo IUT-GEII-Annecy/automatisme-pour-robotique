@@ -1,0 +1,49 @@
+\begin{tikzpicture}[circuit plc sfc,thick,y=1.3\tikzcircuitssizeunit,
+    every sfcstep/.style={red, fill=blue!20, minimum width=1cm,
+            minimum height=1cm, inner sep=0.3mm},
+    every sfcstepi/.style=every sfcstep]
+\draw (0,0)
+to [sfcstepi={info=S0}] (0,-4);
+\draw (2,0)
+to [sfcstep={info=S1}] (2,-4);
+\end{tikzpicture}
+
+\begin{tikzpicture}[circuit plc sfc,thick,every sfcstep/.style={, minimum width=2cm, inner sep=0.3mm, minimum height=1cm},
+every sfcstepi/.style=every sfcstep,
+    x=1.3\tikzcircuitssizeunit,
+    y=1.3\tikzcircuitssizeunit]
+\draw (0,0)
+to [flow direction={pos=0.95}] ++(0,-1)
+to [sfcstepi={info=F1\_S\_0}] ++(0,-4)
+node[sfctransition={info=t1}]{} -- ++(0,-1)
+++(4,0) coordinate(N2) ++(-8,0) coordinate(N1)
+to [sfcstep={info=S2}] ++(0,-4)
+node[sfctransition={info=t2}]{} -- ++(0,-1)
+++(2,0) coordinate(N4) ++(-4,0) coordinate(N3)
+to [sfcstep={info=S4}] ++(0,-4) -- ++(0,-2) coordinate(N7)
+(N4) to [sfcstep={info=S5}] ++(0,-4) -- ++(4,-1)
+-- ++(0,-1) coordinate(N9)
+++(-6,0) -- ++(0,-1) node[sfctransition={info=t4}]{}
+to [sfcstep={info=S8}] ++(0,-4) coordinate(N11)
+(N2) to [sfcstep={info=S3}] ++(0,-4)
+node[sfctransition={info=t3}]{} -- ++(0,-1)
+++(2,0) coordinate(N6) ++(-4,0) coordinate(N5)
+to [sfcstep={info=S6}] ++(0,-4)
+--++(-4,-1) --++(0,-1) coordinate(N8)
+(N6) to [sfcstep={info=S7}] ++(0,-4) -- ++(0,-2) coordinate(N10)
+++(-2,0) -- ++(0,-1) node[sfctransition={info=t5}]{}
+to [sfcstep={info=S9}] ++(0,-4) coordinate(N12)
+++(-4,0) to[sfctransition={info=t6}] ++(0,-2)
+-- ++(-8,0) |- (0,0);
+\draw
+(N1) ++(-0.5,0) -- (N2) -- ++(0.5,0)
+(N3) ++(-0.5,0) -- (N4) -- ++(0.5,0)
+(N5) ++(-0.5,0) -- (N6) -- ++(0.5,0)
+(N7) ++(-0.5,0) -- (N8) -- ++(0.5,0)
+(N9) ++(-0.5,0) -- (N10) -- ++(0.5,0)
+(N11) ++(-0.5,0) -- (N12) -- ++(0.5,0);
+\foreach \x in {1,...,12}
+\node[label={[label distance=-4pt,above
+                    right, red,font=\tiny]N\x},
+    circle,inner sep=1pt,draw=red,thin] at (N\x) {};
+\end{tikzpicture}

@@ -1,0 +1,149 @@
+\section{Données de l'IHM et du pupitre opérateur (contrôleur M221)}
+\label{secDonneesIhm}
+
+Le contrôleur M221 est scruté, comme la baie CS9 et comme le PFC200, par
+un service d'IO-Scanning Ethernet/IP -- ici sur le réseau
+\texttt{NOC\_ETHIP\_ROBOT}. Il assure à la fois l'îlot d'entrées/sorties du
+pupitre opérateur (boutons, sélecteurs, voyants) et l'interface de
+supervision Modbus-TCP vers l'écran HMI. Il produit 4 octets et consomme
+40 octets. Les échanges sont structurés autour d'un objet de type
+\texttt{THmi}.
+
+\begin{UPSTIremarque}[Le M221 est lui aussi réservé en mémoire]
+Comme pour le PFC200 et la baie CS9, les données produites et consommées
+par le M221 transitent par le service d'IO-Scanning Ethernet/IP : elles
+occupent donc, elles aussi, une zone réservée de l'espace mémoire
+\texttt{\%MW} de l'automate M340, à une adresse de base qui dépend de la
+cartographie retenue pour le coupleur \texttt{NOC\_ETHIP\_ROBOT}. Cette
+adresse n'est pas donnée ici : sa détermination (cf. document
+\texttt{02c\_configuration\_noc}) fait partie du travail demandé aux
+étudiants.
+\end{UPSTIremarque}
+
+\subsection{Structure \texttt{THmi}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Champ} & \textbf{Type} \\
+\hline
+\texttt{m\_Inputs} & \texttt{THmiInputs} (données produites -- éléments de
+commande du pupitre) \\
+\hline
+\texttt{m\_Outputs} & \texttt{THmiOutputs} (données consommées -- voyants
+du pupitre et écran de supervision) \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Données produites -- \texttt{THmiInputs} (éléments de commande)}
+
+\begin{center}
+\begin{tabular}{|l|p{8.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Élément de commande} \\
+\hline
+\texttt{m\_nixJ1Plus} / \texttt{m\_nixJ1Minus} & Sélecteur de commande de
+l'axe J1 (sens $+$ / sens $-$) \\
+\hline
+\texttt{m\_nixJ2Plus} / \texttt{m\_nixJ2Minus} & Sélecteur de commande de
+l'axe J2 (sens $+$ / sens $-$) \\
+\hline
+\texttt{m\_nixJ3Up} / \texttt{m\_nixJ3Down} & Bouton-poussoir de commande
+de l'axe J3 (montée / descente) \\
+\hline
+\texttt{m\_nixJ4Plus} / \texttt{m\_nixJ4Minus} & Sélecteur de commande de
+l'axe J4 (sens $+$ / sens $-$) \\
+\hline
+\texttt{m\_nixAuto} / \texttt{m\_nixManu} & Sélecteur du mode de marche
+souhaité (automatique / manuel) \\
+\hline
+\texttt{m\_nixEmptyTanks} & Bouton-poussoir « cuves vides » (confirmation
+opérateur) \\
+\hline
+\texttt{m\_nixLoadTank0} / \texttt{m\_nixUnloadTank4} & Boutons-poussoirs
+de chargement/déchargement manuel des cuves \\
+\hline
+\texttt{m\_nixEmptyTank0} / \texttt{m\_nixEmptyTank4} & Capteurs (contact
+à ouverture) de cuve vide \\
+\hline
+\texttt{m\_nixStopRequest} & Bouton-poussoir « arrêt demandé » (contact à
+ouverture) \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Données consommées -- \texttt{THmiOutputs}}
+
+\texttt{THmiOutputs} se compose de deux sous-champs : \texttt{m\_qToR}
+(voyants et affichage du pupitre) et \texttt{m\_Screen} (informations de
+supervision transmises à l'écran HMI par Modbus-TCP).
+
+\subsubsection{Sous-champ \texttt{m\_qToR} (voyants du pupitre)}
+
+\begin{center}
+\begin{tabular}{|l|p{8.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Signification} \\
+\hline
+\texttt{m\_nqxRedColumn} / \texttt{m\_nqxGreenColumn} / \texttt{m\_nqxBlueColumn} &
+Composantes rouge, verte, bleue de la colonne lumineuse du pupitre \\
+\hline
+\texttt{m\_nqxArmUnderPower} & Voyant « bras sous puissance » \\
+\hline
+\texttt{m\_na4qxHex7Seg} & Affichage 7 segments (ARRAY[0..3] OF BOOL,
+codage binaire, [0]:LSB, [3]:MSB) \\
+\hline
+\texttt{m\_nqxLightLoadTank0..3} & Voyants de chargement associés à chacune
+des quatre cuves \\
+\hline
+\texttt{m\_nqxLightUnLoadTank4} & Voyant de déchargement \\
+\hline
+\texttt{m\_nqxLightStopRequest} & Voyant « arrêt demandé » \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Sous-champ \texttt{m\_Screen} (supervision écran HMI)}
+
+\begin{center}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Signification} \\
+\hline
+\texttt{m\_iStateGmma} & INT & Numéro du mode GEMMA courant (affiché à
+l'opérateur) \\
+\hline
+\texttt{m\_iCurvSpeed\_mm\_per\_s} & INT & Vitesse courante du robot,
+exprimée en mm/s \\
+\hline
+\texttt{m\_a5tankLine} & ARRAY[0..4] OF \texttt{TTank} & État de chacune
+des cinq lignes de traitement affichées à l'écran \\
+\hline
+\end{tabular}
+\end{center}
+
+Chaque élément de \texttt{m\_a5tankLine} est de type \texttt{TTank} :
+
+\begin{center}
+\begin{tabular}{|l|l|p{6.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Signification} \\
+\hline
+\texttt{m\_intPartNumber} & INT & Numéro identifiant la pièce en cours de
+traitement \\
+\hline
+\texttt{m\_xBusy} & BOOL & Indique si la cuve est occupée \\
+\hline
+\texttt{m\_tElapsedTime} & TIME & Durée écoulée depuis le début du
+traitement \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{UPSTIremarque}[Rôle de supervision]
+Ces informations ne participent à aucune commande directe de la partie
+opérative : elles renseignent l'opérateur, via l'écran HMI, sur l'état
+d'avancement du traitement dans chacune des cuves ainsi que sur le mode
+GEMMA actif.
+\end{UPSTIremarque}

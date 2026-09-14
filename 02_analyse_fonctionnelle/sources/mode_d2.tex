@@ -1,0 +1,36 @@
+\section{Mode D2 -- Diagnostic / traitement de la défaillance}
+\label{secModeD2}
+
+\subsection{Conditions d'entrée}
+
+Le mode D2 est atteint depuis le mode D1, dès que la communication avec
+l'ensemble des équipements de la cellule est redevenue opérationnelle.
+
+\subsection{Comportement attendu}
+
+\begin{itemize}
+    \item \textbf{Robot} : l'installation doit amener le robot dans une
+    configuration saine, exempte de tout défaut, sans mouvement en attente
+    d'exécution, prête à recevoir de nouvelles commandes, et avec le bras
+    remis sous puissance.
+    \item \textbf{Convoyeur / guichet} : l'accès au guichet reste interdit,
+    comme en mode D1. Le système de préhension conserve son état.
+    \item \textbf{IHM} : la situation de diagnostic/traitement de la
+    défaillance doit être signalée à l'opérateur par une signalisation
+    dédiée, clignotante, afin de la distinguer de l'arrêt d'urgence fixe
+    du mode D1.
+\end{itemize}
+
+\begin{UPSTIidee}{Mode transitoire}
+Ce mode a vocation à être transitoire : il ne fait qu'assainir la
+configuration de l'installation avant de permettre la reprise de
+l'activité. Aucune action de production n'y est réalisée.
+\end{UPSTIidee}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{A5} (\emph{Préparation pour remise en route
+    après défaillance}), une fois la configuration saine de l'installation
+    obtenue.
+\end{itemize}

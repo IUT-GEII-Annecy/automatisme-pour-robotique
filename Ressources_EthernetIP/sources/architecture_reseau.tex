@@ -1,0 +1,70 @@
+\section{Architecture réseau}
+\label{sec:architecture_reseau}
+
+\subsection{Couches protocolaires}
+EtherNet/IP s'appuie sur les couches standards Ethernet/TCP/IP et ajoute une couche applicative CIP :
+
+\begin{center}
+    \begin{tabular}{|p{5cm}|p{9cm}|}
+        \hline
+        \textbf{Couche} & \textbf{Rôle} \\
+        \hline
+        CIP (application) & Modèle objet : classes, instances, attributs, services. Commun à tous les réseaux CIP. \\
+        \hline
+        TCP ou UDP (transport) & TCP pour la messagerie explicite (connexion, fiabilité). UDP pour la messagerie implicite (rapidité, cyclique). \\
+        \hline
+        IP (réseau) & Adressage IP standard, routable. \\
+        \hline
+        Ethernet (liaison/physique) & Infrastructure Ethernet standard (commutateurs, câblage RJ45, éventuellement industriel M12). \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}{Un réseau Ethernet standard}
+    EtherNet/IP n'impose pas de matériel réseau spécifique : commutateurs (switchs) Ethernet standards, câblage cuivre ou fibre. C'est un avantage par rapport à des bus de terrain propriétaires, mais cela implique aussi de maîtriser les problématiques classiques des réseaux Ethernet (collisions, latence, tempête de broadcast) dans un contexte industriel temps réel.
+\end{UPSTIinfor}
+
+\subsection{Rôles Scanner / Adapter}
+Dans une relation de communication EtherNet/IP, deux rôles sont clairement identifiés :
+
+\begin{minipage}{0.47\linewidth}
+    \paragraph{Scanner (Originator)}
+    \begin{itemize}
+        \item Initie la connexion.
+        \item Ouvre les connexions implicites (cycliques) vers un ou plusieurs Adapters.
+        \item Peut également émettre des requêtes de messagerie explicite.
+        \item Typiquement : l'automate (ex. Codesys) qui pilote la cellule.
+    \end{itemize}
+\end{minipage}%
+\hfill%
+\begin{minipage}{0.47\linewidth}
+    \paragraph{Adapter (Target)}
+    \begin{itemize}
+        \item Équipement de terrain qui répond aux connexions établies par un Scanner.
+        \item Expose des objets CIP (dont des \emph{Assembly}) consultables/paramétrables.
+        \item Typiquement : un variateur, une E/S déportée, une caméra, un robot.
+    \end{itemize}
+\end{minipage}
+
+\begin{UPSTIidee}{Un même automate peut jouer les deux rôles}
+    Un automate Codesys configuré comme Scanner EtherNet/IP peut, dans certaines architectures, également exposer des données en tant qu'Adapter vis-à-vis d'un superviseur ou d'un autre automate. Il faut donc toujours préciser, pour \emph{chaque} liaison de votre architecture, qui est Scanner et qui est Adapter -- ce n'est pas une propriété globale de l'équipement.
+\end{UPSTIidee}
+
+\subsection{Modèle producteur/consommateur}
+EtherNet/IP repose sur un modèle \emph{producteur/consommateur} (\emph{producer/consumer}) plutôt que sur un simple modèle maître/esclave point à point :
+\begin{itemize}
+    \item Un \textbf{producteur} publie une donnée sur le réseau (par exemple via une connexion multicast) sans se soucier explicitement de qui la consomme.
+    \item Un ou plusieurs \textbf{consommateurs} s'abonnent à cette donnée.
+    \item Ce modèle permet à plusieurs équipements de recevoir la même donnée produite une seule fois, avec une charge réseau maîtrisée.
+\end{itemize}
+
+Ce modèle est complété par un modèle \emph{maître/esclave classique} pour la partie messagerie explicite, où le Scanner interroge directement un Adapter précis (requête/réponse point à point).
+
+\begin{UPSTIwarning}{Le Scanner est-il toujours consommateur ?}
+    Non. « Scanner » et « Adapter » désignent qui \emph{initie} la connexion, pas qui produit ou consomme la donnée. Sur une connexion implicite (cyclique) établie par le Scanner, les deux sens de l'échange coexistent :
+    \begin{itemize}
+        \item l'\textbf{Adapter} \textbf{produit} l'Input Assembly (ses mesures/états) -- le \textbf{Scanner} le \textbf{consomme} ;
+        \item le \textbf{Scanner} \textbf{produit} l'Output Assembly (ses commandes/consignes) -- l'\textbf{Adapter} le \textbf{consomme}.
+    \end{itemize}
+    Le Scanner est donc simultanément producteur (des sorties qu'il envoie) et consommateur (des entrées qu'il reçoit) sur une même connexion. Ne confondez pas le rôle \emph{Scanner/Adapter} (qui ouvre la connexion) avec le rôle \emph{producteur/consommateur} (qui émet quelle donnée) : ce sont deux classifications indépendantes qui se combinent.
+\end{UPSTIwarning}

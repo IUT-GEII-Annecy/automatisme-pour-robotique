@@ -1,0 +1,41 @@
+\subsection{Les classes}
+\label{subsec:classes}
+
+On l'a vu, la notion de classe nous demande de pouvoir créer des attributs et des méthodes. Les attributs sont des variables internes aux classes qui devront être conservées entre deux utilisations d'un objet de cette classe.
+L'utilisation de fonctions (POU FUNCTION) ne serait pas satisfaisante, car la durée de vie d'une variable interne à une fonction est limitée à l'exécution de cette fonction.
+
+A l'inverse, un bloc fonctionnel s'utilise après en avoir créé une instance et ses variables internes sont conservées entre d'une utilisation à l'autre. Les POU FB semblent donc adaptées à la création de classes.
+
+\UPSTIaRetenir{Nous utiliserons les blocs fonctions pour implémenter la notion de classe sous CodeSys.}
+
+\begin{UPSTIinfor}{Déclaration d'une classe sous CodeSys}
+    Définir une classe sous CodeSys revient à définir un bloc fonctionnel. Afin de différencier les variables privées (inaccessibles depuis l'extérieur) des attributs publics (accessibles depuis l'extérieur), on utilisera la convention suivante :
+    \begin{itemize}
+        \item Les variables publiques commenceront par \emph{m\_}
+        \item les variables privées n'ont pas de préfixe particulier
+    \end{itemize}
+
+    Ainsi, la déclaration d'une classe \lstinline[language=ST]{<CName>} se fera de la manière suivante :
+    \begin{lstlisting}
+        FUNCTION_BLOCK <CName> (* définition de la classe <CName> *)
+            VAR
+                <type><Name> : <type>; (* variable locale non accessible de l'extérieur *)
+                m_<type><Name> : <type>; (* membre de l'objet accessible de l'extérieur sous certaines conditions*)
+            END_VAR
+    \end{lstlisting}
+\end{UPSTIinfor}
+
+\begin{UPSTIidee}{Attributs de la classe CStep}
+    Puisqu'elle ne possède que des attributs accessibles, la déclaration de notre classe \emph{CStep} se fera de la manière suivante :
+    \begin{lstlisting}
+FUNCTION_BLOCK FB_CStep
+    VAR
+        m_xActivityBit : BOOL; (* bit d'activité (actif ou non) *)
+        m_tActivationDuration : TIME; (* Stocke le temps d'activation de l'étape *)
+        m_tTaskPeriod : TIME; 
+    END_VAR\end{lstlisting}
+
+    L'instanciation d'un objet de cette classe pourra alors s'écrire \lstinline{Etape1 : FB_CStep;}
+
+    Pour le moment, ces attributs ont été déclarés dans notre classe \emph{CStep} mais ils ne sont pas accessibles depuis l'extérieur (Il est impossible d'évaluer l'expression \lstinline{Etape1.m_xActivityBit}). Ces variables sont "coincées" à l'intérieur de notre bloc fonction. Pour les rendre accessibles, nous allons utiliser l'objet \lstinline{PROPERTY} proposé par CodeSys. 
+\end{UPSTIidee}

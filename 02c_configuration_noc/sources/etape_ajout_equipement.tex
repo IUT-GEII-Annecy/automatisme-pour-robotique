@@ -1,0 +1,71 @@
+\section{Étape 4 -- Ajout et configuration d'un équipement sur le réseau}
+\label{secEtapeAjoutEquipement}
+
+Une fois le réseau du coupleur configuré (étape~3), chaque équipement à
+scruter sur ce réseau doit être ajouté et paramétré individuellement. Cette
+étape est illustrée ici pour l'ajout du contrôleur PFC200 sur le réseau
+\texttt{NOC\_ETHIP\_CONVOYEUR}.
+
+\subsection{Ajout de l'équipement}
+
+Effectuer un clic droit sur le réseau, puis choisir l'option
+\emph{Ajouter}. Sélectionner, dans la liste des équipements proposés (issue
+des fichiers EDS importés à l'étape~1), celui correspondant à l'équipement
+recherché, puis valider avec le bouton \emph{Ajouter DTM}. Donner à ce DTM
+un nom explicite (par exemple \texttt{guichet} pour le PFC200).
+
+\subsection{Paramétrage du service d'échange}
+
+Sélectionner l'équipement ajouté dans le navigateur de DTM et ouvrir sa
+configuration (double clic). Adapter le service d'échange (\emph{Exclusive
+Owner}) aux besoins de l'application :
+
+\begin{itemize}
+    \item \textbf{RPI} (\emph{Requested Packet Interval}) : choisir une
+    période compatible avec la périodicité de scrutation requise par le
+    procédé (déterminée par ailleurs à partir de la dynamique des
+    capteurs) ;
+    \item \textbf{Taille des entrées} (rubrique \emph{Entrée T->O}) :
+    nombre d'octets produits par l'équipement, tel que défini par son EDS
+    ou par le besoin applicatif ;
+    \item \textbf{Taille des sorties} (rubrique \emph{Sortie O->T}) :
+    nombre d'octets consommés par l'équipement, de la même manière.
+\end{itemize}
+
+Valider ces réglages avec le bouton \emph{Appliquer}, puis fermer la
+fenêtre.
+
+\subsection{Adressage de l'équipement}
+
+Dans la liste des équipements du réseau, sélectionner l'équipement ajouté,
+puis :
+
+\begin{itemize}
+    \item dans l'\textbf{onglet Paramétrage de l'adresse} : remplacer
+    l'adresse IP proposée par défaut par l'adresse IP réelle de
+    l'équipement, conforme au plan d'adressage de l'installation ;
+    \item dans l'\textbf{onglet Propriétés} : choisir, au niveau de la
+    \emph{Gestion des items}, le \textbf{mode d'importation manuel}. Ce
+    mode permet de définir des symboles utilisateur pour nommer
+    individuellement chacune des données produites et consommées, plutôt
+    que de conserver les noms génériques importés depuis l'EDS.
+\end{itemize}
+
+\subsection{Nommage des données échangées}
+
+En cliquant sur \emph{Items}, il devient possible de donner un nom à
+chacun des bits produits (onglet \emph{Entrée (bit)}) et consommés (onglet
+\emph{Sortie (bit)}). Ces noms doivent correspondre aux noms des champs des
+types de données utilisateur qui seront ensuite exploités dans le programme
+(par exemple les types \texttt{T\_guichet\_IN} et \texttt{T\_guichet\_OUT}
+pour le PFC200).
+
+\UPSTIinfo[Convention de préfixage]{
+On adopte le préfixe \texttt{m\_nix} pour les entrées (données produites,
+booléennes) et le préfixe \texttt{m\_nqx} pour les sorties (données
+consommées, booléennes), conformément à la description de ces données
+donnée au paragraphe consacré à la cartographie mémoire de l'équipement
+(cf. document \texttt{02b\_donnees\_echangees}).
+}
+
+Valider ce nommage avec le bouton \emph{Appliquer}.

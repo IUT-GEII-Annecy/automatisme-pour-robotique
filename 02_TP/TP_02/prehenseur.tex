@@ -1,0 +1,49 @@
+\subsection{Mise en oeuvre du préhenseur}
+
+\UPSTIboiteCentrale{Cahier des charges : Test du préhenseur}{
+    \begin{itemize}
+        \item Le préhenseur sera activé pour saisir une pièce pendant 1 seconde lorsqu'une palette pleine est en poste.
+    \end{itemize}
+}
+
+Le système de préhension est réalisé à l'aide d'un « venturi » et d'une ventouse piloté par un distributeur \textbf{bistable}. Deux signaux électriques sont donc nécessaires pour le commander un pour saisir et un pour déposer.
+
+Le robot de notre cellule ne disposant pas de cette fonctionnalité par défaut, elle a été réalisée en externe sur le connecteur J212 de la baie CS9. Par ailleurs, en l'absence de capteurs, on utilisera des durées \textit{enveloppes} pour déterminer quand la saisie ou la dépose est effective.
+\begin{center}
+    \begin{tabular}[h]{|l|l|l|l|}
+        \hline
+        Action & Nom & Connecteur & Durée enveloppe \\
+        \hline
+        Saisir & fastout0 & J212-4/J212-9 & T\#300ms \\
+        Déposer & fastout1 & J212-1/J212-5 & T\#1s \\
+        \hline 
+    \end{tabular}
+\end{center}
+
+On propose de commander le préhenseur à l'aide d'une variable structurée de typé \texttt{T\_Prehenseur} qui contiendra les ordres de saisie ou de dépose ainsi que les durées d'enveloppe associées. 
+\textbf{Cette variable sera écrite par notre programme puis envoyée à la baie CS9 pour commander le préhenseur.}
+
+\begin{UPSTIManipulation}[Déclaration d'une variable pour le préhenseur]
+    \UPSTIetape{Proposer et déclarer la structure de données \texttt{T\_Prehenseur} dans le dossier \texttt{Types données dérivés} du projet.}
+    \vspace{3cm}
+    \UPSTIetape{Déclarer une variable \texttt{prehenseurScara} de type \texttt{T\_Prehenseur}. Initialiser cette variable avec les caractéristiques ci-dessus}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}[Commande du préhenseur depuis le programme principal]
+    \UPSTIetape{Compléter les sections \texttt{F1\_ProductionNormale} et \texttt{F1\_ProductionNormale\_Post} pour réaliser le cahier des charges du début de cette sous-section.}
+\end{UPSTIManipulation}
+
+\pagebreak
+L'envoi des commandes à la baie CS9 se fait par l'intermédiaire du bloc \texttt{VAL\_ReadWriteIO} fourni par la bibliothèque \texttt{uniVALplc}. Ce bloc permet de lire et d'écrire des données sur les entrées/sorties de la baie CS9. Son interface est donnée en annexe~\ref{annexe:CS9IO}. 
+
+
+\begin{UPSTIManipulation}[Envoi des commandes à la baie]
+    \UPSTIetape{Etablir une structure de donnée \texttt{T\_J212IO} et en instancier une variable pour éviter l'éparpillement des données utilisées par le bloc \texttt{VAL\_ReadWriteIO}.}
+    \UPSTIetape{Dans la section \texttt{WriteEthIpRobot}, faire le lien entre les variables structurées \texttt{T\_Prehenseur} et \texttt{T\_J212IO}.}
+    \UPSTIetape{Utiliser le bloc \texttt{VAL\_ReadWriteIO} pour envoyer les commandes de saisie et de dépose à la baie CS9.}
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Fonctionnement]
+    \UPSTIetape{Vérifier le bon fonctionnement du préhenseur en exécutant le programme.}
+    \UPSTIetape{Faire valider par l'enseignant}
+\end{UPSTIVerification}

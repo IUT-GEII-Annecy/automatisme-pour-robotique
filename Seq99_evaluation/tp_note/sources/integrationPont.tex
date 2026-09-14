@@ -1,0 +1,82 @@
+\section{Intégration du poste de traitement de surface}
+\subsection{Les blocs fonctionnels fournis}
+Le projet fournit les bloc fonctionnels suivants : 
+
+\subsubsection{\texttt{EVAL\_ReadSurfaceTreatment}}
+Ce bloc fonctionnel permet de lire les données provenant du poste de traitement de surface. 
+
+\begin{tabular}{l|l}
+\textbf{Entrées} & \textbf{Description} \\\hline
+\texttt{Enable} : BOOL  & Activation du bloc fonctionnel \\
+\texttt{FromModule} : T\_FromModule & Données provenant du module \\\hline\hline
+\textbf{Entrées/Sorties} & \textbf{Description} \\\hline
+\texttt{mMdule} : T\_TreatmentModule & Structure de gestion du module \\\hline\hline
+\end{tabular}
+
+\subsubsection{\texttt{EVAL\_WriteSurfaceTreatment}}
+Ce bloc fonctionnel permet d'écrire les données vers le poste de traitement de surface.
+
+
+\begin{tabular}{l|l}
+\textbf{Entrées} & \textbf{Description} \\\hline
+\texttt{Enable} : BOOL  & Activation du bloc fonctionnel \\\hline\hline
+\textbf{Sorties} & \textbf{Description} \\\hline
+\texttt{ToModule} : T\_ToPontTS & Données à envoyer au module \\\hline\hline
+\textbf{Entrées/Sorties} & \textbf{Description} \\\hline
+\texttt{mMdule} : T\_TreatmentModule & Structure de gestion du module \\\hline\hline
+\end{tabular}
+
+\subsubsection{\texttt{EVAL\_MoveCart}}
+Ce bloc fonctionnel permet de commander les mouvements du pont roulant.
+
+\begin{tabular}{l|l}
+\textbf{Entrées} & \textbf{Description} \\\hline
+\texttt{Execute} : BOOL  & Lancement du mouvement demandé \\
+\texttt{uiDestination} : UINT & Cuve de destination du pont \\\hline\hline
+\textbf{Sorties} & \textbf{Description} \\\hline
+\texttt{xDone} : BOOL & Mouvement terminé \\
+\texttt{xBusy} : BOOL & Mouvement en cours \\
+\texttt{xError} : BOOL & Erreur lors du mouvement \\\hline\hline
+\texttt{uiErrorCode} : UINT & Code d'erreur \\\hline\hline
+\textbf{Entrées/Sorties} & \textbf{Description} \\\hline
+\texttt{Module} : T\_TreatmentModule & Structure de gestion du module \\\hline\hline
+\end{tabular}
+
+Un type de donnée \texttt{TctrlChariot} est également fourni au besoin. 
+
+Pour toute information complémentaire sur le fonctionnement de ces blocs, se référer à l'enseignant.
+
+\subsection{Travail demandé}
+
+\begin{UPSTIManipulation}{Ajout de la communication avec le poste de traitement de surface}
+
+  \UPSTIetape{Dans le \textit{Navigateur de DTM}, ajouter le module de traitement de surface}
+  \UPSTIetape{Dans la section \texttt{Exclusive Owner} de cet élément, configurer la taille des entrées et de sorties.}
+  \UPSTIetape{Sur le NOC correspondant, dans la liste des équipements et dans la section correspondant à l'équipement ajouté, paramétrer l'adresse IP du module.}
+  \UPSTIetape{Faire \textbf{Valider} par l'enseignant}
+     
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}{Programmation de la communication avec le poste de traitement de surface}
+
+  \UPSTIetape{Déclarer les variables nécessaires à la communication avec le module de traitement de surface.}
+  \UPSTIetape{Ajouter les sections nécessaire à la lecture et l'écriture des données vers le module de traitement de surface. Les placer judicieusement dans le cycle automate.}
+\UPSTIetape{Utiliser les blocs fonctionnels fournis pour réaliser la lecture et l'écriture des données.}
+  \UPSTIetape{Faire \textbf{Valider} par l'enseignant}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}{Programmation des mouvements du pont roulant}
+    \UPSTIetape{Dans la section \texttt{EVAL\_AppelPontRoulant}, appeler le bloc fonctionnel \texttt{EVAL\_MoveCart} pour réaliser les mouvements du pont roulant. Connecter une variable de type \texttt{TctrlChariot} à l'entrée/sortie \texttt{Module} du bloc fonctionnel.}
+    \UPSTIetape{Tester le fonctionnement du pont roulant à partir d'une table d'animation.}
+    \UPSTIetape{Faire \textbf{Valider} par l'enseignant}
+    
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}{Intégration des mouvements du pont roulant dans le programme principal}
+
+    Lorsque le robot dépose le gobelet sur la cuve de traitement de surface, le pont roulant doit se déplacer vers la cuve 2, faire une pause de 2 secondes puis revenir à la cuve 0. Le robot attendra que le pont soit revenu à la cuve 0 avant de récupérer le gobelet et de le ramener au convoyeur.
+
+    \UPSTIetape{Modifier le programme principal pour intégrer ce comportement.}
+    \UPSTIetape{Faire \textbf{Valider} par l'enseignant}
+    
+\end{UPSTIManipulation}

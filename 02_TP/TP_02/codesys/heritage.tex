@@ -1,0 +1,33 @@
+\subsection{Héritage}
+L'héritage est un concept fondamental de la programmation orientée objet. Il permet de définir une classe à partir d'une autre classe. La classe dérivée hérite des propriétés et méthodes de la classe de base.
+
+A l'instanciation d'un bloc fonction, le constructeur de la classe mère est appelé en premier. Ensuite, le constructeur de la classe dérivée est appelé.
+
+La surcharge d'une fonction se fait en déclarant à nouveau cette fonction dans la classe dérivée. La fonction de la classe de base est alors masquée par la fonction de la classe dérivée.
+
+\begin{UPSTIidee}{Etape initiale}
+    Dans notre exemple, on peut créer une classe \emph{CInitStep} qui sera une classe dérivée de \emph{CStep}. Elle héritera de toutes les propriétés et méthodes de \emph{CStep}. La seule différence est qu'à la mise en route, l'étape est activée.
+
+    Cela passe par la surcharge de son constructeur \emph{FB\_Init} pour activation à la création de l'objet et de la fonction \emph{MInit} pour initialisation à la (re)mise en route du programme.
+
+    Cela se fait en déclarant \emph{CStepInit} comme une classe dérivée de \emph{CStep} : \lstinline{FUNCTION_BLOCK CInitStep EXTENDS CStep}
+
+    La surcharge de la fonction \emph{MInit} se fait en déclarant une méthode \emph{MInit} dans \emph{CInitStep}, son corps est alors : 
+    \begin{lstlisting}
+    THIS^.m_xActivityBit := TRUE ;
+    THIS^.m_tActivationDuration := T#0s;
+    \end{lstlisting}
+\end{UPSTIidee}
+
+\paragraph{Classe et méthodes abstraites :} Une classe abstraite est une classe qui ne peut pas être instanciée. Elle sert de classe de base pour d'autres classes. Une méthode abstraite est une méthode qui n'a pas de corps. Elle doit être redéfinie dans une classe dérivée.
+
+On ne fournira alors uniquement le prototype des méthodes et classes abstraites. 
+
+\UPSTIaRetenir{%
+    \begin{itemize}
+        \item Seule la surcharge d'une \lstinline{METHOD ABSTRACT} ne peut fournir un résultat
+        \item Les \lstinline{FUNCTION_BLOCK ABSTRACT} ne peuvent pas être instanciés, seuls ceux qui en héritent peuvent l'être.
+        \item Le mot clef \lstinline{ABSTRACT} est utilisé pour déclarer une classe ou une méthode abstraite.
+        \item Le mot clef \lstinline{EXTENDS} est utilisé pour déclarer une classe dérivée.
+    \end{itemize}
+}

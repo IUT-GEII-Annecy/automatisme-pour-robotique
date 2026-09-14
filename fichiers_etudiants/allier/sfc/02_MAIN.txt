@@ -1,0 +1,27 @@
+Grafcet : MAIN
+============================================================
+
+ÉTAPES
+  (*) Step_0           id=65537     pos=(4,1)
+      Step_1           id=65538     pos=(4,3)
+      Step_3           id=65540     pos=(5,3)
+      Step_2           id=65539     pos=(4,5)
+      Step_5           id=65542     pos=(4,7)
+      Step_4           id=65541     pos=(4,9)
+
+TRANSITIONS
+  pos=(4,2)  [section]  Trans_1
+  pos=(5,2)  [section]  Trans_2
+  pos=(4,4)  [variable]  guichet_IN.m_nixDpp
+  pos=(5,4)  [variable]  guichet_IN.m_nixDpo
+  pos=(4,6)  [section]  Timer2
+  pos=(4,8)  [section]  Timer
+  pos=(4,10)  [variable] ¬guichet_IN.m_nixDpo
+
+DIVERGENCES / CONVERGENCES
+  alt_open  pos=(4,2)  largeur=2
+  alt_close pos=(4,8)  largeur=2
+
+LIAISONS (sauts / retours)
+  transition(4,10) → step(4,1)
+  transition(5,4) → altJoint(5,8)

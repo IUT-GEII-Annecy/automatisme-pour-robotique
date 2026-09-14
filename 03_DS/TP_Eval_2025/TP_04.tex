@@ -1,0 +1,68 @@
+\documentclass[QCM, noCustomPackages]{UPSTI_Document}
+\input{../../../../preamble_IUT.tex}
+\input{../../../preamble_semestre.tex}
+\input{../../preamble_module.tex}
+\input{preamble.tex}
+\AMCpostOquest=0pt
+\AMCinterIquest=0pt
+\AMCinterBquest=0pt
+
+\documentVersion{E}
+\newcommand{\UPSTInumeroVersion}{0}
+\newcommand{\UPSTImessage}{test} 
+
+\newcommand{\sujet}{
+\exemplaire{1}{%
+\renewcommand{\UPSTImessage}{\champnom{\nom{} \prenom{} - Groupe \tp{}}} 
+\renewcommand{\UPSTInumeroVersion}{\id{}}
+\UPSTIbuildPage
+\setcounter{figure}{0}
+\setcounter{table}{0}
+%%% debut de l'en-tête des copies : 
+
+% \begin{center}
+% \noindent{}\fbox{\vspace*{3mm}
+%          \champnom{\Large\bf\nom{} \prenom{} - \id{}}\normalsize{}% 
+%           \vspace*{3mm}
+%       }
+% \end{center}
+
+
+\begin{center}\em
+Durée : 5 séances de TP de 3h
+\end{center}
+\vspace{1ex}
+%%% fin de l'en-tête
+\section{Evaluation du programme}
+\subsection{Connexion Ethernet/IP}
+\UPSTIcritere[1]{c01_convoyeur}{Connexion avec le convoyeur}
+\UPSTIcritere[1]{c02_ihm}{Connexion avec l'ihm}
+\UPSTIcritere[1]{c03_cs9}{Connexion avec la baie CS9}
+\subsection{Fonctionnement des modes}
+\UPSTIcritere[2]{f01_F1mini}{Fonctionnement du mode F1 simplifié}
+\UPSTIcritere[2]{f02_D1}{\textbf{D1} Arrêt d'urgence}
+\UPSTIcritere[2]{f03_D2}{\textbf{D2} Acquittement défauts, Remise sous tension du robot}
+\UPSTIcritere[1]{f04_A5mini}{\textbf{A5} Attente validations utilisateur}
+\UPSTIcritere[2]{f05_A6}{\textbf{A6} Remise du robot en Conditions Initiales}
+\UPSTIcritere[1]{f06_A1}{\textbf{A1}Arrêt en conditions initiales}
+\UPSTIcritere[3]{f07_F1}{\textbf{F1}Mode F1 Prise/dépose}
+\UPSTIcritere[1]{f08_A2}{\textbf{A2}Attente fin de cycle avant arrêt}
+\UPSTIcritere[3]{f09_F4}{\textbf{F4}Fonctionnement du mode manuel}
+\subsection{Mise en oeuvre du GMMA}
+\UPSTIcritere[2]{gm01_GM}{GMMA correct}
+\UPSTIcritere[1]{gm02_Def}{Traitement des défaillances}
+\UPSTIcritere[1]{gm03_Reset}{Initialisation des programmes au lancement}
+\section{Compréhension et qualité du code}
+\UPSTIcritere[3]{q_01}{Réponse aux questions}
+\UPSTIcritere[3]{q_02}{Qualité du code}
+\UPSTIcritere[5]{q_03}{Autonomie et investissement pendant les séances}
+
+}
+}
+\begin{document}
+
+\AMCrandomseed{1237893}
+
+\def\AMCformQuestion#1{{\sc Question #1 :}}
+\csvreader[head to column names,]{liste.csv}{}{\sujet}
+\end{document}

@@ -1,0 +1,59 @@
+\section{Modes de communication}
+\label{sec:messagerie}
+
+CIP propose deux modes de messagerie, aux usages complémentaires.
+
+\subsection{Messagerie explicite}
+La \textbf{messagerie explicite} (\emph{explicit messaging}) fonctionne sur le mode requête/réponse, typiquement sur TCP. Le Scanner envoie une requête ciblant précisément un triplet Classe/Instance/Attribut d'un objet, avec un service donné, et l'Adapter renvoie une réponse.
+
+\begin{center}
+    \begin{tabular}{|p{4cm}|p{9.5cm}|}
+        \hline
+        \textbf{Service CIP} & \textbf{Usage} \\
+        \hline
+        \texttt{Get\_Attribute\_Single} & Lire la valeur d'un attribut précis d'une instance. \\
+        \hline
+        \texttt{Set\_Attribute\_Single} & Écrire la valeur d'un attribut précis d'une instance. \\
+        \hline
+        \texttt{Get\_Attribute\_All} & Lire l'ensemble des attributs d'une instance en une requête. \\
+        \hline
+        \texttt{Reset} & Service générique de réinitialisation (souvent sur l'objet Identity). \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}{Caractéristiques de la messagerie explicite}
+    \begin{itemize}
+        \item Non cyclique : émise ponctuellement, à la demande du programme.
+        \item Fiable (TCP), mais latence variable, non déterministe.
+        \item Adaptée au diagnostic, au paramétrage, à la lecture ponctuelle d'informations (identité, état, configuration).
+        \item Correspond, côté conception objet, à un appel de méthode explicite sur un objet distant.
+    \end{itemize}
+\end{UPSTIinfor}
+
+\subsection{Messagerie implicite}
+La \textbf{messagerie implicite} (\emph{implicit messaging}, ou I/O cyclique) repose sur une \textbf{connexion établie} entre Scanner et Adapter, configurée une fois puis maintenue automatiquement. Les données sont échangées de façon cyclique et automatique, sans qu'il soit nécessaire de reformuler une requête à chaque échange.
+
+\begin{UPSTIidee}{RPI -- Requested Packet Interval}
+    Le \textbf{RPI} (\emph{Requested Packet Interval}) est la période, définie à la configuration de la connexion, à laquelle les données sont produites/rafraîchies sur le réseau (exprimée en millisecondes, ex. 10 ms, 50 ms). Un RPI trop faible sur de nombreuses connexions peut saturer la bande passante réseau ou la charge CPU de l'équipement ; un RPI trop élevé dégrade la réactivité du système. Le choix du RPI est un compromis à documenter explicitement dans votre conception.
+\end{UPSTIidee}
+
+\begin{center}
+    \begin{tabular}{|p{5cm}|p{4.2cm}|p{4.2cm}|}
+        \hline
+        \textbf{Critère} & \textbf{Messagerie explicite} & \textbf{Messagerie implicite} \\
+        \hline
+        Transport & TCP & UDP (généralement) \\
+        \hline
+        Cyclicité & Ponctuelle, à la demande & Cyclique, automatique (RPI) \\
+        \hline
+        Contenu & Un attribut ciblé, ou une réponse structurée & Bloc de données Assembly \\
+        \hline
+        Usage typique & Diagnostic, paramétrage & Échange d'E/S temps réel \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIidee}{À retenir pour la conception}
+    En pratique : les données qui doivent circuler en continu et rapidement (états, mesures, commandes) passent par la \textbf{messagerie implicite} via un Assembly Object dimensionné à l'avance. Les données consultées ou modifiées ponctuellement (identification, configuration, diagnostic approfondi) passent par la \textbf{messagerie explicite}. Une architecture bien conçue combine les deux.
+\end{UPSTIidee}

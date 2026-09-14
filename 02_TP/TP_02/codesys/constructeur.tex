@@ -1,0 +1,21 @@
+\subsection{Construction des objets}
+\label{subsec:construction_objets}
+La construction d'un objet consiste à lui donner des valeurs spécifiques d'initialisation pour chacun de ses membres. Lors de l'instanciation d'un bloc fonction, CodeSys appelle automatiquement, et en premier lieu, la méthode \lstinline{FBInit} de l'objet. Cette méthode est créée implicitement et peut être surchargée pour définir une initialisation particulière. 
+
+Son protoype est le suivant : 
+\begin{lstlisting}
+METHOD FB_Init : BOOL
+VAR _INPUT
+    bInitRetains : BOOL;
+    bInCopyCode : BOOL;
+END_VAR
+\end{lstlisting}
+
+\UPSTIaRetenir{\begin{itemize}
+    \item La méthode \lstinline{FBInit} est définie implicitement lors de la déclaration d'un bloc fonction.
+    \item Elle peut être surchargée pour définir une initialisation particulière.
+    \item Elle est appelée la première et automatiquement lors de l'instanciation d'un bloc fonction.
+    \end{itemize}}
+
+
+

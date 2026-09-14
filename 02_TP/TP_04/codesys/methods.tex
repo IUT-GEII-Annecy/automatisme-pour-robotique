@@ -1,0 +1,57 @@
+\subsection{Méthodes}
+\label{subsec:methodes}
+L'objet \lstinline{METHOD} est un outil proposé par CodeSys pour la programmation orientée objet. Il permet de définir des méthodes (fonctions) propres à un contexte avec un niveau d'accessibilité paramétrable (publique, privée, protégée ou interne).
+
+Les avantages d'utiliser des méthodes au sein d'une classe sont les suivants : 
+\begin{itemize}
+    \item La modularité des blocs fonctionnels est favorisée
+    \begin{itemize}
+        \item On pourra décomposer le corps d'un bloc fonctionnel en plusieurs appels de méthodes
+    \end{itemize}
+    \item La lisibilité du code est améliorée
+    \item l'intégrité des données est favorisée par l'utilisation judicieuse d'attributs d'accessibilité
+\end{itemize}
+
+Comme pour une fonction, on peut définir :
+\begin{itemize}
+    \item Des variables d'Entrées, de sorties ou d'entrées-sorties
+    \item Des variables locales à la méthode
+          \begin{itemize}
+              \item La durée de vie de ces variables locales est alors limitée à l'exécution de la méthode
+          \end{itemize}
+\end{itemize}
+
+Par ailleurs, \textbf{une méthode a accès au contexte de l'instance à laquelle elle est associée}. Cela signifie qu'elle a accès aux variables et méthodes de l'objet dont elle dépend.
+
+Enfin, CodeSys autorise la déclaration de \lstinline{METHOD}s dans une interface. Elle devra alors être implémentée dans les classes qui implémentent cette interface.
+
+\UPSTIaRetenir{Les méthodes des classes que nous définirons seront des méthodes associées au bloc fonction concerné.
+
+Leur ligne de déclaration est la suivante : \lstinline{METHOD <Attribut> <Method_Name> | : <return_data_type>}}
+
+\begin{UPSTIidee}{Les méthodes de la classe CStep}
+        \begin{minipage}[t]{.6\linewidth}
+            Les méthodes de la classe \emph{CStep} seront définies dans le bloc fonctionnel \emph{FB\_CStep}. Elles seront donc des méthodes associées à ce bloc fonctionnel.
+        \paragraph{Méthodes}
+        \begin{itemize}
+            \item \textbf{MInit} : Méthode appelée à l'initialisation du programme
+            \item \textbf{MActivate} : active l'étape
+            \item \textbf{MDeactivate} : désactive l'étape
+        \end{itemize}
+    \end{minipage}%
+    \begin{minipage}[t]{.35\linewidth}
+        \begin{lstlisting}
+METHOD PUBLIC MInit : BOOL
+    VAR_INPUT
+    END_VAR
+    VAR_OUTPUT
+    END_VAR
+    VAR
+    END_VAR
+    // Code de la méthode
+    // ...
+    // Fin du code de la méthode
+END_METHOD
+        \end{lstlisting}
+    \end{minipage}
+\end{UPSTIidee}

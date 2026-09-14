@@ -1,0 +1,124 @@
+\section{Données du robot (baie CS9, serveur \texttt{uniVALplc})}
+\label{secDonneesRobot}
+
+La baie CS9 du robot SCARA est scrutée sur le réseau
+\texttt{NOC\_ETHIP\_ROBOT}. Elle produit 148 octets et consomme 124 octets.
+Contrairement au guichet, les échanges avec la baie CS9 ne se limitent pas à
+des booléens élémentaires : ils sont structurés autour d'un objet unique,
+de type \texttt{T\_StaeubliRobot}, utilisé comme paramètre d'entrée/sortie
+par la quasi-totalité des blocs fonctionnels de la bibliothèque
+\texttt{uniVALplc}.
+
+\begin{UPSTIremarque}[Adresses mémoire non données]
+Les adresses \texttt{\%MW} de base des zones produites et consommées par
+la baie CS9 ne sont pas données ici : leur détermination, à partir de la
+cartographie mémoire du coupleur \texttt{NOC\_ETHIP\_ROBOT} (cf. document
+\texttt{02c\_configuration\_noc}), fait partie du travail demandé aux
+étudiants.
+\end{UPSTIremarque}
+
+\subsection{Principe des échanges}
+
+À chaque cycle automate :
+\begin{enumerate}
+    \item les données produites par la baie CS9 (image mémoire de type
+    \texttt{T\_FromRobot}) sont recopiées, via le bloc
+    \texttt{VAL\_ReadAxesGroup}, dans les champs \texttt{Status} et
+    \texttt{CommandInterface} de l'objet \texttt{T\_StaeubliRobot} ;
+    \item le traitement utilisateur élabore, à partir de cet état, les
+    ordres à transmettre au robot, en renseignant le champ
+    \texttt{Command} de ce même objet ;
+    \item ces ordres sont ensuite transcrits, via le bloc
+    \texttt{VAL\_WriteAxesGroup}, dans l'image mémoire des données à
+    consommer (type \texttt{T\_ToRobot}), transmise à la baie CS9.
+\end{enumerate}
+
+\subsection{Structure \texttt{T\_StaeubliRobot}}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Champ} & \textbf{Type} \\
+\hline
+\texttt{Status} & \texttt{T\_Status} (données produites -- lecture seule) \\
+\hline
+\texttt{Command} & \texttt{T\_Command} (données consommées -- écriture) \\
+\hline
+\texttt{CommandInterface} & \texttt{T\_CommandInterface} (interface de
+communication) \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Champ \texttt{Status} (données produites -- extrait)}
+
+\begin{center}
+\begin{tabular}{|l|l|p{6.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Signification} \\
+\hline
+\texttt{Initialized} & BOOL & Vrai si la bibliothèque cliente est
+initialisée \\
+\hline
+\texttt{Online} & BOOL & Vrai si le robot peut recevoir des commandes \\
+\hline
+\texttt{ErrorPending} & BOOL & Vrai si un défaut est en attente \\
+\hline
+\texttt{IsMoving} & BOOL & Vrai si le robot est en mouvement \\
+\hline
+\texttt{EStopActive} & BOOL & Vrai si un arrêt d'urgence est actif \\
+\hline
+\texttt{ActualSpeed} & REAL & Vitesse cartésienne courante du TCP \\
+\hline
+\texttt{ActualOperationMode} & UINT & Mode de fonctionnement courant
+(0 = invalide, 1 = manuel, 3 = auto, 4 = distant) \\
+\hline
+\texttt{ActualErrorNumber} & UINT & Nombre de défauts en attente \\
+\hline
+\texttt{CartesianPos} & T\_CartesianPos & Position cartésienne courante \\
+\hline
+\texttt{JointPos} & T\_JointPos & Position articulaire courante \\
+\hline
+\texttt{RobotStateMachine} & UINT & État de la machine à états interne du
+robot \\
+\hline
+\texttt{MovementID} & INT & Identifiant du mouvement en cours d'exécution \\
+\hline
+\texttt{MovementProgress} & INT & Pourcentage d'avancement du mouvement en
+cours \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsubsection{Champ \texttt{Command} (données consommées -- extrait)}
+
+\begin{center}
+\begin{tabular}{|l|l|p{6.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Type} & \textbf{Signification} \\
+\hline
+\texttt{EnableVerbose} & BOOL & Active la trace d'activité du serveur \\
+\hline
+\texttt{OverrideCmd} & UINT & Consigne de vitesse (override), plage
+$[1..100]$ \\
+\hline
+\texttt{OperationModeCmd} & UINT & Mode de fonctionnement demandé (0 =
+invalide, 1 = manuel, 3 = auto, 4 = distant) \\
+\hline
+\texttt{ToolCmd} & UINT & Numéro de l'outil sélectionné pour le mouvement \\
+\hline
+\texttt{CoordSystemCmd} & UINT & Numéro du repère utilisateur sélectionné
+pour le mouvement \\
+\hline
+\texttt{LifebitPeriod} & TIME & Période du bit de vie interne (entre
+100~ms et 1000~ms) \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}[Objet central des échanges]
+L'objet \texttt{T\_StaeubliRobot} constitue le point de passage obligé de
+tous les échanges avec la baie CS9 : c'est à la fois l'image de l'état du
+robot (champ \texttt{Status}) et le support des ordres qui lui sont
+adressés (champ \texttt{Command}).
+\end{UPSTIinfor}

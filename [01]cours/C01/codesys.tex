@@ -1,0 +1,71 @@
+\section{Environnement de programmation : CoDeSys}
+    Dans ce module, nous programmerons sous l'environnement de développement CoDeSys. 
+    \subsection{Présentation}
+    CoDeSys est un environnement de développement intégré (IDE) permettant de programmer des automates programmables industriels (API). Il est basé sur la norme IEC 61131-3. Il permet de programmer des automates de différentes marques (Beckhoff, Wago, Schneider, \dots). Il est disponible sous Windows et sous Linux. Il est gratuit pour une utilisation non commerciale. 
+    \subsection{Langages}
+    CoDeSys permet de programmer des automates en utilisant les langages suivants : 
+    \begin{itemize}
+        \item Instruction List (IL).
+        \item Ladder Diagram (LD).
+        \item Function Block Diagram (FBD).
+        \item Structured Text (ST).
+        \item Sequential Function Chart (SFC).
+    \end{itemize}
+    \subsection{Architecture d'un programme}
+    % Un programme CoDeSys est composé de plusieurs fichiers :
+    % \begin{itemize}
+    %     \item Un fichier de configuration du projet (.pro).
+    %     \item Un fichier de configuration de l'automate (.hwf).
+    %     \item Un fichier de configuration du réseau (.net).
+    %     \item Un fichier de configuration de la communication (.opc).
+    %     \item Un fichier de configuration de la visualisation (.visu).
+    %     \item Un fichier de configuration de la cible (.xml).
+    %     \item Un fichier de configuration de la bibliothèque (.lib).
+    % \end{itemize}
+
+    CoDeSys permet de programmer en Monotâche et en Multitâche :  
+    \begin{itemize}
+        \item 15 tâches périodiques au maximum.
+        \item Priorité des taches de 1 à 15, de la plus prioritaire à la moins prioritaire.
+        \item Temps de cycle compris entre \SI{100}{\micro\second} et \SI{10}{\second}.
+    \end{itemize}
+
+    \subsection{Unité de Programme -- Program Organisation Unit (POU)}
+    Une unité de programme est un ensemble d'instructions qui peuvent être appelées depuis un autre programme. Il existe 3 types de POU :
+
+    \begin{description}
+        \item[Programme (Program -- PRG) : ] Un programme consiste en une série d'instruction pouvant produire une ou plusieurs valeurs en sortie. Il peut être appelé depuis un autre programme ou depuis un bloc fonction.
+        Toutes les valeurs des variables du programme restent inchangées entre deux appels, quelque soit sa provenance. 
+        
+        \item[Bloc fonction (Function Block -- FB) : ] Un bloc fonction est un ensemble d'instructions pouvant produire une ou plusieurs valeurs en sortie. Il peut être appelé depuis un autre programme ou depuis un bloc fonction. Un bloc fonction sera toujours appelé au travers d'une instance de bloc fonction, copie du bloc fonction. Par conséquent, les valeurs des variables du bloc fonction seront inchangées entre deux appels d'une même instance uniquement. Ce type de POU sera particulièrement adapté à la programmation orientée objet que nous développerons dans ce module. 
+        \item[Fonction (Function -- FUN) : ] Une fonction ne peut produire qu'une seule valeur en sortie. Elle peut être appelée par n'importe quel POU et les valeurs des variables ne persistent pas d'un appel à l'autre. 
+    \end{description}
+
+
+    \UPSTIinfo[Structure d'un POU]{
+    Un POU est divisé en 2 parties :
+    \begin{enumerate}
+        \item Déclaration des variables.
+        \begin{itemize}
+            \item Variables d'entrées/sorties : \textbf{VAR\_INPUT}, \textbf{VAR\_OUTPUT}, \textbf{VAR\_IN\_OUT}.
+            \item Variables Locales : \textbf{VAR}, \textbf{CONSTANT}.
+        \end{itemize}
+        \item Implémentation du POU
+    \end{enumerate}
+    %%% TODO: Ajouter un exemple de POU %%%
+    }
+
+    \UPSTIinfo[METHOD et ACTION]{
+        Au sein d'une POU, il est possible de définir des méthodes et des actions. 
+        \begin{description}
+            \item[ACTION] : Portion de code toujours accessible qui ne peut utiliser que le \textbf{contexte} de l'entité à laquelle elle est associée. 
+            \begin{description}
+                \item[Exemple :] Une fonction RESET qui remet à zéro toutes les variables d'entrées/sorties d'un bloc fonction. 
+            \end{description}
+            \item[METHOD] :  Portion de code accessible qui utilise le contexte de l'entité à laquelle elle est associée, mais qui peut également créer son propre contexte. On peut définir \textbf{l'accessibilité} d'une méthode (PRIVATE, PROTECTED, PUBLIC, INTERNAL, \dots).
+        \end{description}
+    }
+
+\input{codesys_types.tex}
+\input{codesys_langageSFC.tex}
+\input{codesys_gmma.tex}

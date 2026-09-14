@@ -1,0 +1,41 @@
+\section{Mode A6 -- Mise en conditions initiales}
+\label{secModeA6}
+
+\subsection{Conditions d'entrée}
+
+Le mode A6 est atteint depuis le mode A5, une fois la remise en route
+autorisée par l'opérateur, ou depuis le mode F4 (mode manuel), lorsque
+l'opérateur demande le retour aux conditions initiales de l'installation
+(à condition qu'aucun mouvement ne soit alors en cours en mode F4).
+
+\subsection{Comportement attendu}
+
+L'objectif de ce mode est d'amener le robot dans sa position de référence,
+au-dessus du guichet, sans jamais entraver la circulation des palettes sur
+le convoyeur pendant que le robot se déplace vers cette position.
+
+\begin{itemize}
+    \item \textbf{Robot} : le robot doit rejoindre sa position de
+    référence au-dessus du guichet, en restant sous puissance pendant tout
+    le déplacement. Le trajet emprunté ne doit à aucun moment risquer
+    d'entrer en collision avec une palette présente sur le convoyeur.
+    \item \textbf{Convoyeur / guichet} : l'accès au guichet doit rester
+    interdit pendant toute la durée de la mise en conditions initiales.
+    \item \textbf{Gestion d'un arrêt demandé par l'opérateur} : si un
+    arrêt est demandé par l'opérateur pendant que le robot est en
+    mouvement, le robot doit être immobilisé (tout en restant sous
+    puissance) et doit reprendre sa progression vers la position de
+    référence dès que cette demande d'arrêt n'est plus active.
+    \item \textbf{IHM} : la mise en conditions initiales en cours doit être
+    signalée à l'opérateur par une signalisation dédiée. En cas d'arrêt
+    demandé pendant ce mode, cette situation particulière doit également
+    être signalée distinctement, ainsi que le bouton concerné.
+\end{itemize}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{A1} (\emph{Arrêt en conditions initiales}),
+    une fois que le robot a atteint sa position de référence au-dessus du
+    guichet.
+\end{itemize}

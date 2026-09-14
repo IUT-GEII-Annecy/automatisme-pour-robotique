@@ -1,0 +1,25 @@
+\subsection{Les pointeurs spéciaux}
+\label{subsec:pointeurs_speciaux}
+CodeSys défini deux vecteurs spéciaux \lstinline{THIS} et \lstinline{SUPER}. Leur utilisation est réservée au contexte de la POO, dans le corps d'un bloc fonctionnel ou dans les méthodes associées.
+\subsubsection{le pointeur THIS} 
+
+Le pointeur \lstinline{THIS} est un pointeur spécial qui pointe vers l'objet auquel appartient la méthode. Il est automatiquement disponible dans tous les blocs fonctions. 
+
+Les utilisations principales de \lstinline{THIS} sont données ci-dessous, les exemples sont extraits de la documentation en ligne de CodeSys. 
+
+\paragraph{Démasquage d'une propriété ou d'une méthode : } Par exemple, lorsqu'une variable locale a le même nom qu'une propriété de l'objet, il est nécessaire de démasquer l'objet pour accéder à la propriété.  
+
+\lstinputlisting[multicols=2]{this_exemple1.st}
+
+\paragraph{Désigner l'objet tout entier} lors d'un passage d'objet en paramètre d'une méthode.
+
+\lstinputlisting[multicols=2]{this_exemple2.st}
+
+\subsubsection{Le pointeur SUPER}
+Le pointeur \lstinline{SUPER} est un pointeur spécial qui pointe vers l'objet parent de l'objet auquel appartient la méthode. Il est automatiquement disponible dans tous les blocs fonctions. Par définition, son utilisation est réservée aux blocs fonctionnels obtenus par dérivation. 
+
+Ce pointeur permet d'accéder aux méthodes et propriétés de l'objet parent, notamment quand celles-ci ont été surchargées dans les blocs fonctionnels dérivés. 
+
+Le code suivant, issu de la documentation en ligne de CodeSys, montre quelques exemples d'utilisation des pointeurs \lstinline{SUPER} et \lstinline{THIS}.
+
+\lstinputlisting[multicols=2]{super_exemple.st}

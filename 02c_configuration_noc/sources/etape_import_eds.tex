@@ -1,0 +1,38 @@
+\section{Étape 1 -- Importation des fichiers EDS}
+\label{secEtapeImportEds}
+
+Avant de pouvoir ajouter un équipement à un réseau Ethernet/IP, son fichier
+descripteur \textbf{EDS} (\emph{Electronic Data Sheet}) doit être connu de
+Control Expert. Cette opération n'est à réaliser qu'une seule fois par
+équipement (et non à chaque projet).
+
+\begin{UPSTIwarning}{Droits d'administrateur requis}
+L'importation d'un fichier EDS dans Control Expert nécessite des droits
+d'administrateur sur le poste de travail. Sur les postes de la salle, cette
+opération a déjà été réalisée lors de l'installation du logiciel.
+\end{UPSTIwarning}
+
+La procédure d'importation est la suivante :
+
+\begin{enumerate}
+    \item ouvrir le \textbf{navigateur de DTM} (menu \emph{Outils ->
+    Navigateur de DTM}) ;
+    \item sélectionner le réseau concerné ;
+    \item effectuer un clic droit dans ce réseau, puis choisir le menu
+    \emph{Équipement -> Fonctions supplémentaires -> Ajouter un fichier EDS
+    à la bibliothèque} ;
+    \item sélectionner le fichier EDS à importer, puis valider son import
+    (bouton \emph{OK}) ;
+    \item mettre à jour le catalogue des DTM (menu \emph{Outils ->
+    Catalogue matériel}, onglet \emph{Catalogue DTM}, bouton \emph{Mise à
+    jour}).
+\end{enumerate}
+
+\UPSTIremarque[Fichiers EDS utilisés sur cette installation]{
+Pour l'équipement PFC200 (réseau \texttt{NOC\_ETHIP\_CONVOYEUR}), le fichier
+EDS correspondant est fourni directement par le catalogue Control Expert
+(équipement \emph{WAGO 2759-101 EN/IP}).\\ Pour les équipements du réseau
+\texttt{NOC\_ETHIP\_ROBOT} (baie CS9, contrôleur M221), les fichiers EDS
+utilisés sont respectivement \texttt{Staeubli-CS9-uniVALplc-s4.6.eds} et
+\texttt{M221-Scara.eds} (ce dernier étant obtenu par adaptation du fichier
+générique \texttt{M221\_EDS\_Model.eds}).}

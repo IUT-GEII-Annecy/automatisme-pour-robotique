@@ -1,0 +1,94 @@
+\section{Introduction}
+
+Ce document constitue une analyse fonctionnelle des modes de marche et
+d'arrêt de la cellule robotique support du module \emph{Automatisme pour la
+Robotique}. Il complète le TD de conception (dossier \texttt{01\_conception})
+auquel on renverra pour la présentation détaillée du système, de ses
+constituants et de ses contraintes ; seul un très bref rappel en est fait
+ici.
+
+\begin{UPSTIinfor}{Rappel du système}
+La cellule associe un robot SCARA, un convoyeur à palettes régulé par des
+bloqueurs, un poste \textbf{guichet} (interface entre le convoyeur et le
+robot, de \textbf{capacité unitaire}), une IHM et un automate Schneider
+M340. Le besoin consiste à faire tremper des gobelets, transportés par des
+palettes, dans l'une des quatre cuves de traitement disponibles. Pour une
+présentation complète, se reporter à \texttt{01\_conception/sources/\allowbreak
+presentation\_systeme.tex}.
+\end{UPSTIinfor}
+
+\subsection{Objet du document}
+
+Ce document est un document de référence à consulter pour connaitre les attendus 
+de fonctionnement de la cellule robotisée.
+
+Pour chaque mode retenu, ce document précise :
+\begin{itemize}
+    \item les \textbf{conditions d'entrée} dans le mode (l'évènement ou la
+    condition qui déclenche son activation) ;
+    \item le \textbf{comportement attendu} du robot, du convoyeur/guichet
+    et de l'IHM durant ce mode (le résultat visé, jamais le mécanisme mis
+    en \oe uvre pour l'obtenir) ;
+    \item les \textbf{conditions de sortie} du mode, c'est-à-dire vers
+    quel(s) autre(s) mode(s) l'installation peut évoluer, et sous quelle
+    condition.
+\end{itemize}
+
+\subsection{Structure GEMMA retenue}
+
+L'analyse du GEMMA propre à cette installation fait apparaître, pour
+la partie de la cellule effectivement étudiée dans ce module, les modes
+suivants, répartis selon les trois familles habituelles du GEMMA :
+
+\begin{itemize}
+    \item \textbf{Famille D -- Procédures en Défaillance de la Partie
+    Opérative}
+    \begin{itemize}
+        \item Mode \textbf{D1} -- Arrêt d'urgence
+        \item Mode \textbf{D2} -- Diagnostic / traitement de la défaillance
+    \end{itemize}
+    \item \textbf{Famille A -- Procédures d'Arrêt de la Partie Opérative}
+    \begin{itemize}
+        \item Mode \textbf{A5} -- Préparation pour remise en route après
+        défaillance
+        \item Mode \textbf{A6} -- Mise en conditions initiales
+        \item Mode \textbf{A1} -- Arrêt en conditions initiales
+    \end{itemize}
+    \item \textbf{Famille F -- Procédures de Fonctionnement}
+    \begin{itemize}
+        \item Mode \textbf{F1} (couplé à une sortie vers \textbf{A2}) --
+        Production normale
+        \item Mode \textbf{F4} -- Marche de vérification dans le désordre
+        (mode manuel)
+    \end{itemize}
+\end{itemize}
+
+\subsection{Enchaînement général des modes}
+
+L'automate étant considéré comme repassant systématiquement en mode
+\textbf{D1} dès qu'une défaillance de communication avec l'un des
+équipements de la cellule (baie robot, contrôleur de l'IHM, contrôleur du convoyeur) est
+détectée, l'enchaînement de référence entre les modes retenus est le
+suivant :
+
+\begin{center}
+\begin{tabular}{cl}
+D1 & $\longrightarrow$ D2 (dès que la communication est rétablie) \\
+D2 & $\longrightarrow$ A5 (une fois la configuration de l'installation
+    assainie) \\
+A5 & $\longrightarrow$ A6 (une fois la remise en route autorisée par
+    l'opérateur) \\
+A6 & $\longrightarrow$ A1 (une fois les conditions initiales atteintes) \\
+A1 & $\longrightarrow$ F1 (sur demande de marche automatique) \\
+    & $\longrightarrow$ F4 (sur demande de marche manuelle) \\
+F1 & $\longleftrightarrow$ A2 (arrêt/reprise en fin de transfert de
+    gobelet) \\
+F4 & $\longrightarrow$ A6 (sur demande de retour aux conditions
+    initiales) \\
+\text{tout mode} & $\longrightarrow$ D1 (dès qu'une défaillance de
+    communication est détectée) \\
+\end{tabular}
+\end{center}
+
+Chacun de ces modes est détaillé dans les sections suivantes, dans cet
+ordre.

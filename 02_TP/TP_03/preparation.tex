@@ -1,0 +1,49 @@
+\section{Partie TD}
+
+\subsection{Cartographie du Réseau Ethernet/IP}
+
+Lors du premier TP, la configuration du second coupleur BMX NOC 0401.2 (\texttt{NOC\_ETHIP\_ROBOT}) a été réalisée. Son image mémoire commence à l'adresse \texttt{\%MW64} et comporte 128 mots en entrée ainsi que 128 mots en sortie. Les données produites et consommées par les deux équipements connectés (baie CS9 et contrôleur M221) sont récapitulées dans le tableau ci-dessous :
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Équipement} & \textbf{Entrée (T->O) - Données produites} & \textbf{Sortie (O->T) - Données consommées} \\ \hline
+CS9 (Serveur UniVALplc) & 148 octets & 124 octets \\ \hline
+M221 (Îlot E/S, HMI) & 4 octets & 40 octets \\ \hline
+\end{tabular}
+\caption{Données échangées sur le réseau Ethernet/IP}
+\end{table}
+
+\begin{UPSTIactivite}[4][Cartographie de l'espace mémoire \%MW][][][Préparation]
+
+\UPSTIquestion{À partir des informations du tableau et de l'organisation mémoire du coupleur \texttt{BMX NOC 0401.2} (cf. TP n°1), établir la cartographie complète de l'espace mémoire \texttt{\%MW} de l'automate.}
+\vspace{13cm}
+\end{UPSTIactivite}
+\pagebreak
+
+\subsubsection{Déclaration des Objets}
+
+Le bloc fonctionnel \texttt{VAL\_ReadAxesGroup} nécessite que les données produites par le serveur UniVALplc soient de type \texttt{T\_FromRobot}, afin de les convertir en un objet \texttt{T\_StaeubliRobot}. De même, pour le bloc \texttt{VAL\_WriteAxesGroup}, les données consommées doivent être de type \texttt{T\_ToRobot}.
+
+\begin{UPSTIactivite}[4][Déclaration des objets \texttt{T\_FromRobot} et \texttt{T\_ToRobot}][][][Préparation]
+    \UPSTIquestion{Utilisez les techniques de chevauchement et d'alias pour déclarer les objets suivants :
+\begin{itemize}
+    \item \texttt{fromRobotScara} de type \texttt{T\_FromRobot} (pour les données produites par la baie CS9).
+    \item \texttt{toRobotScara} de type \texttt{T\_ToRobot} (pour les données consommées par la baie CS9).
+\end{itemize}}
+\vspace{15cm}
+\end{UPSTIactivite}
+
+
+\pagebreak
+Pour le contrôleur M221, les blocs fonctionnels \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi} seront utilisés pour gérer les échanges de données avec l'interface HMI.
+
+\begin{UPSTIactivite}[4][Déclaration des objets \texttt{TFromHmi} et \texttt{TToHmi}][][][Préparation]
+    \UPSTIquestion{Déclarez les objets suivants :
+\begin{itemize}
+    \item \texttt{fromHmiScara} de type \texttt{TFromHmi} (pour les données produites par le contrôleur M221).
+    \item \texttt{toHmiScara} de type \texttt{TToHmi} (pour les données consommées par le contrôleur M221).
+\end{itemize}}
+\vspace{15cm}
+\end{UPSTIactivite}

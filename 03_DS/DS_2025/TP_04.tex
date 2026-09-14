@@ -1,0 +1,196 @@
+\documentclass[QCM, noCustomPackages]{UPSTI_Document}
+\input{../../../../preamble_IUT.tex}
+\input{../../../preamble_semestre.tex}
+\input{../../preamble_module.tex}
+\input{preamble.tex}
+
+
+\documentVersion{E}
+\newcommand{\UPSTInumeroVersion}{0}
+\newcommand{\UPSTImessage}{test} 
+
+\newcommand{\sujet}{
+\exemplaire{1}{%
+\renewcommand{\UPSTImessage}{\champnom{\nom{} \prenom{}}} 
+\renewcommand{\UPSTInumeroVersion}{\id{}}
+\UPSTIbuildPage
+\setcounter{figure}{0}
+\setcounter{table}{0}
+%%% debut de l'en-tête des copies : 
+
+% \begin{center}
+% \noindent{}\fbox{\vspace*{3mm}
+%          \champnom{\Large\bf\nom{} \prenom{} - \id{}}\normalsize{}% 
+%           \vspace*{3mm}
+%       }
+% \end{center}
+
+
+\begin{center}\em
+Durée : 1h30 minutes.
+
+  Les sujets des TPs, les supports de cours et vos notes prises en séance sont autorisés. 
+  Tout autre document est interdit. 
+  L'usage de la calculatrice est autorisé.
+
+  % Les questions faisant apparaître le symbole \multiSymbole{} peuvent
+  % présenter zéro, une ou plusieurs bonnes réponses. Les autres ont
+  % une unique bonne réponse.
+
+  % Des points négatifs pourront être affectés à de \emph{très
+  %   mauvaises} réponses.
+\end{center}
+\vspace{1ex}
+%%% fin de l'en-tête
+
+
+
+\section*{Contexte}
+\begin{wrapfigure}{r}{0.2\textwidth}
+    \centering
+    \includegraphics[width=\linewidth,trim=10 15 10 15, clip]{tx2-140.jpg}
+\end{wrapfigure}
+Vous travaillez sur l'intégration d'un robot Stäubli TX2~140 (6 axes) dans une cellule robotisée. 
+L'objectif est de piloter le robot via un automate Schneider M340 utilisant le protocole Ethernet/IP.
+
+Le réseau comporte les éléments suivants :
+\begin{itemize}
+    \item \textbf{Automate Schneider M340} Automate Maître. Adresses IP : \texttt{192.168.0.1/24}, \texttt{10.10.0.1}.
+    \item \textbf{Automate Wago PFC200} Automate Esclave, connecté à l'IHM et au convoyeur. Adresse IP : \texttt{192.168.0.2/24}.
+    \item \textbf{Contrôleur CS9 du robot Stäubli} Adresse IP : \texttt{192.168.0.10/24}.
+    \item \textbf{Interface Homme Machine} Adresse IP : \texttt{192.168.0.12/24}.
+    \item \textbf{PC de supervision} Adresse IP : \texttt{10.10.0.253}
+\end{itemize}
+
+Le protocole Ethernet/IP, dérivé du CIP, est utilisé pour la communication entre l'automate d'une part, l'automate Wago et le contrôleur CS9 d'autre part. L'automate Wago est équipé d'une carte réseau Ethernet/IP et de cartes d'entrées/sorties. Le contrôleur CS9 est équipé, entre autres, d'une carte réseau Ethernet/IP.
+L'automate M340 est équipé d'un modules BMX NOC. 
+
+Dans cette communication Ethernet/IP : 
+\begin{itemize}
+    \item La baie CS9 produit \textbf{148} octets de données et en consomme \textbf{124} octets.
+    \item L'automate PFC200 produit \textbf{50} octets de données et en consomme \textbf{100} octets.
+\end{itemize}
+
+\section{Architecture réseau (10 minutes)}
+\begin{question}{q1_1_schema}
+    \textbf{Schéma} \newline
+    Réalisez un schéma annoté de l'architecture réseau en incluant les équipements identifiés, les adresses IP et les connexions. Ce schéma sera le plus complet et précis possible. 
+    \evaluationProfLignes{5}{7}
+\end{question}
+
+
+\begin{question}{q1_1_roles}
+    Expliquer le rôle de chaque équipement.
+    \evaluationProfLignes{5}{6}
+\end{question}
+
+\begin{question}{q1_2_reseaux}
+    \textbf{Séparation de réseaux} \newline
+    Pourquoi est-il pertinent de séparer le réseau du robot du reste de l'entreprise ?
+    \evaluationProfLignes{2.5}{3}
+\end{question}
+
+\section{Configuration de l'automate (20 minutes)}
+\begin{UPSTIinfor}{Les coupleurs BMX NOC401.2}
+    Ce coupleur utilise l'espace mémoire conventionnel de l'API (\%MWi) pour stocker :
+    \begin{itemize}
+        \item Les données d'entrée (\texttt{NOC\_ETHIP\_IN}) contenant 
+        \begin{itemize}
+            \item L'état de santé des connexions vers les équipements « Target » (\texttt{HEALTH\_BITS\_IN : ARRAY[0..31] OF BYTE})
+            \item Les données de Production (INput) dont \textbf{la taille est définie par l'utilisateur}.
+        \end{itemize}
+        \item Les données de sortie (\texttt{NOC\_ETHIP\_OUT}) contenant
+        \begin{itemize}
+            \item La mise en service des connexions (\texttt{CONTROL\_BITS\_OUT : ARRAY[0..31] OF BYTE})
+            \item Les données de Consommation (OUTput) dont \textbf{la taille est définie par l'utilisateur}.
+        \end{itemize}
+    \end{itemize}
+    Chaque connexion est identifiée par un numéro de connexion (de 0 à 31). Le bit de santé de la connexion est stocké dans le tableau \texttt{HEALTH\_BITS\_IN} à l'indice correspondant au numéro de connexion. Par exemple, le bit de santé de la première connexion est stocké dans \texttt{HEALTH\_BITS\_IN[0].0}. Celui de la 10ème connexion est stockée dans \texttt{HEALTH\_BITS\_IN[1].1}. 
+    Le même principe s'applique pour les bits de contrôle des connexions sortantes.
+    \end{UPSTIinfor}
+    \begin{question}{q2_2_nbrCon}
+        D'après l'encadré ci-dessus, combien de bits de santés sont disponibles sur ces coupleurs ? En~déduire le nombre maximal de connexions possibles.
+        \evaluationProfLignes{5}{4}
+    \end{question}
+\begin{question}{q2_1}
+    \textbf{Description de la communication} \newline
+    Décrire, le plus précisément possible, le parcours des données depuis le robot Stäubli jusqu'au programme automate. 
+    Pour vous guider, quelques questions minimales à traiter :
+    \begin{itemize}
+        \item D'où proviennent les données et sous quelles forme sont-elles transmises ? 
+        \item Que deviennent-elle en arrivant dans l'automate ? 
+        \item Quel(s) bloc(s) fonctionnel(s) doivent être impérativement utilisés et pourquoi ? 
+    \end{itemize}
+    Vous pourrez utiliser un schéma, des exemples ou tout ce qui vous semblera pertinent.
+    \evaluationProfLignes{10}{15}
+\end{question}
+
+\begin{question}{q2_3_carto}
+    \textbf{Cartographie des données} \newline
+    A partir de la description du système, proposer une cartographie des données au sein du M340 pour les échanges entre les automates et le contrôleur CS9. Vous préciserez leur taille et leur emplacement dans l'espace mémoire.
+    \evaluationProfLignes{5}{15}
+\end{question}
+
+
+\pagebreak
+\section{Programmation et contrôle des mouvements (30 minutes)}
+On propose de programmer le comportement de la cellule en suivant le Guide des Modes de Marche Automatisée (GEMMA). Dans cette étude, on se concentrera sur les modes 
+\begin{itemize}
+    \item A5 : Préparation pour la remise en route
+    \item A6 : Mise en conditions initiales
+\end{itemize}
+\subsection{Le mode A5 : Préparation pour la remise en route}
+On donne pour cahier des charges pour le mode A5 :
+\begin{enumerate}
+    \item Le robot doit se déplacer devant le détecteur de pièce. 
+    \item Si une pièce est présente sur l'outil, le robot la dépose sur l'aire de stockage.
+    \item Une fois le dépot effectué ou s'il n'y a pas de pièce, le robot se déplace en position de sécurité.
+\end{enumerate}
+Les coordonnées pour chacune des positions sont les suivantes :
+\begin{center}
+    \begin{tabular}{l|ccc|ccc}
+        & X & Y & Z & RX & RY & RZ \\
+        \hline
+        Devant le détecteur & 100 & -400 & 150 & 0 & 0 & 0 \\
+        \hline
+        Stockage & 100 & -400 & 50 & 0 & 0 & 0 \\
+        \hline
+        Sécurité & 100 & -400 & 300 & 0 & 0 & 0 \\
+    \end{tabular}
+\end{center}
+
+
+\begin{question}{q3_signaux}
+\textbf{Signaux d'entrée/sortie} \newline
+Proposez une liste des signaux d'entrée et de sortie nécessaires pour le mode A5. \\Vous préciserez leur rôle et leur type. 
+\evaluationProfLignes{5}{3}
+\end{question}
+
+\begin{question}{q3_A5_GRAFCET}
+\textbf{Grafcet Fonctionnel} \newline
+\UPSTIrappel{Un GRAFCET fonctionnel est conçu pour décrire les fonctions ou les comportements attendus du système sans nécessairement entrer dans le détail de sa mise en œuvre technique. Il se concentre sur le "quoi faire" plutôt que sur le "comment le faire".}
+Proposer un grafcet \textbf{fonctionnel} pour le mode A5. Vous préciserez les conditions de transition entre les étapes et les actions associées.
+\evaluationProfLignes{5}{13}
+\end{question}
+
+\begin{question}{q3_A5_dectecteur}
+    \textbf{Sans écrire le code dans son intégralité}, décrire les étapes de programmations que vous mettriez en oeuvre pour réaliser la mise en position devant le poste de Controle. 
+
+    Vous préciserez éventuellement ce qui doit être réalisé au front montant de l'étape, la transition utilisée une fois l'action réalisée et le(s) bloc(s) fonctionnel(s) utilisé(s).
+\evaluationProfLignes{5}{6}
+\end{question}
+
+\begin{question}{q3_A5_relatif}
+    On propose de réaliser l'action de déscente de la pièce depuis la position de contrôle vers la position de stockage en utilisant des \textbf{coordonnées relatives}. \\
+    Quelles étapes de programmation suivez-vous pour réaliser cette action ?
+    \evaluationProfLignes{5}{6}
+\end{question}
+
+}
+}
+\begin{document}
+\AMCrandomseed{1237893}
+
+\def\AMCformQuestion#1{{\sc Question #1 :}}
+\csvreader[head to column names,]{liste.csv}{}{\sujet}
+\end{document}

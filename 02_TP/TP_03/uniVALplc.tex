@@ -1,0 +1,44 @@
+
+\section{La solution UniVALplc}
+\subsection{Architecture UniVALplc pour le TP}
+\begin{UPSTIinfor}{A propos de UniVALplc}
+    UniVALplc est une solution logicielle développée par Stäubli Robotics pour intégrer les robots de la gamme Stäubli dans des systèmes de production automatisés. Cette solution permet de commander les mouvements du robot et de gérer les échanges de données avec les équipements périphériques.
+\end{UPSTIinfor}
+\begin{UPSTIinfor}{Architecture UniVALplc}
+\begin{description}
+    \item[Serveur] : Installé sur le contrôleur CS9 du robot. Il répondra aux commandes en provenance de l'automate M340 via le réseau Ethernet/IP.
+    \begin{itemize}
+        \item Les commandes sont interprétées pour générer des mouvements du robot.
+        \item Les commandes peuvent faire référence à des objets internes du contrôleur CS9 (points, outils, frames, etc.)
+    \end{itemize}
+    \item[Client] : Bibliothèque de blocs fonctionnels fournie par le fabricant de l'automate \textbf{M340}. 
+\end{description}
+\end{UPSTIinfor}
+
+\subsection{Présentation du fonctionnement}
+Les blocs fonctionnels utilisés pour interagir avec le robot se répartissent en deux types :
+\begin{itemize}
+    \item Les blocs spécifiques aux contrôleurs Stäubli, identifiables par le préfixe \texttt{VAL\_}, permettent d'accéder aux fonctionnalités propres à UniVALplc.
+    \item Les blocs conformes à la norme \textit{plcOpen} (préfixe \texttt{MC\_}), sont utilisés pour commander les mouvements standards, comme la gestion des axes et des positions.
+\end{itemize}
+
+\begin{UPSTIinfor}{Configuration du serveur}
+Pour que l'intégration soit réussie, il est nécessaire de respecter l'orientation des données de l'automate client. Dans notre cas, comme il s'agit d'un API M340 de Schneider, l'option \textit{Little Endian} a été configurée lors de l'installation du serveur UniVALplc sur le contrôleur CS9. De plus, pour que les commandes envoyées par l'API soient acceptées, le sélecteur de modes de marche WMS9 du robot doit être positionné sur « Commande à distance ».
+\end{UPSTIinfor}
+
+\subsection{Programmation de l'API}
+Un objet clé utilisé dans la communication est l'instance du type \texttt{T\_StaeubliRobot}, qui représente le robot et son contrôleur. Cet objet comprend trois champs principaux :
+\begin{itemize}
+    \item \texttt{Status} : contient des informations sur l'état actuel du robot et de son contrôleur.
+    \item \texttt{Command} : permet de transmettre des commandes au robot.
+    \item \texttt{CommInterface} : gère l'interface de communication entre le contrôleur CS9 et l'automate.
+\end{itemize}
+
+Le processus de base à chaque cycle de l'API consiste en trois étapes :
+\begin{enumerate}
+    \item Lire l'état du robot à partir d'une mémoire image (\textit{T->O}) actualisée périodiquement par le réseau Ethernet/IP, en utilisant le bloc fonctionnel \texttt{VAL\_ReadAxesGroup}.
+    \item Utiliser les blocs fonctionnels UniVALplc pour commander les mouvements du robot en se basant sur les informations reçues.
+    \item Écrire les commandes dans la mémoire image (\textit{O->T}) à l'aide du bloc \texttt{VAL\_WriteAxesGroup}, afin de les transmettre au contrôleur CS9 via Ethernet/IP.
+\end{enumerate}
+
+Ce principe s'applique également pour l'accès aux E/S du contrôleur M221, où la lecture et l'écriture des données se font à travers des services d'assemblage sous Ethernet/IP.

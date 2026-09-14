@@ -1,0 +1,42 @@
+\section{Cartographie de l'espace mémoire}
+\subsection{Cartographie actuelle}
+
+D'après les travaux pratiques précédents (TP n°1 et TP n°2), la configuration actuelle est la suivante :
+
+
+
+\subsection{Exercice : Intégration du poste de traitement de surface}
+
+\UPSTIquestion{
+Le contrôleur WAGO du traitement de surface a l'adresse IP \texttt{172.16.180.185}. Sur quel coupleur doit-il être configuré ? Justifier votre réponse.
+
+}
+
+\subsection{Bits de santé et diagnostic}
+
+\UPSTIquestion{
+Les coupleurs Ethernet/IP disposent de bits de santé (\texttt{HEALTH\_BITS\_IN}) permettant de détecter les problèmes de communication avec les équipements.
+
+\begin{enumerate}
+    \item Quelle est la variable contenant les bits de santé du coupleur choisi ?
+    \item Quel bit (index) correspondra au contrôleur WAGO du traitement de surface ?
+    \item Compléter l'expression logique pour tester la santé de la communication avec le WAGO :
+
+\begin{lstlisting}[language=ST]
+(* Test de santé communication WAGO *)
+xHealthWagoTS := ....................................;
+\end{lstlisting}
+\end{enumerate}
+}
+
+\UPSTIquestion{
+Dans le mode D1 (Arrêt d'urgence) du GEMMA, la condition de maintien dans cet état vérifie les erreurs de communication. Modifier cette condition pour prendre en compte le nouveau contrôleur WAGO :
+
+\begin{lstlisting}[language=ST]
+(* Nouvelle condition à établir *)
+xErreurCom := .................................................
+              .................................................
+              .................................................
+              ................................................. ;
+\end{lstlisting}
+}

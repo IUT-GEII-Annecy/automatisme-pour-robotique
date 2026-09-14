@@ -1,0 +1,89 @@
+
+\section{Partie TP - Manipulations}
+
+\UPSTIattention{Pour ne pas avoir à recommencer en cas de problème, sauvegarder régulièrement le projet.}
+
+\begin{UPSTIVerification}[Pré-requis]
+    \UPSTIetape{Vérifier le fonctionnement des manipulations du TP précédent}
+\end{UPSTIVerification}
+
+\begin{UPSTIConfiguration}[Options du projet]
+    \UPSTIetape{Dans \texttt{Outils->Options du projet}, configurer les options suivantes : }
+    \begin{itemize}
+        \item Autoriser le chevauchement d'adresses : 
+        \begin{itemize}
+            \item \texttt{Général} ->Gestion des messages de génération : le chevauchement d’adresses ne génère
+            aucun message.
+        \end{itemize}
+        \item Autorisation des tableaux dynamiques : 
+        \begin{itemize}
+            \item \texttt{Variables} -> \texttt{Autoriser les tableaux dynamiques (\textbf{ANY\_ARRAY\_XXX})} : cocher la case.
+            \end{itemize}
+    \end{itemize}
+\end{UPSTIConfiguration}
+
+
+
+\subsection{Configuration du réseau du Robot}
+
+Dans le TP précédent, nous avons configuré le premier coupleur \texttt{BMX NOC 0401.2} pour le réseau du guichet (\texttt{172.16.180.0/24}). Nous allons maintenant configurer le second coupleur pour le réseau \texttt{NOC\_ETHIP\_ROBOT (192.168.0.0/24)}.
+
+\begin{UPSTIConfiguration}[Ajout des équipements sur le réseau \texttt{NOC\_ETHIP\_ROBOT}]
+    \UPSTIetape{Vérifier la configuration de l'adresse IP}
+    \begin{itemize}
+        \item Ouvrir le \texttt{Navigateur de DTM} (\texttt{Outils->Navigateur de DTM} puis double-clic sur le réseau).
+        \item Rubrique \texttt{TCP/IP} : vérifier que l'adresse IP est bien \texttt{192.168.0.1/24}.
+        \end{itemize}
+    \UPSTIetape{Ajout des équipements (pour chaque équipement : \textbf{Clique droit -> Ajouter})}
+    \begin{itemize}
+        \item Ajouter la baie CS9 
+        \begin{description}
+            \item [Type :] \texttt{uniVALplc v4.6 - CS9 Adapter}
+            \item [Gestion des noms de \texttt{DTMs} :] cs9Scara
+        \end{description}
+        \item Ajouter le contrôleur M221
+        \begin{description}
+            \item [Type :] \texttt{TM221\_for\_Scara}
+            \item [Gestion des noms de \texttt{DTMs} :] m221Scara
+        \end{description}
+    \end{itemize}
+    \textit{Après avoir configuré les interfaces IP des coupleurs \texttt{BMX NOC 0401.2}, il est essentiel de respecter l'ordre d'ajout des équipements sur le réseau \texttt{NOC\_ETHIP\_ROBOT}, afin de respecter le plan d'adressage mémoire défini précédemment. }
+\end{UPSTIConfiguration}
+\pagebreak
+\begin{UPSTIConfiguration}[Configuration des adresses des équipements]
+    \UPSTIetape{Configurer les adresses des équipements}
+    \begin{enumerate}
+        \item Double-cliquer sur le coupleur réseau \texttt{NOC\_ETHIP\_ROBOT}.
+        \item Pour chacun des appareils ajoutés, configurer les adresses IP suivantes (\textit{Onglet Paramétrage de l'adresse}) :
+        \begin{itemize}
+            \item \texttt{[003] cs9Scara} : \texttt{192.168.0.10}
+            \item \texttt{[004] m221Scara} : \texttt{192.168.0.11}
+        \end{itemize}
+    \end{enumerate}
+\end{UPSTIConfiguration}
+
+\begin{UPSTIConfiguration}[Configuration des équipements]
+    \UPSTIetape{Configurer le cs9Scara}
+    \begin{itemize}
+        \item Sur le \texttt{Navigateur de DTM}, double-cliquer sur le \texttt{cs9Scara}.
+        \item Rubrique \texttt{Exclusive Owner} : Paramétrer la périodicité de la tâche Mast. 
+    \end{itemize}
+    \UPSTIetape{Configurer le m221Scara}
+    \begin{itemize}
+        \item Sur le \texttt{Navigateur de DTM}, double-cliquer sur le \texttt{m221Scara}.
+        \item Supprimer le service \texttt{Write To 150} et le remplacer par un service \texttt{Read From 100 / Write To 150}. 
+        \item Vérifier que ce nouveau service offre 4 octets en entrées et 40 octets en sortie, avec une lecture/écriture périodique de \SI{30}{ms}
+    \end{itemize}
+\end{UPSTIConfiguration}
+
+\begin{UPSTIVerification}[Vérification de l'espace mémoire]
+    \UPSTIetape{Sauvegarder, Vérifier et Compiler votre application}
+    \UPSTIetape{Dans l'éditeur de données : Vérifier les zones mémoires allouées}
+    \begin{itemize}[label=$\square$]
+        \item \texttt{cs9Scara\_IN : T\_cs9Scara\_IN AT \%MW80}
+        \item \texttt{cs9Scara\_OUT : T\_cs9Scara\_OUT AT \%MW208}
+        \item \texttt{m221Scara\_IN : T\_m221Scara\_IN AT \%MW154}
+        \item \texttt{m221Scara\_OUT : T\_m221Scara\_OUT AT \%MW270}
+    \end{itemize}
+\end{UPSTIVerification}
+

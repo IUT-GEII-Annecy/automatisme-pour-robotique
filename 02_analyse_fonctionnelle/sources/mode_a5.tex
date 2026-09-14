@@ -1,0 +1,51 @@
+\section{Mode A5 -- Préparation pour remise en route après défaillance}
+\label{secModeA5}
+
+\subsection{Conditions d'entrée}
+
+Le mode A5 est atteint depuis le mode D2, une fois que l'installation a
+retrouvé une configuration saine.
+
+\subsection{Comportement attendu}
+
+L'objectif de ce mode est de préparer une remise en route sûre de
+l'installation après une défaillance, en tenant compte du fait qu'une
+pièce pouvait être en cours de manipulation au moment où la défaillance
+est survenue.
+
+\begin{itemize}
+    \item \textbf{Robot} : le robot devra déposer l'éventuel gobelet, s'il
+    en porte un.
+    \item \textbf{Convoyeur / guichet} : l'accès au guichet reste interdit
+    pendant toute la durée de ce mode.
+    \item \textbf{Opérateur} : dans la mesure où l'installation ne peut
+    pas, à elle seule, s'assurer qu'aucune pièce n'est restée engagée dans
+    l'une des aires de traitement (cuves), c'est à l'opérateur qu'il
+    revient :
+    \begin{itemize}
+        \item d'autoriser la dépose de l'éventuelle pièce restée saisie par
+        le robot ;
+        \item de confirmer que l'ensemble des aires de traitement sont
+        effectivement vides.
+    \end{itemize}
+    \item \textbf{IHM} : la situation doit être signalée à l'opérateur, et
+    les deux confirmations attendues de sa part (autorisation de dépose,
+    aires de traitement vides) doivent lui être demandées explicitement.
+\end{itemize}
+
+\begin{UPSTIwarning}{Sécurité de la remise en route}
+Ce mode ne doit pas être quitté tant que l'opérateur n'a pas explicitement
+confirmé les deux conditions attendues de lui. Cette validation humaine est
+indispensable dès lors que l'installation ne dispose pas des moyens de
+détection nécessaires pour vérifier elle-même l'état des aires de
+traitement et du système de préhension.
+\end{UPSTIwarning}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{A6} (\emph{Mise en conditions initiales}),
+    une fois que l'opérateur a autorisé la dépose de l'éventuelle pièce
+    restée saisie et confirmé que toutes les aires de traitement sont
+    vides.
+\end{itemize}

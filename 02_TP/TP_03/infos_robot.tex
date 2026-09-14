@@ -1,0 +1,116 @@
+\section{Programmation du robot via uniVALplc}
+\begin{UPSTIinfor}{Principe de la programmation robot}
+    Dans notre structure, le robot est piloté par l'automate M340 via l'API \texttt{uniVALplc}. L'envoi des ordres de mouvements se fait d'une file de commande de mouvement (FIFO - First In First Out). Les commandes seront effectuées par le robot dans l'ordre reçu. Chacune d'entre elle sera retirée de la file une fois exécutée.
+
+    Pour rappel :
+    \begin{itemize}
+        \item L'exécution séquentielle des commandes de mouvement dans la file débute dès que le bras est mis sous puissance (\texttt{MC\_GroupPower}).
+        \item Il est possible d'ajouter des commandes de mouvement à tout moment, y compris lorsque le robot est en mouvement ou hors puissance.
+        \item Une commande de mouvement sort de la file dès que sa trajectoire associée est totalement achevée.
+        \item Pour vider la FIFO de toutes les commandes de mouvement empilées, on dispose du bloc fonctionnel \texttt{MC\_GroupStop}.
+        \item L'arrêt immédiat du robot durant l'exécution d'une trajectoire peut se faire
+              \begin{itemize}
+                  \item via le bouton d'arrêt d'urgence (E-Stop)
+                  \item par un changement de mode de marche sur la baie (WMS9)
+                  \item à l'aide des blocs fonctionnels \texttt{MC\_GroupInterrupt} et \texttt{MC\_GroupStop}.
+              \end{itemize}
+        \item Suite à un arrêt obtenu à l'aide du bloc fonctionnel \texttt{MC\_GroupInterrupt}, il est possible :
+              \begin{itemize}
+                  \item de reprendre les mouvements là où ils ont été stoppés grâce au bloc fonctionnel \texttt{MC\_GroupContinue}
+                  \item d'interrompre les mouvements en vidant la file (\texttt{MC\_GroupStop} vu précédemment).
+              \end{itemize}
+        \item Une mise sous puissance du bras conduira éventuellement à une phase dite de « connexion » faite à petite vitesse pour rejoindre la trajectoire interrompue. Les mouvements toujours présents dans la file seront ensuite repris. Il est donc important de vider la file avant de mettre le bras sous puissance si l'on souhaite éviter ce comportement.
+    \end{itemize}
+
+\end{UPSTIinfor}
+
+Le tableau ci-dessous présente les blocs fonctionnels de l'API \texttt{uniVALplc} permettant de mettre sous puissance et la gestion des erreurs du robot.
+\begin{center}
+    \begin{tabular}{l|p{10cm}}
+        \textbf{Name} & \textbf{Description}                                                                                                \\
+        \hline\hline
+        MC\_GroupInterrupt               & Stop the movement of the robot. The robot can continue along the commanded path after MC\_GroupContinue is executed \\\hline
+        MC\_GroupStop                    & Stop the movement of the robot and flushes all movements that have been commanded                                   \\\hline
+        MC\_GroupContinue                & Restart the movement of the robot after it has been stopped by MC\_GroupInterrupt                                   \\\hline
+        MC\_GroupReset                   & Reset all pending errors reported by the robot                                                                      \\\hline
+        MC\_GroupPower                   & Switch ON/OFF the power stage of the robot                                                                          \\
+    \end{tabular}
+\end{center}
+
+
+\begin{UPSTIinfor}{Téléversement d'un programme}
+    Lorsque l'on télécharge un nouveau programme dans l'automate, la communication entre l'API M340 et la baie CS9 ainsi que celle avec le M221 sont rompues. Il en est de même avec le PFC200. Les bits de vie entretenus par ces communications ne s'effectuant plus :
+    \begin{itemize}
+        \item la baie CS9 passe en défaut, interdisant toute commande sauf naturellement celle qui permet d'acquitter ces erreurs (MC\_GroupReset).
+        \item Le M221 est programmé pour faire clignoter à la fréquence de 1 Hz la composante rouge de la colonne qu'il gère.
+        \item Le PFC200 fait passer le poste Guichet en \texttt{non passant} et sa colonne prend la couleur magenta.
+    \end{itemize}
+
+    Pour la remise en service :
+    \begin{itemize}
+        \item Les deux contrôleurs M221 et PFC200 retrouvent leur fonctionnement normal dès que la communication devient opérationnelle.
+        \item Il faut mettre en place une procédure de redémarrage pour la baie CS9 (cf. \ref{sec:modeD2}).
+    \end{itemize}
+\end{UPSTIinfor}
+
+
+Les commandes de mouvement de type \textbf{PLC-Open} disponibles sont les suivantes :
+\begin{center}
+    \begin{tabular}{l|l|l}
+        \textbf{Nom du bloc fonctionnel} & \textbf{Description}        & \textbf{Type de mouvement}           \\
+        \hline
+        MC\_MoveAxisAbsolute             & Joint interpolated movement & joint position (T\_JointPos)         \\
+        MC\_MoveDirectAbsolute           & Joint interpolated movement & cartesian position (T\_CartesianPos) \\
+        MC\_MoveLinearAbsolute           & Linear movement             & cartesian position (T\_CartesianPos) \\
+        MC\_MoveCircularAbsolute         & Circular movement           & cartesian position                   \\
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIPreparation}[Types de mouvement]
+    A partir de la documentation du client \texttt{uniVALplc} fournie dans le sous-dossier \path{Scara/uniVALplc/Doc/} :
+    \UPSTIquestion{Expliquer le fonctionnement de chacun des blocs fonctionnels du tableau ci-dessus.}
+    \vspace{10cm}
+
+
+
+\end{UPSTIPreparation}
+
+\subsection{Bonnes pratiques de programmation}
+L'utilisations des blocs fonctions en ST pour la commande du robot implique une certaine rigueur dans la programmation. En effet, par le nombre de paramètres qu'ils nécessitent, l'appel d'un bloc est particulièrement volumineux en terme de nombre de lignes de codes. Cela complexifie grandement la lecture du programme s'ils sont insérés directement au moment de leur utilisations.
+
+Ainsi, nous proposons de déplacer l'appel des blocs fonctions dans une section (sous-programme) dédiée.
+On leur associera une variable structurée qui contiendra l'ensemble des paramètres nécessaires à leur usage. Leur déclenchement se fera alors au travers de la variable booléenne d'activation, présente dans la structure.
+
+L'encart ci-dessous propose une démarche pour la mise en oeuvre de cette méthode.
+
+\begin{UPSTIinfor}{Utilisation des types structurés}
+    Pour chaque type de bloc fonctionnel, on créera un type structuré associé. Ce type structuré contiendra l'ensemble des paramètres nécessaires à l'appel du bloc fonctionnel.
+    Pour éviter la multiplication du nombre de types différents, on propose la mise en commun suivante :
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            \textbf{Type de fonction} & \textbf{Type associé} & \textbf{Blocs concernés} \\
+            \hline
+            Mouvements du robot       & T\_MoveAxisAbsolute   & \begin{tabular}{@{}l@{}}
+                                                                    MC\_MoveAxisAbsolute     \\
+                                                                    MC\_MoveDirectAbsolute   \\
+                                                                    MC\_MoveLinearAbsolute   \\
+                                                                    MC\_MoveCircularAbsolute \\
+                                                                \end{tabular} \\
+            \hline
+            Gestion globale du robot  & T\_ctrlStatusGroup    & \begin{tabular}{@{}l@{}}
+                                                                    MC\_GroupInterrupt \\
+                                                                    MC\_GroupStop      \\
+                                                                    MC\_GroupContinue  \\
+                                                                    MC\_GroupReset     \\
+                                                                    MC\_GroupPower     \\
+                                                                \end{tabular}  \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    Les types associés contiendront l'ensemble des paramètres nécessaires à l'appel de tous ces blocs fonctionnels. Ainsi, il est possibles que certains paramètres ne soient pas utilisés pour un bloc fonctionnel donné.
+
+\end{UPSTIinfor}
+
+

@@ -1,0 +1,62 @@
+
+\section{Installation de Control Expert}
+\UPSTIattention{Il est fortement conseillé d'installer la même version que celle installée dans la salle pour faciliter la compatibilité des fichiers. A la dernière mise à jour de ce tutoriel, la version installée est la \versionCE. 
+
+\textbf{Vérifier la version de Control Expert installée dans la salle de TP.}}
+\begin{UPSTIManipulation}[Installation de Control Expert]
+    \UPSTIetape{Télécharger le logiciel Control Expert.} 
+    \begin{itemize}
+        \item Soit sur le site de schneider Electric : \lienTelechargementCE
+        \begin{itemize}
+            \item Vous devrez probablement créer un compte. Vous pouvez le faire avec votre adresse universitaire. Choisissez alors l'entreprise \textbf{Université Savoie-Mont Blanc, 9 Rue de l'arc en ciel, 74940 Annecy-le-Vieux}.
+        \end{itemize}
+        \item Soit depuis le disque \texttt{U:/}, dans le dossier du module. 
+    \end{itemize}
+    \UPSTIetape{Suivre les étapes d'installation du logiciel Control Expert.}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}[Associer le serveur de licence]
+    \UPSTIetape{Lancer le logiciel \texttt{Schneider Electric License Manager}. Il a été installé en même temps que Control Expert.}
+    \UPSTIetape{Sur l'onglet \texttt{Roating}, cliquer sur \texttt{Configure}.}
+    \UPSTIetape{Dans la fenêtre qui s'ouvre, ajouter le serveur de licence :}
+    \begin{description}
+        \item[Adresse IP] : \ipServeur
+        \item[Port] : \portServeur
+        \item[Web Port] : \webPortServeur
+    \end{description}
+    \UPSTIetape{Valider et fermer le logiciel.}
+\end{UPSTIManipulation}
+
+\UPSTIattention{Une connexion au VPN de l'université sera nécessaire pour lancer le logiciel.}
+\begin{UPSTIManipulation}[Lancement de Control Expert]
+    \UPSTIetape{Vérifier que vous êtes connecté au VPN de l'université.}
+    \UPSTIetape{Lancer le logiciel Control Expert.}    
+\end{UPSTIManipulation}
+
+\section{Importation de la description des équipements}
+
+\begin{UPSTIManipulation}{Importation de la description des équipements}
+    \textbf{Cette manipulation nécessite d'avoir ajouté un module réseau (NOC par exemple) dans le projet.}
+    Une vidéo de cette étape est disponible sur le lien \path{https://www.se.com/fr/fr/faqs/FA406942/}
+    \textit{Les fichiers nécessaires sont disponible dans le dossier du module}
+        \UPSTIetape{Dans Control Expert :}
+        \begin{enumerate}
+            \item Ouvrir le navigateur DTM \texttt{Outils->Navigateur DTM}.
+            \item Clique droit sur un des réseaux puis \texttt{Menu Equipement -> Fonctions supplémentaires -> Ajouter un fichier EDS à la bibliothèque}
+            \item Sélectionner le fichier à ajouter puis Valider.
+        \end{enumerate}
+        \UPSTIetape{Mettre à jour le catalogue des DTMs :}
+        \begin{itemize}
+            \item \texttt{Outils -> Catalogue matériel}
+            \item Onglet \texttt{Catalogue DTM}
+            \item Cliquer sur \texttt{Mise à jour}
+        \end{itemize}
+\end{UPSTIManipulation}
+
+\section{Importation de la Bibliothèque de Types UniVALplc}
+
+\begin{UPSTIManipulation}{Importation de la Bibliothèque de Types UniVALplc}
+    \textit{Les fichiers et bibliothèques nécessaires sont disponible dans le dossier \texttt{Scara/uniVALplc/}}
+        \UPSTIetape{Exécuter le programme \texttt{Mise à jour de la bibliothèque de types}.}
+        \UPSTIetape{Importer le fichier \texttt{FAMILY.DCS} pour ajouter la bibliothèque UniVALplc à l'environnement de développement.}
+\end{UPSTIManipulation}

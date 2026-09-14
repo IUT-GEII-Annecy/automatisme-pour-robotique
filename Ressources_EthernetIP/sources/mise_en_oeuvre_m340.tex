@@ -1,0 +1,63 @@
+\section{Mise en \oe uvre sur un automate Schneider M340 (Control Expert)}
+\label{sec:mise_en_oeuvre_m340}
+
+Cette partie transpose la démarche générique de la section \ref{sec:mise_en_oeuvre_codesys} à un automate \textbf{Modicon M340} programmé avec \textbf{Control Expert} (ex-Unity Pro). Les concepts CIP (Scanner, Adapter, Assembly, RPI) sont strictement identiques -- seuls l'outil de configuration et le vocabulaire de mapping changent.
+
+\subsection{Support matériel EtherNet/IP sur M340}
+Sur la gamme M340, le rôle de Scanner EtherNet/IP est porté par un \textbf{module de communication dédié} (\texttt{BMX~NOE~0100}/\texttt{0110}), à ajouter dans le rack. Le port Ethernet intégré du processeur (CPU \texttt{BMX~P34~2020}/\texttt{2030}/\texttt{2040}) reste, quant à lui, réservé aux services Modbus TCP, au serveur web de diagnostic (FactoryCast) et aux échanges Global Data -- il ne réalise pas de scan EtherNet/IP.
+
+\begin{UPSTIinfor}{Un service parmi d'autres sur le module NOE}
+    Le module \texttt{BMX~NOE} est lui aussi multi-services : messagerie Modbus TCP, serveur web de diagnostic, et \emph{scanner EtherNet/IP} peuvent coexister sur la même interface selon le firmware installé. Activer le scanner EtherNet/IP ne désactive pas les autres services -- il faut seulement veiller à la charge réseau globale et vérifier, dans la documentation Schneider du module, que le firmware installé supporte bien la fonction de scan EtherNet/IP.
+\end{UPSTIinfor}
+
+\subsection{Démarche de configuration dans Control Expert}
+La configuration d'une liaison EtherNet/IP s'effectue dans l'éditeur de réseau (\emph{DTM Network Editor} / \emph{configuration matérielle}) :
+
+\begin{enumerate}
+    \item \textbf{Déclarer le scanner EtherNet/IP} sur le module de communication \texttt{BMX~NOE} : c'est l'équivalent du scanner ajouté sous l'interface Ethernet dans Codesys.
+    \item \textbf{Importer le fichier EDS} de l'Adapter cible dans le catalogue de matériel (\emph{Hardware Catalog}), s'il n'y est pas déjà -- ou utiliser un DTM constructeur si l'équipement en fournit un.
+    \item \textbf{Ajouter le device Adapter} sous le scanner, en renseignant son adresse IP.
+    \item \textbf{Configurer la connexion I/O scanning} : choix de l'Assembly Input/Output (souvent proposé par des tailles prédéfinies dans l'EDS), et \textbf{RPI} (période de rafraîchissement, en ms).
+    \item \textbf{Mapper les données} sur des zones mémoire automate (\texttt{\%MW}, \texttt{\%IW}, ou variables DDT structurées), qui seront ensuite manipulées dans le programme (Ladder, ST, ou blocs fonctionnels).
+\end{enumerate}
+
+\begin{UPSTIidee}{Correspondance avec le vocabulaire Codesys}
+    \begin{center}
+        \begin{tabular}{|p{5.5cm}|p{7.5cm}|}
+            \hline
+            \textbf{Codesys} & \textbf{Control Expert} \\
+            \hline
+            Scanner ajouté sous l'interface Ethernet & Scanner EtherNet/IP configuré sur le module \texttt{BMX~NOE} \\
+            \hline
+            Device Adapter + fichier EDS & Équipement ajouté au catalogue matériel via EDS/DTM \\
+            \hline
+            Variables mappées sur l'Input/Output Assembly & Zone \texttt{\%MW} (ou DDT) associée à la connexion I/O scanning \\
+            \hline
+            Programme ST au-dessus du mapping & Programme Ladder/ST/FBD au-dessus des \texttt{\%MW} \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{UPSTIidee}
+
+\subsection{Messagerie explicite depuis un M340}
+Le module \texttt{BMX~NOE} ne se limite pas à l'échange cyclique (implicite) : il permet aussi d'émettre des \textbf{requêtes explicites CIP} depuis le programme Control Expert, par exemple pour lire l'objet Identity d'un équipement au démarrage, ou déclencher ponctuellement un service qui ne justifie pas une connexion cyclique dédiée.
+
+\begin{enumerate}
+    \item \textbf{Fonction générique \texttt{DATA\_EXCH}} : ce bloc fonction, déjà utilisé pour la messagerie explicite Modbus TCP, peut également construire et envoyer une requête CIP explicite (service, classe, instance, attribut) vers l'adresse IP de l'Adapter, puis récupérer la réponse dans une table de gestion (mots de statut/échange).
+    \item \textbf{Bloc dédié de la \emph{General Purpose Library} (GPL)} : Control Expert propose, dans sa bibliothèque de fonctions génériques, un bloc spécialisé pour la messagerie explicite EtherNet/IP, où le service CIP, la classe, l'instance et l'attribut visés se renseignent directement sur des entrées du bloc -- plus simple à mettre en \oe uvre que le paramétrage bas niveau de \texttt{DATA\_EXCH}.
+\end{enumerate}
+
+\begin{UPSTIinfor}{Un mécanisme asynchrone, comme sous Codesys}
+    Comme toute messagerie explicite CIP, l'échange est asynchrone : le programme déclenche la requête, puis doit scruter un mot d'état/de gestion (souvent appelé \emph{rapport d'échange}) pour savoir quand la réponse est disponible, si elle a réussi, et récupérer les données reçues. Ne bloquez jamais un cycle automate en attendant activement la fin de l'échange.
+\end{UPSTIinfor}
+
+\begin{UPSTIwarning}{Explicite et implicite se partagent le même NOE}
+    Multiplier les requêtes explicites sur un module déjà chargé par plusieurs connexions I/O scanning peut dégrader les temps de réponse de l'ensemble. Réservez la messagerie explicite aux échanges ponctuels (diagnostic, identification, paramétrage) et laissez les données cycliques temps réel transiter par les Assembly de la connexion implicite -- exactement la même règle de conception qu'à la section \ref{sec:messagerie} sous Codesys.
+\end{UPSTIwarning}
+
+\subsection{Où placer la couche objet applicative}
+Le principe d'encapsulation vu à la section \ref{sec:mise_en_oeuvre_codesys} reste valable : les \texttt{\%MW} issus du scanner M340 ne sont que le reflet brut de l'Assembly CIP échangé. Rien n'empêche, en ST sous Control Expert (types DDT + blocs fonctionnels), de reproduire la même logique de classes/propriétés/méthodes pour donner du sens à ces mots mémoire avant de les exposer au reste de l'application -- la plate-forme change, pas la démarche de conception.
+
+\begin{UPSTIinfor}{Diagnostic de la connexion}
+    Control Expert expose, pour chaque connexion I/O scanning configurée, un état de santé (souvent un mot ou quelques bits dédiés, parfois nommé \emph{Health Word} selon l'EDS de l'équipement) permettant de détecter une perte de connexion avec l'Adapter (câble débranché, adresse IP erronée, équipement hors tension). Intégrez systématiquement ce diagnostic dans votre classe d'encapsulation -- une valeur figée dans l'Input Assembly peut aussi bien signifier « rien ne change » que « la connexion est rompue ».
+\end{UPSTIinfor}

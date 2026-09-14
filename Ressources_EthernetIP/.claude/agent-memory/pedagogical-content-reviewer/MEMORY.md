@@ -1,0 +1,1 @@
+- [EtherNet/IP support (BUT GEII)](ethernetip_support.md) — doc structure, quality baseline, fixed M340 NOE-vs-CPU scanning error

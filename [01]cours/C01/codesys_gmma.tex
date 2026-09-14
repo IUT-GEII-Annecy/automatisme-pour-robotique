@@ -1,0 +1,106 @@
+\section{Programmation classique hiérarchisée à l'aide du GMMA}
+Cette section propose un paradigme de programmation d'une application automatisée à l'aide du GMMA sur l'application e!Cockpit.
+
+L'application consiste en une tâche principale nommée \emph{MainTask} qui est exécutée périodiquement. Cette tâche appelle une seule unité de programme (POU) : \emph{MainProgram} qui mettra en oeuvre un GMMA en langage SFC. Chaque étape du GMMA sera associée à une POU correspondant au mode à jouer. Enfin, la POU de chaque mode sera implémentée dans un langage adapté au type de tâche à réaliser. Enfin, on ajoute deux gestionnaires d'événements : \emph{}
+
+Ce paradigme permet de respecter une hiérarchisation des tâches et des POUs : Le GMMA est préemptif et autorise ou non les différents modes en fonction de l'état du système.
+
+\paragraph{La tâche principale} fonctionne avec une priorité comprise entre 4 et 15. Elle est exécutée cycliquement avec une période qui doit être compatible avec la dynamique du procédé. Une surveillance doit être mise en place par l'intermédiaire d'un watchdog (chien de garde) réglé avec une sensibilité de 1.
+Cette tâche appelle alors une seule POU : le programme principal \emph{MainProgram}.
+
+\begin{UPSTIinfor}{Dynamique du procédé}
+    La dynamique du procédé correspond à la vitesse à laquelle le procédé peut évoluer. Afin de fonctionner correctement, le système automatisé doit être capable de réagir à tous les événements du procédé. Pour cela, la période de la tâche principale doit être inférieure à cette dynamique.
+
+    Pour déterminer ce temps, on peut effectuer une étude s'intéressant à l'entrée la plus rapide qui doit être prise en compte par le système automatisé. Le cycle de l'automate doit alors être plus rapide que le temps de cette entrée.
+
+    Par exemple, si le système automatisé doit réagir à une entrée TOR, il faut déterminer le temps de changement d'état de cette entrée et s'assurer que le cycle de l'automate est plus rapide que ce temps en configurant le watchdog.
+\end{UPSTIinfor}
+
+\paragraph{La POU MainProgram}, appelée par la tâche principale, gère la POU associée au GMMA. Cela signifie qu'elle appellera la POU du GMMA après avoir effectué les vérifications nécessaires. Par exemple, elle pourra faire un reset du GMMA au premier cycle de l'automate.
+
+\paragraph{La POU du GMMA} est une POU de type SFC. Elle est composée de plusieurs étapes. Chaque étape est associée à une POU correspondant à un mode de fonctionnement.
+A chaque étape, on utilise les actions d'entrée pour paramétrer le mode puis l'action active pour que la POU correspondante soit appelée à chaque cycle automate.
+
+\paragraph{Les POU des modes} sont des POUs implémentées en ST ou en SFC. Elles sont appelées par la POU du GMMA et sont exécutées à chaque cycle automate si le mode correspondant est actif.
+
+\paragraph{Les gestionnaires d'événements} sont des POUs implémentés en ST ou en SFC.  Ils permettent de gérer les événements qui ne sont pas liés à un mode de fonctionnement. Typiquement, on définira un événement pour le premier cycle (\emph{OnFirstRun}) pour effectuer diverses initialisations (par exemple un booléen global \emph{xFirstCycleRun} qui fera un reset du GMMA) et un événement en fin de cycle (\emph{OnPrepareStop}) qui pourra fixer les modes de repli si nécessaire. On peut aussi utiliser, par exemple, un gestionnaire d'événement pour gérer les alarmes.
+
+\paragraph{Exemple}
+Cette section présente un code d'exemple d'application du GMMA dans une structure hiérarchisée.
+\paragraph{Variable globales (Global Variable List -- GVL)} :
+On définit une variable globale indiquant que l'on se trouve dans le premier cycle :
+\begin{lstlisting}[language=ST]
+VAR_GLOBAL
+    xFirstCycleRun : BOOL;
+END_VAR
+\end{lstlisting}
+
+\paragraph{2 Events Handlers :}
+On écrit une fonction pour le premier cycle :
+\begin{lstlisting}[language=ST]
+FUNCTION OnFirstRun : DWORD
+    VAR_IN_OUT
+        EventPrm : CmpApp.EVTPARAM_CmpApp;
+    END_VAR
+
+    GVL.xFirstCycleRun := TRUE;
+    OnFirstRun := 0;\end{lstlisting}
+
+\paragraph{Tâche principale}
+La tâche principale est configurée avec une période de \SI{40}{\milli\second} et une priorité de 4. Elle appelle la POU \emph{MainProgram}. Le watchdog est configuré avec une sensibilité de 1 et un temps de \SI{60}{\milli\second}.
+
+\paragraph{Le programme principal (MainProgram) :}
+Le programme principal, en langage ST, s'occupe de lancer correctement le GMMA :
+\begin{lstlisting}[language=ST]
+PROGRAM MainProgram
+    VAR
+        xSFRResetGmma : BOOL := FALSE;
+    END_VAR
+
+    IF GVL.xFirstCycleRun THEN
+        xSFRResetGmma := TRUE;
+        GVL.xFirstCycleRun := FALSE;
+    END_IF
+
+    GM_Gmma(SFRRESET := xSFRResetGmma);\end{lstlisting}
+
+\paragraph{Le GMMA :}
+Le GMMA est implémenté en langage SFC. La déclaration des variables est la suivante :
+\begin{lstlisting}[language=ST]
+PROGRAM GM_Gmma
+    VAR_IN_OUT 
+        SFRReset : BOOL;
+    END_VAR
+    
+    VAR
+        xD1Reset : BOOL := FALSE;
+        xF1A2Reset : BOOL := FALSE;
+    END_VAR\end{lstlisting}
+
+
+\lstDeleteShortInline~
+\pagebreak
+\begin{UPSTIactivite}[][Application : Etape D1 du GMMA]
+    \UPSTIquestion{Dessiner la première étape du GMMA, appelée GM\_S\_D1 associée à sa transition.}
+    \UPSTIquestion{Écrire l'action d'entrée \lstinline{GM_Gmma.GM_AP1_ResetChartD1} qui met à \lstinline{TRUE} le booléen \lstinline{xD1Reset}.}
+    \UPSTIquestion{Écrire l'action active \lstinline{GM_Gmma.GM_AN_D1_ArretUrgence} qui :}
+    \begin{itemize}
+        \item Passe à \lstinline{TRUE} le booléen \lstinline{xD1Reset} si nécessaire.
+        \item Appelle la POU \lstinline{D1_ArretUrgence} avec le paramètre \lstinline{SFCReset}
+        \item Appelle la POU \lstinline{D1_ArretUrgencePost} pour le traitement post arrêt d'urgence.
+    \end{itemize}
+    \vspace{15cm}
+\end{UPSTIactivite}
+
+\paragraph{Les POU spécifiques à chaque mode} sont implémentées en langage ST, LADDER ou SFC selon si le comportement associé est combinatoire ou séquentiel.
+
+Par exemple, la POU \lstinline{D1_ArretUrgence} implémenté en SFC aura les déclarations suivantes :
+
+\begin{lstlisting}
+PROGRAM D1_ArretUrgence
+    VAR_IN_OUT
+        SFCReset : BOOL;
+    END_VAR\end{lstlisting}
+
+
+

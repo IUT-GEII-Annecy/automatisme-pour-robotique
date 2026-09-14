@@ -1,0 +1,297 @@
+\subsection{Les types de données}
+\subsubsection{Les types de données natifs}
+CodeSys propose un ensemble de types de données natifs. Ces types de données sont définis par la norme IEC 61131-3. 
+Pour chaque type de données, le tableau suivant précise son empreinte mémoire ainsi que les règles de nommage (préfixe) que nous utiliserons dans ce module. 
+
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \rowcolor{gray!30} \textbf{Type de données} & \textbf{Empreinte mémoire} & \textbf{Règles de nommage} \\
+        \hline
+        BOOL & 1 bit & x \\
+        \hline
+        BYTE & 8 bits & by \\
+        \hline
+        SINT & 8 bits & si \\
+        \hline
+        USINT & 8 bits & usi \\
+        \hline
+        WORD & 16 bits & w \\
+        \hline
+        INT & 16 bits & i \\
+        \hline
+        UINT & 16 bits & ui \\
+        \hline
+        DWORD & 32 bits & dw \\
+        \hline
+        DINT & 32 bits & d \\
+        \hline
+        UDINT & 32 bits & udi \\
+        \hline
+        REAL & 32 bits & r \\
+        \hline
+        LWORD & 64 bits & lw \\
+        \hline
+        LINT & 64 bits & li \\
+        \hline
+        ULINT & 64 bits & uli \\
+        \hline
+        LREAL & 64 bits & lr \\
+        \hline
+        STRING & Variable & s \\
+        \hline
+    \end{tabular}
+    \caption{Empreinte mémoire et règles de nommage des types de données natifs}
+    \label{tab:types_donnees}
+\end{table}
+
+\subsubsection{Les types de données de datation}
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \rowcolor{gray!30} \textbf{Type de données} & \textbf{Empreinte mémoire} & \textbf{Règles de nommage} \\
+        \hline
+        TIME (T\#) & 32 bits & tim \\
+        \hline
+        TIME\_OF\_DAY (TOD\#) & 32 bits & tod \\
+        \hline
+        DATE (D\#) & 32 bits & date \\
+        \hline
+        DATE\_AND\_TIME (DT\#) & 32 bits & dt \\
+        \hline
+    \end{tabular}
+    \caption{Empreinte mémoire et règles de nommage des types de données de datation}
+\end{table}
+
+\subsubsection{Les tableaux}
+Sous l'environnement CoDeSys, il est possible de déclarer des tableaux de variables. Ils peuvent être de dimension 1, 2 ou 3. Aussi, et contrairement au langage C, il est possible de définir le premier et le dernier indice. \textbf{Ainsi, le premier indice d'un tableau n'est pas forcément 0.} 
+
+\UPSTIinfo[Déclaration d'un tableau]{La déclaration d'un tableau se fait à l'aide de la syntaxe suivante : \\~<nom> : ARRAY [<ll1>..<ul2>|,<ll2> <ul2>|,<ll3>..<ul3>] OF <type>;~. \\Avec ~<lli>~ la borne inférieure et ~<uli>~ la borne supérieure de la dimension i. }
+
+Notre convention de nommage veut que l'on ajoute le prefixe ~a<dim><type>~ à la déclaration d'un tableau. Avec ~<dim>~ le nombre de dimensions et ~<type>~ le préfixe correspondant à celui des éléments du tableau (Cf Table \ref{tab:types_donnees}).
+
+Par exemple, pour définir un tableau ~tab~ de taille 10 de type ~WORD~ et un tableau ~tab2~ de taille 20x10 de type ~INT~, on écrira :
+\begin{lstlisting}[language=ST]
+VAR 
+    a1wtab : ARRAY [0..9] OF WORD;
+    a2itab2 : ARRAY [1..20, 1..10] OF INT;
+END_VAR
+\end{lstlisting}
+
+Il est possible de récupérer le premier et le dernier indice d'un tableau à l'aide des fonctions ~LOWER_BOUND(<array_name>,<dim>)~ et ~UPPER_BOUND(<array_name>,<dim>)~, respectivement.
+
+\UPSTIinfo[Tableau à longueur variable]{
+    Lorsqu'un tableau est donné en ~VAR_IN_OUT~ d'une fonction, d'un bloc fonction ou d'une méthode, il est possible de ne pas préciser la taille du tableau par la syntaxe ~<nom> : ARRAY [*|, *|, *] OF <type>~. Dans ce cas, le tableau est dit à longueur variable. Il est possible de récupérer la taille du tableau à l'aide de la fonction ~SIZEOF(<array_name>)~.
+
+    Par exemple, pour définir un tableau ~tab~ de dimension 1 et de taille variable de type ~WORD~, on écrira :\\~a1wtab : ARRAY [*] OF WORD;~
+}
+
+\subsubsection{Les structures}
+\begin{UPSTIinfor}{Définition d'une structure}
+    La définition d'une structure se fait à l'aide de la syntaxe suivante : 
+    \begin{lstlisting}[language=ST]
+TYPE <struct_name> :
+    STRUCT
+        <nom1> : <type1>;
+        <nom2> : <type2>;
+        ...
+        <nomi> : <typei>;
+    END_STRUCT
+END_TYPE\end{lstlisting}
+
+    Avec ~<nomi>~ le nom de la variable et ~<typei>~ le type de la variable. 
+\end{UPSTIinfor}
+Sous l'environnement CoDeSys, il est possible de déclarer des structures de variables. 
+Notre convention de nommage veut que l'on ajoute le prefixe ~T~ au nom d'une variable de type structure et ~m_<data_type><member_name>~ au nom d'un membre de la structure.
+
+Par exemple, pour définir une structure ~TVerin~ contenant deux membres ~m_xSorti~ et ~m_xRENTRE~ de type ~BOOL~, on écrira : 
+\begin{lstlisting}[language=ST]
+TYPE TVerin :
+    STRUCT
+        m_xSorti : BOOL;
+        m_xRENTRE : BOOL;
+    END_STRUCT
+END_TYPE\end{lstlisting}
+
+Dans une structure uniquement, il est possible de déclarer des membres de type ~BIT~ afin de ne réserver qu'un seul bit mémoire (contrairement au type BOOL qui réserve 1 octet mémoire). Cela peut permettre d'assigner un nom à différents bits d'un registre, par exemple. 
+
+\paragraph{Accès aux membres d'une structure : }
+Il est possible d'accéder aux membres d'une structure à l'aide de la syntaxe ~<struct_name>.<member_name>~. Par exemple, pour accéder au membre ~m_xSorti~ de la structure ~enrVerin1~ de type ~TVerin~, on écrira ~enrVerin1.m_xSorti~.
+
+
+\paragraph{Héritage : }
+Le mot clé ~EXTENDS~ permet de définir une structure héritant d'une autre structure. La structure fille hérite de tous les membres de la structure mère auxquels elle peut ajouter ses propres membres. La syntaxe de cet héritage simple est alors : 
+
+\begin{lstlisting}[language=ST]
+TYPE <struct_fille> EXTENDS <struct_mere> :
+    STRUCT
+        <nom_n+1> : <type_n+1>;
+        <nom_n+2> : <type_n+2>;
+        ...
+    END_STRUCT
+END_TYPE\end{lstlisting}
+
+\subsubsection{Les énumérations}
+Une énumération est un type permettant de nommer des constantes entières. Elle augmente la lisibilité du code et permet de le rendre plus robuste. On peut par exemple définir une énumération ~ETAT~ contenant les constantes ~ETAT\_OUVERT~, ~ETAT\_FERME~, ~ETAT\_EN\_COURS~ et ~ETAT\_ERREUR~. Chaque ETAT correspond à une valeur entière que le développeur ne connait pas forcément. 
+
+Par défaut, le premier élément de l'énumération vaut 0 et chaque élément suivant vaut l'élément précédent + 1. Il est possible de modifier cette valeur en utilisant l'opérateur ~|:=~. Par défaut, le type des valeurs de chaque élément est ~INT~. 
+
+\begin{UPSTIinfor}{Définition d'une énumération}
+    La définition d'une énumération se fait à l'aide de la syntaxe suivante : 
+    \begin{lstlisting}[language=ST]
+TYPE <enum_name> :
+    (
+        <nom1> |:= <valeur1>,
+        <nom2> |:= <valeur2>,
+        ...
+        <nomi> |:= <valeuri>
+    )|<base_data_type>|:= <valeur_par_defaut>;
+END_TYPE\end{lstlisting}
+\end{UPSTIinfor}
+
+Par exemple, pour définir une énumération ~ETAT~ contenant les constantes ~ETAT\_OUVERT~, ~ETAT\_FERME~, ~ETAT\_EN\_COURS~ et ~ETAT\_ERREUR~, on écrira :
+\begin{lstlisting}[language=ST]
+TYPE ETAT :
+    (
+        ETAT_OUVERT,
+        ETAT_FERME,
+        ETAT_EN_COURS,
+        ETAT_ERREUR
+    ):= ETAT_OUVERT;
+END_TYPE\end{lstlisting}
+
+Voici alors un exemple de déclaration, d'initialisation et d'utilisation d'une variable de type ~ETAT~ :
+\begin{lstlisting}[language=ST]
+VAR
+    etat : ETAT;
+END_VAR
+etat := ETAT_FERME;
+IF etat = ETAT_FERME THEN
+    (* Faire quelque chose *)
+END_IF\end{lstlisting}
+
+\UPSTIattention[Noms de constante identiques]{
+    Si deux types énumération contiennent des constantes de même nom, il est alors impératif de préciser le type d'énumération. Par exemple, si on définit une énumération ~ETAT~ contenant les constantes ~ETAT\_OUVERT~, ~ETAT\_FERME~, ~ETAT\_EN\_COURS~ et ~ETAT\_ERREUR~ et une énumération ~ETAT\_VERIN~ contenant les constantes ~ETAT\_OUVERT~, ~ETAT\_FERME~, ~ETAT\_EN\_COURS~ et ~ETAT\_ERREUR~, il faudra alors écrire ~ETAT.ETAT\_OUVERT~ et ~ETAT\_VERIN.ETAT\_OUVERT~ pour différencier les deux constantes.
+}
+
+\subsubsection{Les unions}
+Une union est un type permettant d'utiliser une même zone mémoire pour stocker des données de types différents. Cela signifie que la modification de la valeur d'une variable de l'union modifiera la valeur des autres variables.
+
+Puisqu'il est partagé entre tous les membres de l'union, l'espace mémoire occupé par une union est égal à la taille de la variable occupant le plus d'espace mémoire.
+
+\begin{UPSTIinfor}{Définition d'une union}
+    La définition d'une union se fait à l'aide de la syntaxe suivante : 
+    \begin{lstlisting}[language=ST]
+TYPE <union_name> :
+    UNION
+        <nom1> : <type1>;
+        <nom2> : <type2>;
+        ...
+        <nomi> : <typei>;
+    END_UNION  
+END_TYPE\end{lstlisting}
+\end{UPSTIinfor}
+
+Nos conventions de nommage veulent que l'on ajoute le prefixe ~T~ au nom d'une variable de type union et ~m_<data_type><member_name>~ au nom d'un membre de l'union.
+
+Enfin, des types de données spécifiques sont définis pour les unions : 
+\begin{description}
+    \item[ANY\_TYPE] : Type de données permettant de définir une union de type quelconque. Uniquement utilisable pour les interfaces
+    \item[WSTRING] : Type de données permettant de définir une union de type chaine de caractères. Ce type de données est similaire au type STRING, mais l'encodage utilisé ici est UniCode au lieu de ASCII. 
+\end{description}
+
+\UPSTIremarque[Le type WSTRING]{
+    Contrairement au STRING, le nombre de caractères affichable par une variable de type WSTRING d'une taille donnée dépend des caractères utilisés. En effet, certains caractères sont codés sur 1 octet, d'autres sur 2 octets. Par exemple, le caractère ~A~ est codé sur 1 octet, tandis que le caractère ~é~ est codé sur 2 octets. 
+}
+
+\subsubsection{Les pointeurs}
+\UPSTIrappel[Pointeur]{
+    Un pointeur est une variable contenant l'adresse mémoire d'une autre variable. Elle permet, de partager l'accès à une zone mémoire (variable) entre différents contextes. En langage C, par exemple, cela permet de créer des fonctions capables de modifier des variables locales à la fonction appelante. 
+
+    Lorsque vous avez utilisé la fonction \lstinline[language=c]{scanf}, vous avez passé en paramètre l'adresse de la variable à modifier à l'aide de l'opérateur \lstinline[language=c]{\&}. Cela permet à la fonction \lstinline[language=c]{scanf} de modifier la valeur de la variable passée en paramètre.
+}
+
+\begin{UPSTIinfor}{Définition d'un pointeur}
+    La définition d'un pointeur se fait à l'aide de la syntaxe suivante : 
+    \begin{lstlisting}[language=ST]
+<pointer_name> : POINTER TO <type>;\end{lstlisting}
+
+Ici, ~<type>~ peut désigner le type d'une variable, une fonction, un bloc fonction, une méthode ou même un POU. 
+\end{UPSTIinfor}
+
+Les opérateurs disponibles pour l'utilisation de pointeurs sont les suivants : 
+\begin{itemize}
+    \item ~^~ : Opérateur de déréférencement. Il permet d'accéder à la valeur pointée par le pointeur. 
+    \item ~ADR~ : Opérateur d'adressage. Il permet d'accéder à l'adresse mémoire pointée par le pointeur.
+    \item ~[ ]~ : Opérateur d'indexation : Il permet d'accéder à un élément d'un tableau pointé par un pointeur.
+\end{itemize}
+
+Nos rêgles de nommage veulent que l'on ajoute le prefix ~p~ au nom d'une variable de type pointeur.
+
+\UPSTIexemple{
+    \begin{minipage}[t]{0.45\linewidth}
+    \begin{lstlisting}[language=ST]
+VAR
+    piA : POINTER TO INT := 0;
+    iAlpha AT %MW1: INT := 7;
+    iBeta AT %MW3: INT := 4;
+    piB : POINTER TO INT := ADR(iBeta);
+    dwGapInBytes: DWORD; (* en octet *)
+END_VAR\end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\linewidth}
+\begin{lstlisting}[language=ST]
+(* Traitement *)
+piA := ADR (iAlpha);
+piA^ := 0 ; (* <=> iAlpha := 0; *)
+piB[0] := 0 ; (* <=> iBeta := 0; *)
+dwGapInBytes := piB - piA; (* = 4 *)\end{lstlisting}
+    \end{minipage}
+}
+
+\subsubsection{Les références}
+Sous CodeSys, une référence possède des propriétés similaires à celles d'un pointeur. Elle présente des avantages et inconvénients suivants par rapport à un pointeur :
+\begin{minipage} [t]{0.45\linewidth}
+    \begin{itemize}
+        \item Plus simple à utiliser : pas besoin d'utiliser l'opérateur ~^~ pour accéder à la valeur pointée.
+        \item Syntaxe plus simple
+        \item Sécurisée sur le type : le compilateur vérifie que la référence pointe bien sur une variable du type attendu.
+    \end{itemize}
+    
+\end{minipage}\hfill
+\begin{minipage} [t]{0.45\linewidth}
+    \begin{itemize}
+        \item Il est impossible de modifier la variable pointée par la référence,
+        \item On ne peut référencer que des variables (pas de fonctions, blocs fonction, méthodes ou POU).
+    \end{itemize}
+\end{minipage}
+
+La fonction ~__ISVALIDREF(ref_int~ permet de vérifier si une référence est valide ou non. Elle renverra ~TRUE~ si la référence est valide (pointe vers une variable et non 0), ~FALSE~ sinon.
+
+\UPSTIexemple{
+    \begin{minipage}[t]{0.45\linewidth}
+    \begin{lstlisting}[language=ST]
+VAR
+    ref_int: REFERENCE TO INT := 0;
+    iAlpha: INT := 7;
+    iBeta: INT := 4;
+    xRef: BOOL;
+END_VAR\end{lstlisting}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\linewidth}
+\begin{lstlisting}[language=ST]
+(* Traitement *)
+xRef := __ISVALIDREF (ref_int); (* FALSE *)
+ref_int REF := iAlpha ; (*<=> ADR (iAlpha); *)
+xRef := __ISVALIDREF (ref_int) ; (* TRUE *)
+ref_int := 0 ; (*<=> ADR(iAlpha)^:= 0 ; *);
+ref_int REF := iBeta (*<=> ADR (iBeta)*);
+ref_int := 0 ; (* <=> iBeta := 0 ; *)
+\end{lstlisting}
+    \end{minipage}
+}

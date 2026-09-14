@@ -1,0 +1,99 @@
+
+\documentclass{UPSTI_Document}
+
+\usepackage{UPSTI_Pedagogique}
+\usepackage{UPSTI_SI}
+\usepackage{hyperref}
+
+\title{Mise en œuvre d’UniVALplc sous Ethernet/IP}
+\author{IUT d'ANNECY / TETRAS}
+\date{Année 2023-2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+Les différentes structures de commande disponibles pour l'intégration de robots dans les systèmes de production 
+sont variées et dépendent des compétences de l'intégrateur ainsi que de l'environnement d'application. Les 
+contrôleurs modernes offrent des interfaces digitales et analogiques, et supportent divers protocoles de 
+communication, tels que CanOpen, Profibus DP, et Ethernet industriel (EtherCAT, Ethernet/IP, PowerLink, Profinet).
+
+\section{Objectifs}
+\begin{itemize}
+    \item Comprendre les principes de base de la solution UniVALplc de Stäubli
+    \item Configurer le service IO-Scanning sous Ethernet/IP
+    \item Accéder à la baie CS9 et aux E/S déportées du contrôleur M221
+    \item Mettre en œuvre des blocs fonctionnels de la bibliothèque uniVALplc
+\end{itemize}
+
+\section{Préambule}
+Ce TP vise à intégrer un automate programmable pour commander un robot dans une cellule de production, en utilisant la solution UniVALplc de Stäubli. 
+Le contrôleur de robot, via son serveur uniVALplc, accepte des commandes d’un client API, comme le M340, à travers des blocs fonctionnels 
+spécifiques.
+
+\section{Matériel}
+Le matériel requis pour ce TP comprend :
+\begin{itemize}
+    \item \textbf{Robot Stäubli SCARA TS240}: Robot collaboratif 4 axes avec contrôleur CS9 et mode sélecteur WMS9.
+    \item \textbf{Convoyeur TS2plus}: Convoyeur Bosch RexRoth pour transporter les palettes avec produits.
+    \item \textbf{Contrôleur PFC200 WAGO}: Pour la gestion du convoyeur et accessible via Ethernet/IP.
+    \item \textbf{Automate Schneider M340}: Utilisé pour la communication avec la baie CS9 et le contrôleur M221.
+    \item \textbf{Contrôleur M221}: Fournit les informations de supervision via Ethernet/IP.
+\end{itemize}
+
+\section{Préparation}
+Avant de commencer, assurez-vous de :
+\begin{enumerate}
+    \item Importer les fichiers EDS nécessaires dans Control Expert
+    \item Configurer la bibliothèque de types uniVALplc dans le logiciel
+    \item S'assurer que les connexions réseau sont correctement établies et sécurisées
+\end{enumerate}
+
+\section{Configuration du Réseau Ethernet/IP}
+\subsection{Cartographie de l'espace mémoire}
+Les équipements CS9 et M221 sont configurés sur le réseau NOC\_ETHIP\_ROBOT avec les paramètres suivants :
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|}
+        \hline
+        Équipement & Entrée (T -> O) & Sortie (O -> T) \\
+        \hline
+        CS9 & 148 octets & 124 octets \\
+        M221 & 4 octets & 40 octets \\
+        \hline
+    \end{tabular}
+    \caption{Cartographie mémoire pour le réseau Ethernet/IP}
+\end{table}
+
+\subsection{Déclaration des objets mémoire}
+Déclarez les objets `fromRobotScara` et `toRobotScara` pour représenter les données produites et consommées de la baie CS9, et les objets 
+`fromHmiScara` et `toHmiScara` pour le contrôleur M221.
+
+\section{Manipulations}
+\begin{UPSTIactivite}
+    \subsection{Configuration des adresses IP}
+    Configurez les adresses IP pour chaque équipement selon le plan d'adressage.
+
+    \subsection{Mise en œuvre des Blocs Fonctionnels}
+    Utilisez les blocs fonctionnels \texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup} pour lire et écrire les données du robot.
+
+    \subsection{Interface HMI}
+    Utilisez les blocs \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi} pour interagir avec l'interface opérateur et superviser les voyants.
+
+    \subsection{Système de Préhension}
+    Configurez le système de préhension via les sorties rapides TOR disponibles sur le connecteur J212 de la baie CS9.
+\end{UPSTIactivite}
+
+\section{Annexes}
+\subsection{Blocs Fonctionnels}
+Documentation des blocs fonctionnels \texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup}, qui permettent l'interaction avec le robot via 
+le serveur UniVALplc. Ces blocs utilisent l'objet \texttt{T\_StaeubliRobot} pour représenter l'état du robot.
+
+\subsection{Configurations réseau}
+\begin{itemize}
+    \item \textbf{Fichier EDS pour CS9}: Staeubli-CS9-uniVALplc-s4.6.eds
+    \item \textbf{Fichier EDS pour M221}: M221-Scara.eds (modifié à partir de M221\_EDS\_Model.eds)
+\end{itemize}
+
+\end{document}

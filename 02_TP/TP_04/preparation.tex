@@ -1,0 +1,31 @@
+\section{Partie TD}
+\subsection{Mode de marche Normal}
+Pour simplifier l'élaboration du programme, on utilisera des macros-étapes : 
+\begin{itemize}
+    \item \texttt{F1\_MS1} : Saisie des gobelets.
+    \item \texttt{F1\_MS2} : Dépose des gobelets.
+\end{itemize}
+\begin{UPSTIPreparation}[Grafcet du mode F1]
+	\UPSTIquestion{Donner le grafcet du mode F1. On ne décrira pas, pour le moment, les étapes des macro-étapes \texttt{F1\_MS1} et \texttt{F1\_MS2}.}
+	\vspace{17cm}
+\end{UPSTIPreparation}
+
+
+
+\subsection{Implémentation des macro-étapes}
+On prendra comme position de référence la position initiale du robot (\texttt{X=90, Y=-410, Z=150, RX=-180, RY=0, RZ=0}). \textbf{Les autres positions seront calculées par rapport à cette position d'origine. Cette transformation sera effectuée à l'aide de blocs fonctionnels issus de la bibliothèque \texttt{uniVALplc}.}
+
+\begin{UPSTIPreparation}[Blocs fonctionnels de transformation de coordonnées]
+	\UPSTIquestion{Lire la documentation du type \texttt{T\_Trsf} et du bloc fonctionnel \texttt{VAL\_ShiftPoint}, puis donner les étapes pour pour transformer les coordonnées d'un point en utilsant ce bloc.}
+	\vspace{4cm}
+\end{UPSTIPreparation}
+
+
+\begin{UPSTIPreparation}[Macro-étape \texttt{F1\_MS1}]
+	\UPSTIquestion{Proposer un grafcet pour la macro-étape\texttt{F1\_MS1}.} 
+    
+    \textit{A côté de chaque étape, décrire les actions effectuées et les variables qui devront être modifiées.}
+
+	\vspace{11cm}
+	\textbf{Faire vérifier}
+\end{UPSTIPreparation}

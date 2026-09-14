@@ -1,0 +1,34 @@
+\section{Mode A1 -- Arrêt en conditions initiales}
+\label{secModeA1}
+
+\subsection{Conditions d'entrée}
+
+Le mode A1 est atteint depuis le mode A6, une fois que le robot a rejoint
+sa position de référence au-dessus du guichet. Il est également atteint
+depuis les modes F1/A2 ou F4, lorsque l'opérateur ramène l'installation à
+l'arrêt après un fonctionnement en production ou en mode manuel.
+
+\subsection{Comportement attendu}
+
+\begin{itemize}
+    \item \textbf{Robot} : le robot reste immobile, dans sa position de
+    référence au-dessus du guichet, tout en demeurant sous puissance, prêt
+    à reprendre un mouvement dès qu'un mode de production ou un mode
+    manuel sera demandé.
+    \item \textbf{Convoyeur / guichet} : le flux des palettes au niveau du
+    guichet est libre (passant), le poste n'étant, dans ce mode, le siège
+    d'aucune opération de saisie ou de dépose par le robot.
+    \item \textbf{IHM} : l'installation est prête pour un fonctionnement
+    automatique ou manuel ; cette disponibilité doit être signalée
+    clairement à l'opérateur.
+\end{itemize}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{F1} (\emph{Production normale}), sur
+    demande de marche automatique de l'opérateur.
+    \item Vers le mode \textbf{F4} (\emph{Mode manuel}), sur demande de
+    marche manuelle de l'opérateur (ces deux demandes étant mutuellement
+    exclusives).
+\end{itemize}

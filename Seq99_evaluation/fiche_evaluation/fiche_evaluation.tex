@@ -1,0 +1,219 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fiche d'évaluation AMC — Cellule robotisée
+%
+% TP noté d'Automatisme pour la robotique — BUT GEII
+% Mode standalone (génération par CSV, sans extraction automatique du TP)
+%
+% Structure :
+%   - 14 critères répartis en 5 groupes (20 pts au total)
+%   - Groupe robot       : Prise/Dépose Robot              (8 pts)
+%   - Groupe pont_config : Configuration réseau             (3 pts)
+%   - Groupe pont_prog   : Programmation communication      (5 pts)
+%   - Groupe pont_mouvt  : Mouvements du chariot            (2 pts)
+%   - Groupe pont_integ  : Intégration programme principal  (2 pts)
+%
+% Compilation :
+%   pdflatex fiche_evaluation.tex
+%   (nécessite automultiplechoice, csvsimple, UPSTI_Document, UPSTI_AMC)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[QCM, noCustomPackages]{UPSTI_Document}
+
+% ============================================================
+% PROFIL ET CONFIGURATION INSTITUTIONNELLE
+% ============================================================
+\UPSTIloadProfile{BUT_GEII}
+
+% ============================================================
+% MÉTADONNÉES DU DOCUMENT
+% ============================================================
+\discipline[Autom - Robotique]{Automatisme pour la robotique}
+
+% Titre affiché dans la grande zone centrale de l'en-tête UPSTI
+\newcommand{\UPSTItitreEnTete}{Évaluation pratique}
+
+% Titre du document (affiché sous l'en-tête en mode QCM)
+\newcommand{\UPSTItitre}{Cellule robotisée -- Évaluation pratique}
+
+% Numéro/type affiché à droite de l'en-tête (colonne type de document)
+\newcommand{\UPSTInumero}{Noté}
+
+% Numéro de séquence (commande locale à ce projet, non UPSTI)
+\newcommand{\sequence}{99}
+
+% Version E = version étudiante (cases en bleu clair, pas de correction)
+\documentVersion{E}
+
+% Valeur par défaut (sera surchargée dans chaque \exemplaire par \id{})
+\newcommand{\UPSTInumeroVersion}{--}
+
+% Message affiché dans la zone basse de l'en-tête
+% (sera surchargé dans chaque \exemplaire par le nom de l'étudiant)
+\newcommand{\UPSTImessage}{}
+
+% ============================================================
+% DÉBUT DU DOCUMENT
+% ============================================================
+\begin{document}
+
+% Graine aléatoire AMC : fixe l'ordre de tirage des questions
+% (valeur choisie arbitrairement, à conserver pour reproductibilité)
+\AMCrandomseed{202599}
+
+% Mode de tirage des groupes : sans remise (ordre fixe, tous les critères)
+\setdefaultgroupmode{withoutreplacement}
+
+% ============================================================
+% BANQUE DE CRITÈRES
+% ============================================================
+% Syntaxe : \UPSTIcritere[pts]{id}{description}
+%   - pts         : points accordés pour ce critère (défaut : 1)
+%   - id          : identifiant unique (utilisé par AMC pour la correction)
+%   - description : texte affiché sur la fiche étudiante
+%
+% Chaque \UPSTIcritere est encapsulé dans un \element{groupe}{...}
+% \restituegroupe{groupe} pioche dans cette banque lors de la génération.
+% ============================================================
+
+% ------------------------------------------------------------
+% Groupe : robot — Partie 1 - Prise/Dépose Robot (12 pts)
+% ------------------------------------------------------------
+
+\element{robot}{%
+  \UPSTIcritere[2]{var-robot}{%
+    Variables de position déclarées avec les bons types et valeurs initiales.%
+  }%
+}
+
+\element{robot}{%
+  \UPSTIcritere[2]{shift-post}{%
+    Bloc \texttt{VAL\_ShiftPoint} instancié et appelé au bon endroit
+    dans le GRAFCET coopératif.%
+  }%
+}
+
+\element{robot}{%
+  \UPSTIcritere[3]{shift-calcul}{%
+    Branchements de \texttt{VAL\_ShiftPoint} corrects :
+    entrées et sortie du bloc correctement câblées.%
+  }%
+}
+
+\element{robot}{%
+  \UPSTIcritere[2]{mouv-approche}{%
+    Commande de mouvement vers le point d'approche correctement conditionnée.%
+  }%
+}
+
+\element{robot}{%
+  \UPSTIcritere[3]{grafcet-complet}{%
+    GRAFCET \texttt{F1\_EVAL\_PriseDepose} complet et comportement conforme
+    au cahier des charges.%
+  }%
+}
+
+% ------------------------------------------------------------
+% Groupe : pont — Partie 2 - Pont roulant (6 pts, 3 critères)
+% ------------------------------------------------------------
+
+\element{pont}{%
+  \UPSTIcritere[2]{pont-config}{%
+    Configuration réseau correcte : module ajouté dans le DTM Navigator,
+    tailles E/S renseignées, adresse IP sur le bon coupleur NOC.%
+  }%
+}
+
+\element{pont}{%
+  \UPSTIcritere[2]{pont-comm}{%
+    Programmation de la communication : variables déclarées, blocs de
+    lecture/écriture câblés et positionnés correctement dans le cycle API.%
+  }%
+}
+
+\element{pont}{%
+  \UPSTIcritere[2]{pont-fonct}{%
+    Fonctionnement du chariot : bloc \texttt{EVAL\_MoveCart} correctement
+    appelé et séquence principale robot\,+\,pont opérationnelle.%
+  }%
+}
+
+% ------------------------------------------------------------
+% Groupe : qualite — Qualité du code (2 pts)
+% ------------------------------------------------------------
+
+\element{qualite}{%
+  \UPSTIcritere[2]{qualite-code}{%
+    Qualité générale du code : nommage cohérent, structure lisible,
+    absence de code mort ou de câblages inutiles.%
+  }%
+}
+
+% ============================================================
+% GÉNÉRATION DES COPIES NOMINATIVES
+% ============================================================
+% Pour chaque ligne du CSV (colonnes : id, prenom, nom) :
+%   - \renewcommand{\UPSTImessage}{...} : affiche le nom dans l'en-tête
+%   - \renewcommand{\UPSTInumeroVersion}{...} : identifiant étudiant (AMC)
+%   - \UPSTIbuildPage : construit l'en-tête UPSTI
+%   - \restituegroupe{...} : tire tous les critères du groupe (sans remise)
+%   - \AMCcleardoublepage : saut de page entre deux copies
+% ============================================================
+
+\csvreader[head to column names]{etudiants.csv}{}{%
+  \exemplaire{1}{%
+
+    % --- Réinitialisation du compteur de critères ---
+    \UPSTIresetCritere
+    % --- Personnalisation de l'en-tête pour cet étudiant ---
+    \renewcommand{\UPSTImessage}{\champnom{\nom\ \prenom}}%
+    \renewcommand{\UPSTInumeroVersion}{\id{}}%
+    \UPSTIbuildPage
+    \AMCassociation{\id}
+
+
+    % --------------------------------------------------------
+    % Partie 1 — Robot : Prise/Dépose (12 pts)
+    % --------------------------------------------------------
+    \section*{Partie~1 --- Robot : Prise/Dépose
+              \hfill \normalfont\small /12~pts}
+
+    \restituegroupe{robot}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{9}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % Partie 2 — Pont roulant et traitement de surface (6 pts)
+    % --------------------------------------------------------
+    \section*{Partie~2 --- Pont roulant et traitement de surface
+              \hfill \normalfont\small /6~pts}
+
+    \restituegroupe{pont}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{3}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % Qualité du code (2 pts)
+    % --------------------------------------------------------
+    \section*{Qualité du code
+              \hfill \normalfont\small /2~pts}
+
+    \restituegroupe{qualite}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{2}
+
+    % Saut de page entre deux copies (fin de recto ou verso)
+    \AMCcleardoublepage
+  }%
+}
+
+\end{document}

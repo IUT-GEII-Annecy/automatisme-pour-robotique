@@ -1,0 +1,21 @@
+\subsection{Programmation hiérarchisée avec GEMMA}
+
+La commande de la cellule est structurée selon un GEMMA (Guide d'Étude des Modes de Marches et d'Arrêts) comprenant :
+
+\begin{itemize}
+    \item \textbf{Mode D1 - Arrêt d'urgence} : mise hors puissance du bras
+    \item \textbf{Mode D2 - Diagnostic/Traitement de défaillance} :
+    \begin{itemize}
+        \item Acquittement des erreurs (\texttt{MC\_GroupReset})
+        \item Vidage de la pile de mouvements (\texttt{MC\_GroupStop})
+        \item Autorisation nouveaux mouvements (\texttt{MC\_GroupContinue})
+        \item Mise sous puissance (\texttt{MC\_GroupPower})
+    \end{itemize}
+    \item \textbf{Mode A5 - Remise en route} : évacuation éventuelle pièce saisie
+    \item \textbf{Mode A6 - Mise en conditions initiales} : positionnement sécurisé du robot
+    \item \textbf{Mode A1 - Arrêt en conditions initiales} : prêt pour production
+    \item \textbf{Mode F1 - Production normale} : cycle automatique décrit ci-dessus
+    \item \textbf{Mode A2 - Arrêt demandé en fin de cycle} : retour en A1 après cycle en cours
+\end{itemize}
+
+Toute erreur de communication (détectée via les bits de santé des réseaux Ethernet/IP) provoque un passage immédiat en mode D1, avec reprise automatique du mode en cours une fois la communication rétablie.

@@ -1,0 +1,60 @@
+\section{Introduction}
+
+Ce document recense et décrit les \textbf{données échangées} entre l'automate
+Schneider M340 et les différents organes de la cellule robotique : le poste
+guichet du convoyeur (via le contrôleur WAGO PFC200), la baie de commande du
+robot SCARA (contrôleur Stäubli CS9, serveur \texttt{uniVALplc}) et le pupitre
+opérateur / écran de supervision (contrôleur Schneider M221). Pour la
+présentation générale du système et de ses contraintes, se reporter au dossier
+\texttt{01\_conception} ; pour la description fonctionnelle des modes de
+marche et d'arrêt, se reporter au dossier \texttt{02\_analyse\_fonctionnelle}.
+
+\subsection{Objet du document}
+
+Contrairement à l'analyse fonctionnelle des modes, ce document a une vocation
+délibérément \textbf{technique} : il décrit précisément la nature, le format
+et le contenu des données échangées avec chacun des équipements de la
+cellule, telles qu'elles sont définies par les fichiers de configuration
+EDS (Electronic Data Sheet) et les structures de données fournies par les
+bibliothèques logicielles utilisées (\texttt{uniVALplc} côté robot,
+assemblage Ethernet/IP côté PFC200 et M221).
+
+\subsection{Rappel du réseau Ethernet/IP}
+
+L'automate M340 est équipé de deux coupleurs Ethernet/IP de type
+BMX~NOC~0401.2, chacun scrutant un ensemble d'équipements distinct :
+
+\begin{itemize}
+    \item \textbf{NOC\_ETHIP\_CONVOYEUR} : scrute le contrôleur
+    \textbf{PFC200} (WAGO), qui gère la commande du poste guichet du
+    convoyeur ;
+    \item \textbf{NOC\_ETHIP\_ROBOT} : scrute conjointement la baie
+    \textbf{CS9} du robot SCARA (serveur \texttt{uniVALplc}) et le
+    contrôleur \textbf{M221} (îlot d'entrées/sorties du pupitre opérateur et
+    interface de supervision Modbus-TCP vers l'écran HMI).
+\end{itemize}
+
+\begin{UPSTIinfor}{Vocabulaire Ethernet/IP}
+Pour chaque équipement scruté par l'automate (le \emph{Scanner} /
+\emph{Originator}), on distingue :
+\begin{itemize}
+    \item les \textbf{données produites} (\texttt{T->O}, \emph{Target ->
+    Originator}) : elles vont de l'équipement (la \emph{Target} /
+    \emph{Adapter}) vers l'automate. Elles constituent, du point de vue de
+    l'automate, une \textbf{entrée} (\texttt{IN}) ;
+    \item les \textbf{données consommées} (\texttt{O->T}, \emph{Originator
+    -> Target}) : elles vont de l'automate vers l'équipement. Elles
+    constituent, du point de vue de l'automate, une \textbf{sortie}
+    (\texttt{OUT}).
+\end{itemize}
+\end{UPSTIinfor}
+
+Chaque coupleur réserve, dans l'espace mémoire \texttt{\%MW} de l'automate,
+une zone d'entrée (contenant l'état de santé des connexions --
+\texttt{HEALTH\_BITS\_IN} -- suivi de la zone image des données produites)
+et une zone de sortie (contenant la mise en service des connexions --
+\texttt{CONTROL\_BITS\_OUT} -- suivie de la zone image des données
+consommées).
+
+Les sections suivantes détaillent, pour chaque organe de la cellule, la
+nature des données échangées.

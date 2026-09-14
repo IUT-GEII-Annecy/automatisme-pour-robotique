@@ -1,0 +1,18 @@
+\section*{Préambule}
+Pour rappel, l'objectif de ce module est de réaliser l'intégration d'un robot dans une cellule automatisée. Le premier TP a permis de configurer le projet et de réaliser la communication avec l'automate commandant le convoyeur. 
+
+Dans ce TP, nous allons réaliser la communication entre l'automate et le contrôleur du robot.
+
+\UPSTIobjectifs{
+     \begin{itemize}
+        \item Configurer la communication avec la baie CS9.
+        \item Configurer la communication avec le contrôleur M221.
+     \end{itemize}
+}
+
+Les systèmes de production modernes intègrent de plus en plus de robots, et différentes structures de commande sont disponibles pour répondre à cette évolution. Le choix de la structure dépend non seulement des compétences de l'intégrateur, mais aussi de l'environnement dans lequel le robot opère. Les contrôleurs de robots actuels, qu'ils soient collaboratifs ou non, proposent des interfaces numériques et analogiques via des cartes additionnelles. Ces contrôleurs supportent aussi diverses technologies de communication, allant des réseaux de terrain traditionnels comme CanOpen ou Profibus DP, aux réseaux Ethernet industriels déterministes tels que EtherCAT, Ethernet/IP, PowerLink ou encore Profinet. 
+
+Dans ces configurations, les contrôleurs de robots peuvent être configurés aussi bien comme maîtres que comme esclaves. Dans le cadre de ce TP, nous allons utiliser un automate programmable pour piloter un robot, ce qui nous permet de l’intégrer dans notre cellule robotisée comme un objet industriel connecté. Le contrôleur du robot conserve sa fonction principale de « motion », en gérant les déplacements du robot. Toutefois, le séquencement de ces mouvements sera dicté par l’automate programmable.
+
+La solution UniVALplc développée par Stäubli s’inscrit parfaitement dans cette logique. Ce TP, ainsi que les suivants, se concentrent sur l’intégration d’UniVALplc dans un réseau Ethernet/IP pour permettre la communication entre l’automate et le contrôleur de robot. L’objectif est d’utiliser les blocs fonctionnels pour commander les mouvements du robot et gérer les échanges de données avec les équipements périphériques, tels que la baie CS9 et le contrôleur M221.
+

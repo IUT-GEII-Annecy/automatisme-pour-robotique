@@ -1,0 +1,20 @@
+\documentclass[cours, noCustomPackages]{UPSTI_Document}
+\usepackage{IUT_Annecy}
+\usepackage{logos_iut}
+
+% --- Git info (nécessite git et les hooks gitinfo2 activés) ---
+\usepackage{gitinfo2} % génère gitHeadInfo.gin via hooks post-commit/checkout/merge
+% Voir doc gitinfo2 pour activer les hooks une fois:
+%   git config --local gitinfo2.enabled true
+%   git info # ou copier les hooks fournis par le package
+\input{preamble.tex}
+\input{../preamble_module.tex}
+
+\documentVersion{E}
+\newcommand{\UPSTInumeroVersion}{\gitAuthorDate\if \gitDirty*dirty \fi}
+\newcommand{\UPSTInumero}{0.1}
+\begin{document}
+
+\input{main.tex}
+
+\end{document}

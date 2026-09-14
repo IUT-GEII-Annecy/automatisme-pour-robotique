@@ -1,0 +1,1 @@
+Type_Power.m_xStatus

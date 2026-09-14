@@ -1,0 +1,21 @@
+Grafcet : A6_SFC
+============================================================
+
+ÉTAPES
+  (*) D1               id=196609    pos=(5,0)
+      D2               id=196610    pos=(5,2)
+      A6               id=196617    pos=(5,6)
+      A1               id=196618    pos=(5,8)
+      F1               id=196614    pos=(5,10)
+      A5               id=196611    pos=(?,?)
+
+TRANSITIONS
+  pos=(5,1)  [section]  TrD1D2
+  pos=(5,3)  [section]  TrD2A5
+  pos=(5,5)  [section]  TrA5A6
+  pos=(5,7)  [section]  TrA6A1
+  pos=(5,9)  [section]  TrA1F1
+  pos=(5,11)  [variable]  tHMI.m_Inputs.m_nixStopRequest
+
+LIAISONS (sauts / retours)
+  transition(5,11) → step(5,0)

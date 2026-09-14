@@ -1,0 +1,50 @@
+\section{Modèle objet CIP}
+\label{sec:modele_cip}
+
+\subsection{Objets, instances, attributs, services}
+Le modèle CIP structure toute donnée ou fonctionnalité d'un équipement autour de quatre notions, à mettre directement en parallèle avec la programmation orientée objet que vous pratiquez en Codesys :
+
+\begin{center}
+    \begin{tabular}{|p{3cm}|p{6.5cm}|p{4.5cm}|}
+        \hline
+        \textbf{Notion CIP} & \textbf{Définition} & \textbf{Analogie POO (Codesys)} \\
+        \hline
+        Classe (\emph{Class}) & Type d'objet générique, identifié par un code hexadécimal (ex. 0x01 = Identity). & Une classe (ex. \texttt{FUNCTION\_BLOCK}) \\
+        \hline
+        Instance & Occurrence concrète d'une classe au sein d'un équipement, numérotée. & Une instance (objet) de la classe \\
+        \hline
+        Attribut & Donnée membre de l'instance (lisible et/ou modifiable), identifiée par un numéro. & Une propriété / variable membre \\
+        \hline
+        Service & Action exécutable sur une classe ou une instance (ex. \texttt{Get\_Attribute\_Single}). & Une méthode \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}{Adressage d'une donnée CIP}
+    Pour accéder à une donnée CIP, il faut donc toujours préciser un triplet : \textbf{Classe} -- \textbf{Instance} -- \textbf{Attribut} (souvent noté \texttt{Class/Instance/Attribute} ou \texttt{C/I/A}), auquel s'ajoute le \textbf{service} demandé (lecture, écriture, action). C'est l'équivalent CIP d'un appel de méthode ou d'accès à une propriété sur un objet logiciel précis.
+\end{UPSTIinfor}
+
+\subsection{Objets standards essentiels}
+L'ODVA (organisation qui normalise CIP) définit des objets standards, présents sur la quasi-totalité des équipements EtherNet/IP. Les connaître permet de diagnostiquer un équipement même sans documentation constructeur détaillée.
+
+\begin{center}
+    \begin{tabular}{|p{2.3cm}|p{4cm}|p{7.5cm}|}
+        \hline
+        \textbf{Code} & \textbf{Nom} & \textbf{Rôle} \\
+        \hline
+        0x01 & Identity Object & Identification de l'équipement : fabricant, type de produit, numéro de série, révision, état de l'équipement. Premier objet à consulter pour un diagnostic. \\
+        \hline
+        0x04 & Assembly Object & Regroupe plusieurs attributs d'autres objets en un seul bloc de données, pour l'échange cyclique (I/O). Voir \ref{sec:objets_assembly}. \\
+        \hline
+        0x06 & Connection Manager Object & Gère l'ouverture, la configuration et la fermeture des connexions CIP (implicites et explicites). \\
+        \hline
+        0xF5 & TCP/IP Interface Object & Configuration de l'interface TCP/IP de l'équipement (adresse IP, masque, passerelle). \\
+        \hline
+        0xF6 & Ethernet Link Object & Informations et statistiques de la liaison Ethernet physique (vitesse, duplex, compteurs d'erreurs). \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIidee}{Objets spécifiques au domaine applicatif}
+    Au-delà de ces objets standards communs à tous les équipements, chaque famille de produits ajoute des objets métiers (ex. objet Moteur pour un variateur, objet Capteur pour une caméra de vision). Ces objets spécifiques sont documentés dans le fichier \textbf{EDS} (\emph{Electronic Data Sheet}) fourni par le constructeur -- voir le glossaire.
+\end{UPSTIidee}

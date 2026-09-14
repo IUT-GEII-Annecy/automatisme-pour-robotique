@@ -1,0 +1,33 @@
+\section{Partie TP}
+On respectera les bonnes pratiques de programmation définies dans les TPs précédents, à savoir \textit{(liste non exhaustive)} :
+\begin{itemize}
+    \item Utilisation des macros-étapes pour simplifier la lecture du programme.
+    \item Utilisation de variables structurées pour accéder aux paramètres des blocs fonctionnels.
+    \item Appels des blocs fonctionnels dans une section dédiée, associée au mode concerné.
+\end{itemize}
+
+\begin{UPSTIinfor}{Conventions de nommage}
+    \begin{itemize}
+        \item Les macros-étapes commencent par le nom du mode suivi de \texttt{\_MS}, d'un numéro puis de l'action qu'elle effectue. Exemple : \texttt{F1\_MS1\_SaisieGobelet}.
+        \item Une action sur front montant (\texttt{P1}) ou sur front descendant (\texttt{P0}) commence par le nom du mode suivi, puis de l'éventuelle macro à laquelle elle appartient, de de \texttt{\_P0} ou \texttt{\_P1}puis l'action qu'elle effectue. Exemple : \texttt{F1\_MS1\_AP1\_ConfigurationMvtsLineaires}.
+        \item Les variables structurées associées à un bloc fonctionnel commencent par \texttt{s\_} suivi du mode dans lequel elles sont utilisées, suivi du nom du bloc fonctionnel, puis du nom de la variable structurée. Exemple : \texttt{s\_F1\_VAL\_ShiftPoint}.
+        \item Les instances de blocs fonctionnels commencent par le nom du mode, suivi d'un nom explicite du bloc fonctionnel. Exemple : \texttt{F1\_ShiftPoint}.
+    \end{itemize}
+\end{UPSTIinfor}
+
+\begin{UPSTIManipulation}[Implémentation]
+    Dans notre cas, le mode \texttt{F1} sera donc composé de 3 sections : 
+\begin{description}
+    \item[F1\_ProductionNormale] : Contient le SFC principal du mode \texttt{F1}.
+    \item[F1\_ProductionNormale\_Actions] : Contient les actions associées aux étapes du mode \texttt{F1}. 
+    \item[F1\_ProductionNormale\_AppelsBF] : Contient les appels des blocs fonctionnels associés au mode \texttt{F1}.
+\end{description}
+    \UPSTIetape{Implémenter les transitions \texttt{T\_A1\_to\_F1} \texttt{T\_F1\_to\_A2} et \texttt{T\_A2\_to\_A1}.}
+    \UPSTIetape{Modifier le SFC du mode \texttt{F1} pour qu'il corresponde à la préparation.}
+    \UPSTIetape{Implémenter la macro-étape \texttt{F1\_MS1} en respectant les consignes données dans les préparations.}
+    \UPSTIetape{Implémenter la macro-étape \texttt{F1\_MS2} en respectant les consignes données dans les préparations.}
+    \UPSTIetape{Instancier les blocs fonctionnels et les variables structurées associées.}
+    \UPSTIetape{Compléter la section d'appel des blocs fonctionnels associée au mode \texttt{F1}.}
+    \UPSTIetape{Compléter la section \textit{post} associée au mode \texttt{F1}.}
+    \UPSTIetape{Faire vérifier avant de tester}
+\end{UPSTIManipulation}

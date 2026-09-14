@@ -1,0 +1,112 @@
+\subsection{Mise en oeuvre}
+Cette section propose un exemple de mise en oeuvre de la programmation orientée objet sous CodeSys. Nous allons construire une classe \emph{CStep} qui représente une étape d'un grafcet. Cette classe implémentera une interface \emph{ITF\_ObjStep} qui définira les méthodes et attributs communs à toutes les étapes : 
+\begin{itemize}
+    \item \textbf{Attributs}
+          \begin{itemize}
+              \item \textbf{m\_xActivityBit} : bit d'activité (actif ou non)
+                    \begin{itemize}
+                        \item Accessible en lecture uniquement
+                    \end{itemize}
+              \item \textbf{m\_tActivationDuration} : Stocke le temps d'activation de l'étape
+                    \begin{itemize}
+                        \item Accessible en lecture uniquement
+                    \end{itemize}
+              \item \textbf{m\_tTaskPeriod} : période de la tâche
+                    \begin{itemize}
+                        \item Accessible en lecture et en écriture
+                    \end{itemize}
+          \end{itemize}
+    \item \textbf{Méthodes}
+    \begin{itemize}
+        \item \textbf{MInit} : Méthode appelée à l'initialisation du programme
+        \item \textbf{MActivate} : active l'étape
+        \item \textbf{MDeactivate} : désactive l'étape
+    \end{itemize}
+\end{itemize}
+
+\begin{UPSTIactivite}[][L'interface \lstinline{ITF_ObjStep}]
+\UPSTIquestion{Compléter la liste des propriété et méthodes de l'interface \lstinline{ITF_ObjStep}.}
+
+\begin{lstlisting}[escapechar=~, numbers=none, basicstyle=\Large, language=st]
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface.png}~INTERFACE ITF_ObjStep
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~ PROPERTY xActivityBit : BOOL (*Accesseur Get*)
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~ PROPERTY ~\dotfill~
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~ PROPERTY ~\dotfill~
+    ~$\cdots$~
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~ METHOD MInit;
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~ METHOD ~\dotfill~
+    ~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~ METHOD ~\dotfill~
+\end{lstlisting}
+\end{UPSTIactivite}
+\pagebreak
+\begin{UPSTIactivite}[][Le bloc fonction \lstinline{CStep}]
+\UPSTIquestion{Compléter la déclaration du bloc fonctionnel \lstinline{CStep} qui implémente l'interface \lstinline{ITF_ObjStep}. Elle contiendra les variables locales associées aux propriétés de l'interface.}
+\begin{lstlisting}[escapechar=~, basicstyle=\Large, language=st]
+FUNCTION_BLOCK ~\dotfill~
+VAR
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+END_VAR
+\end{lstlisting}
+\UPSTIquestion{Ajouter des lignes permettant la mise à jour de la durée d'activation lorsque l'étape est active -- Si l'étape est active, la durée d'activation augmente de la période de la tâche.}
+\begin{lstlisting}[escapechar=~, basicstyle=\Large, language=st]
+~\dotfill~
+~\dotfill~
+~\dotfill~
+~\dotfill~
+\end{lstlisting}
+\UPSTIquestion{Définir les accesseurs pour les propriétés de l'interface.}
+\begin{lstlisting}[numbers=none, escapechar=~, basicstyle=\Large, language=st]
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~CStep.xActivityBit.Get
+    ~\dotfill~
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~CStep~\dotfill~
+    ~\dotfill~
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~CStep~\dotfill~
+    ~\dotfill~
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_interface_property.png}~CStep.Set (*Limiter les valeurs admissible a [T#1ms, T#10s]*)
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+\end{lstlisting}
+\end{UPSTIactivite}
+\pagebreak
+\begin{UPSTIactivite}
+    \UPSTIquestion{Surcharger le constructeur de la classe \lstinline{CStep} pour initialiser la période de la tâche à \lstinline{T#1ms}, le bit d'activité à \lstinline{FALSE} et la durée d'activation à \lstinline{T#0s}.}
+    \begin{lstlisting}[numbers=none, escapechar=~, basicstyle=\Large, language=st]
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~METHOD~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+\end{lstlisting}
+\end{UPSTIactivite}
+\begin{UPSTIactivite}
+    \UPSTIquestion{Définir les méthodes \lstinline{MInit}, \lstinline{MActivate} et \lstinline{MDeactivate} de la classe \lstinline{CStep}.}
+    \begin{lstlisting}[numbers=none, escapechar=~, basicstyle=\Large, language=st]
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~METHOD CStep.MInit 
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~METHOD CStep.MActivate 
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+    ~\dotfill~
+~\includegraphics[height=\fontcharht\font`\B]{_cds_icon_method.png}~METHOD CStep.MDeactivate
+    ~\dotfill~
+    \end{lstlisting}
+\end{UPSTIactivite}
+
+\pagebreak
+\begin{UPSTIactivite}[][Utilisation]
+    \UPSTIquestion{Compléter le programme suivant pour utiliser la classe \lstinline{CStep}. Le programme activera l'étape au premier cycle et la désactivera au bout de \SI{30}{\second}.}
+    \lstinputlisting[numbers=none, escapechar=~, basicstyle=\Large, language=st]{usercase.st}
+\end{UPSTIactivite}

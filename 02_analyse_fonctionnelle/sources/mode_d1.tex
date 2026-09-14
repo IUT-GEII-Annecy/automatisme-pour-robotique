@@ -1,0 +1,41 @@
+\section{Mode D1 -- Arrêt d'urgence}
+\label{secModeD1}
+
+\subsection{Conditions d'entrée}
+
+Le mode D1 est le mode dans lequel se trouve l'installation à la mise en
+route de l'automate (premier mode actif). Il est également atteint depuis
+n'importe quel autre mode dès qu'un arrêt d'urgence est enclenché ou 
+qu'une défaillance de communication est
+détectée avec l'un des équipements de la cellule (baie de commande du
+robot, IHM ou contrôleur du convoyeur).
+
+\subsection{Comportement attendu}
+
+\begin{itemize}
+    \item \textbf{Robot} : le bras doit être mis hors puissance, dès lors
+    que les équipements nécessaires à cette opération sont eux-mêmes
+    disponibles. Le système de préhension conserve l'état dans lequel il
+    se trouvait.
+    \item \textbf{Convoyeur / guichet} : l'accès au guichet doit être
+    interdit.
+    \item \textbf{IHM} : la situation d'arrêt d'urgence doit être signalée
+    sans ambiguïté à l'opérateur, par une signalisation dédiée et fixe
+    (non clignotante), distincte de la signalisation utilisée pour les
+    autres arrêts.
+\end{itemize}
+
+\begin{UPSTIwarning}{Mode figé tant que la communication n'est pas rétablie}
+L'installation reste figée dans ce mode tant que la communication avec
+l'ensemble des équipements de la cellule n'est pas redevenue opérationnelle.
+Aucune évolution vers un autre mode n'est possible avant ce retour à la
+normale.
+\end{UPSTIwarning}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{D2} (\emph{Diagnostic / traitement de la
+    défaillance}), dès que la communication avec l'ensemble des
+    équipements de la cellule est de nouveau opérationnelle.
+\end{itemize}

@@ -1,0 +1,121 @@
+
+\subsection{Mise en oeuvre de la communication}
+Dans cette section, nous allons créer les sous-programmes en charge de la communication avec la baie CS9. 
+On propose, pour cela, d'ajouter deux sous-programmes à notre projet avec les noms et rôles suivants : 
+\begin{enumerate}
+    \item Une section \texttt{ReadEthIpRobot}, \textbf{première section à être exécutée}, elle aura pour rôle :
+    \begin{enumerate}
+        \item Lecture des données du robot via le bloc fonctionnel \texttt{VAL\_ReadAxesGroup}
+        \item Lecture des informations depuis l'IHM via le bloc fonctionnel \texttt{BF\_ReadHmi}
+    \end{enumerate} 
+    \item Une section \texttt{WriteEthIpRobot}, \textbf{dernière section à être exécutée}, elle aura pour rôle :
+    \begin{enumerate}[resume]
+        \item Écriture des informations vers l'IHM via le bloc fonctionnel \texttt{BF\_WriteHmi}
+        \item Écriture des données du robot via le bloc fonctionnel \texttt{VAL\_WriteAxesGroup}
+    \end{enumerate}
+\end{enumerate}
+
+
+Pour cela, ce TP suivra les étapes suivantes : 
+\begin{enumerate}
+    \item Importation des blocs fonctionnels nécessaires (HMI et CS9) dans le projet
+    \item Déclaration des variables nécessaires à la communication
+    \item Création des sections \texttt{ReadEthIpRobot} et \texttt{WriteEthIpRobot}
+    \begin{enumerate}
+        \item Réservation des variables 
+        \item Instanciation des blocs fonctionnels
+        \item Appel des blocs de lecture et d'écriture dans les sections respectives. 
+    \end{enumerate}
+    \item Vérification du bon fonctionnement de la communication
+\end{enumerate}
+
+\subsubsection{Communication avec la baie CS9}
+
+Les blocs fonctionnels \texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup} sont fournis par la bibliothèque \texttt{UnivalPlc}. Puisque l'ajout d'une bibliothèque de types nécessite des droits d'administrateur, cela a été fait en amont du TP.
+
+\begin{UPSTIinfor}{Importation des Fichiers EDS et de la Bibliothèque de Types}
+    \textit{Ces manipulations ont été faites en amont du TP. Cet encart est à titre informatif.}
+    \begin{enumerate}
+        \item Exécuter le programme de mise à jour de la bibliothèque de types sous \textit{Control Expert} en mode administrateur.
+        \item Importer le fichier \texttt{FAMILY.DCS} pour ajouter la bibliothèque UniVALplc à l'environnement de développement.
+    \end{enumerate}
+    \textit{Les fichiers et bibliothèques nécessaires sont disponible dans le dossier \texttt{Scara/uniVALplc/}}
+\end{UPSTIinfor}
+
+
+\begin{UPSTIManipulation}[Déclaration des variables nécessaires à la communication]
+    Afin de rassembler les données provenant du bloc de communication avec le robot, on propose de déclarer une structure de données \texttt{T\_CtrlStatusGroup}. 
+    \lstinputlisting[language=st]{TCtrlStatusGroup.st}
+
+    \UPSTIetape{Définir ce type de données dans le dossier \texttt{Types données dérivés} du projet.}
+\end{UPSTIManipulation}
+    
+
+\begin{UPSTIManipulation}[Mise en oeuvre de la communication]
+    \UPSTIetape{Créer les deux sous-programmes décrits en début de cette sous-section et les ordonner afin qu'ils soient exécutés dans l'ordre adéquate.}
+    \UPSTIetape{Réserver les variables du tableau suivant. Pour certaines variables, l'adresse de lecture est à fixer selon la préparation (cf. \ref{sec:declarationObjets}).}
+    \begin{center}
+        \begin{tabular}{|l|l|l|l|}
+            \hline
+            Nom & Type & Adresse & Commentaire \\
+            \hline
+            ctrlStatusGroupRead & TCtrlStatusGroup &  & \textit{État de la lecture} \\
+            ctrlStatusGroupWrite & TCtrlStatusGroup &  & \textit{État de l'écriture} \\
+            fromRobotScara & T\_FromRobot & \textit{à fixer} & \textit{Données du robot} \\
+            toRobotScara & T\_ToRobot & \textit{à fixer} & \textit{Commandes vers le robot} \\
+            staeubliRobotScara & T\_StaeubliRobot &  & \textit{Structure de données du robot} \\
+            \hline
+        \end{tabular}
+    \UPSTIetape{Instancier les blocs fonctionnels \texttt{VAL\_ReadAxesGroup}, \texttt{VAL\_WriteAxesGroup}, \texttt{BF\_ReadHmi} et \texttt{BF\_WriteHmi} dans le dossier \texttt{Instances FB dérivé}.}
+    \UPSTIetape{Appeler les blocs fonctionnels dans les sections \texttt{ReadEthIpRobot} et \texttt{WriteEthIpRobot} en respectant l'ordre de lecture et d'écriture.}
+    \begin{itemize}
+        \item On conditionnera l'exécution des blocs au bon fonctionnement de la communication. Pour cela, prendre en compte le bit de santé \texttt{NOC\_ETHIP\_ROBOT\_IN.HEALTH\_BITS\_IN[0].0}.
+    \end{itemize}
+    \end{center}
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Fonctionnement de la communication]
+    \UPSTIetape{Créer une table d'animation nommée \texttt{scara} afin de visualiser les données suivantes :}
+    \begin{multicols}{2}
+        \begin{itemize}
+            \item \texttt{NOC\_ETHIP\_ROBOT\_IN.HEALTH\_BITS\_IN[0].0}
+            \item \texttt{ctrlStatusGroupRead}
+            \item \texttt{ctrlStatusGroupWrite}
+            \item \texttt{staeubliRobotScara}
+        \end{itemize}
+    \end{multicols}
+    
+    \UPSTIetape{Vérifier, compiler puis transférer le programme.}
+    \UPSTIetape{Vérifier que les données échangées entre l'IHM et le robot sont correctes.}
+    \begin{itemize}[label=$\square$]
+        \item Bit de santé du coupleur 
+        \item Absence d'erreur dans les variables \texttt{ctrlStatusGroupRead} et \texttt{ctrlStatusGroupWrite}
+        \item Conformité des données du robot \texttt{staeubliRobotScara}
+    \end{itemize}
+    
+\end{UPSTIVerification}
+
+\subsubsection{Communication avec le contrôleur M221}
+
+Les blocs fonctionnels \texttt{BF\_ReadHmi} et \texttt{BF\_WriteHmi} ont été créés par l'équipe enseignante et doivent être importés dans le projet.
+
+\begin{UPSTIManipulation}[Importation des blocs fonctionnels HMI]
+    \UPSTIetape{\textbf{Clique-droit->Importer} sur le dossier \texttt{Type FB dérivés} dans l'arborescence du projet.}
+    \UPSTIetape{Sélectionner les fichiers \texttt{FB\_ReadHmi.xdb} et \texttt{FB\_WriteHmi.xdb} dans le dossier \path{U:\Documents\BUT\GEII\ModulesS5\Automatisme_Pour_Robotique\Scara}}
+    \UPSTIetape{Si l'application vous le demande, \textbf{Garder tout} puis valider.}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}[Déclaration des variables nécessaires à la communication]
+    \UPSTIetape{En suivant les mêmes étapes que pour la communication avec la baie CS9, réaliser la communication avec le contrôleur M221.}
+    \begin{itemize}
+        \item L'appel du bloc \texttt{BF\_ReadHmi} se fera \textbf{après} le bloc \texttt{VAL\_ReadAxesGroup}.
+        \item L'appel du bloc \texttt{BF\_WriteHmi} se fera \textbf{avant} le bloc \texttt{VAL\_WriteAxesGroup}.
+        \item On utilisera le bit de santé \texttt{NOC\_ETHIP\_ROBOT\_IN.HEALTH\_BITS\_IN[0].1} ainsi que le précédent pour conditionner l'exécution des blocs.
+    \end{itemize}
+\end{UPSTIManipulation}
+
+\begin{UPSTIVerification}[Communication avec l'IHM]
+    \UPSTIetape{Compiler, transférer puis vérifier le bon fonctionnement.}
+    \UPSTIetape{Faire valider par l'enseignant.}
+\end{UPSTIVerification}
+

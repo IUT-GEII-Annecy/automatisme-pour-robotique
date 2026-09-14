@@ -1,0 +1,36 @@
+\section{Objet Assembly}
+\label{sec:objets_assembly}
+
+L'\textbf{Assembly Object} (classe 0x04) est l'objet central de la messagerie implicite : il regroupe, dans un seul bloc de données contigu, plusieurs attributs qui seraient sinon dispersés dans plusieurs objets/instances. Cela évite de multiplier les connexions cycliques et permet un échange efficace en une seule trame.
+
+\subsection{Les trois assemblies typiques}
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{5cm}|p{6.5cm}|}
+        \hline
+        \textbf{Assembly} & \textbf{Sens du point de vue de l'Adapter} & \textbf{Contenu typique} \\
+        \hline
+        Input Assembly & Adapter $\rightarrow$ Scanner & États, mesures, retours de capteurs, codes de défaut. \\
+        \hline
+        Output Assembly & Scanner $\rightarrow$ Adapter & Commandes, consignes, ordres de marche. \\
+        \hline
+        Configuration Assembly & Scanner $\rightarrow$ Adapter (généralement à l'ouverture de connexion) & Paramètres de configuration transmis une fois à l'établissement de la connexion. \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}{Point de vue Scanner vs point de vue Adapter}
+    Attention au sens : ce que l'Adapter appelle son \emph{Input Assembly} correspond, côté Scanner (votre automate), à une donnée reçue en \textbf{entrée}. Ce que l'Adapter appelle son \emph{Output Assembly} correspond, côté Scanner, à une donnée envoyée en \textbf{sortie}. La documentation constructeur (fichier EDS) se place presque toujours du point de vue de l'Adapter -- gardez ce repère en tête au moment de câbler vos variables Codesys.
+\end{UPSTIinfor}
+
+\subsection{Dimensionnement}
+Chaque Assembly a une \textbf{taille fixe}, exprimée en octets, définie soit par une instance standard proposée par l'équipement, soit par une configuration (\emph{assembly configurable}) lorsque l'équipement le permet. Ce dimensionnement doit être décidé \emph{avant} la mise en \oe uvre :
+\begin{itemize}
+    \item Lister précisément les données à échanger dans chaque sens.
+    \item Choisir un format compact (bits groupés en octets/mots, éviter le gaspillage).
+    \item Vérifier la correspondance entre la taille de l'Assembly déclarée côté Adapter et celle attendue côté configuration Scanner : une incohérence empêche l'établissement de la connexion.
+\end{itemize}
+
+\begin{UPSTIidee}{Lien avec votre code orienté objet}
+    Une bonne pratique de conception consiste à faire correspondre un Assembly Object à une \textbf{structure de données} (ou à une classe simple) côté Codesys, représentant l'état échangé avec l'équipement distant. L'objet logiciel qui pilote l'équipement (ex. \texttt{CVariateur}, \texttt{CCameraVision}) encapsule alors la mise en forme/lecture de cette structure, et expose à son tour des propriétés et méthodes de haut niveau au reste de l'application -- la complexité du mapping CIP reste cachée à l'intérieur de l'objet.
+\end{UPSTIidee}

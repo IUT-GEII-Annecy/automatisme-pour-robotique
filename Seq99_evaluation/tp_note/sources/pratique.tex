@@ -1,0 +1,48 @@
+\section{Réalisation d'un GRAFCET de prise/dépose}
+\subsection{Un GRAFCET d'approche}
+Afin de généraliser la prise et la dépose d'objets par le robot, on propose d'écrire un GRAFCET de \texttt{prise/dépose} qui sera utilisé à chaque prise ou dépose d'un gobelet. Le squelette de ce GRAFCET vous a été donné au tableau et se trouve dans la section \texttt{F1\_EVAL\_PriseDepose} et sa section POST associée.
+
+Pour réaliser ce comportement, on propose d'utiliser les variables de type \texttt{T\_CartesianPos} suivantes
+\begin{center}
+  \begin{tabular}{l|l|l|p{5cm}}
+    Type & Nom                                     & Coordonnées                   & Description                           \\\hline\hline
+    T\_CartesianPos & \texttt{cartesianPos\_Cuve0}            & (360,-160,  20, 180,  0,  0)  & Position du gobelet sur la cuve 0     \\
+    T\_CartesianPos & \texttt{cartesianPos\_Cuve1}            & (450,   0,  20, 180,  0,  0)  & Position du gobelet sur la cuve 1     \\
+    T\_CartesianPos & \texttt{cartesianPos\_Convoyeur}        & ( 90,-410,  50, 180,  0,  0)  & Position du gobelet sur le convoyeur  \\\hline
+    T\_Trsf & \texttt{Trsf\_Approche}                 & (  0,   0, 100,   0,  0,  0)  & Translation d'approche                \\\hline
+    T\_CartesianPos & \texttt{cartesianPos\_Destination}      &                               & Variable d'échange entre GRAFCET principal et GRAFCET de mouvements. \\
+  \end{tabular}
+\end{center}
+
+Chaque bloc fonctionnel UniVALplc de mouvement est associé à une variable structurée reliée à ses entrées et sorties. L'appel des bloc est fait dans la section \texttt{ScaraMoves} qu'il est possible de consulter.
+
+A chaque fois que l'on souhaite faire une prise ou dépose de gobelet, la stratégie proposée, pour l'étape correspondante, est la suivante :
+\begin{enumerate}
+  \item Dans le programme principale \texttt{F1\_ProductionNormale}, une action \textbf{P1} est lancée
+    \begin{itemize}
+      \item Elle définit la variable \texttt{cartesianPos\_Destination} avec la position de destination voulue. \textit{On utilisera ici les positions définies dans les variables définies ci-dessus.}
+      \item Elle positionne une variable \texttt{priseDepose} qui indiquera si le robot doit poser ou récupérer un gobelet.
+    \end{itemize}
+  \item Le GRAFCET coopérant de la section \texttt{F1\_EVAL\_PriseDepose} se déclenche alors \textit{(Condition de sortie de l'étape initiale à définir)}
+    \begin{enumerate}
+      \item Le point d'approche est calculé à partir du point de destination
+      \item Le robot est envoyé au point d'approche
+      \item Le robot descend jusqu'au point de destination
+      \item La prise ou dépose est effectuée
+      \item Le robot remonte
+      \item Le GRAFCET attend que l'étape du programme principal correspondante ne soit plus active
+    \end{enumerate}
+  \item Le programme principal se poursuit.
+\end{enumerate}
+
+\begin{UPSTIManipulation}{Réalisation du GRAFCET de prise/dépose}
+
+  \UPSTIetape{Vérifier, et définir si besoin, les variables du tableau précédent.}
+
+  Ouvrir la documentation afin de prendre connaissance du fonctionnement du bloc \texttt{VAL\_ShiftPoint}.
+  \UPSTIetape{Dans la section \texttt{F1\_EVAL\_PriseDepose\_Post}, Appeler une instance de bloc \texttt{VAL\_ShiftPoint}.}
+  \UPSTIetape{Dans la section \texttt{F1\_EVAL\_PriseDepose\_Post}, utiliser ce bloc fonctionnel pour faire le calcul du point d'approche lors de l'étape \texttt{F1\_M\_01}}
+  \UPSTIetape{Provoquer le lancement du mouvement du robot pour aller au point d'approche. \\\textbf{Attention, il peut être judicieux de vérifier que le robot ne se trouve pas déjà au point d'approche avant de lancer ce mouvement.}}
+  \UPSTIetape{Compléter le reste du programme pour suivre le comportement désiré}
+  \UPSTIetape{Faire \textbf{Valider} par l'enseignant}
+\end{UPSTIManipulation}

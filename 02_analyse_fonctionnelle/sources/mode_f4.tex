@@ -1,0 +1,45 @@
+\section{Mode F4 -- Mode manuel}
+\label{secModeF4}
+
+\subsection{Conditions d'entrée}
+
+Le mode F4 est atteint depuis le mode A1, sur demande de marche manuelle
+formulée par l'opérateur (exclusive de la demande de marche automatique
+menant au mode F1).
+
+\subsection{Comportement attendu}
+
+Ce mode est destiné aux besoins de maintenance : il permet à l'opérateur de
+commander directement, depuis le pupitre opérateur, le déplacement de
+chacun des axes du robot, simultanément ou non, dans le respect des
+butées articulaires de chaque axe.
+
+\begin{itemize}
+    \item \textbf{Convoyeur / guichet} : l'accès au guichet est interdit
+    pendant toute la durée du mode manuel.
+    \item \textbf{Robot} : les commandes de mouvement issues du pupitre
+    opérateur ne sont prises en compte que si le guichet est vide. Une
+    demande de mouvement contradictoire (par exemple une demande
+    simultanée de monter et de descendre un même axe) ne doit provoquer
+    aucun mouvement.
+    \item \textbf{Comportement pendant un mouvement en cours} : si
+    l'opérateur relâche la commande à l'origine du mouvement (ou formule
+    une nouvelle demande contradictoire), le mouvement en cours doit être
+    interrompu et l'installation doit se tenir prête à accepter une
+    nouvelle demande de mouvement valide. Si l'opérateur maintient sa
+    commande jusqu'à la fin de course demandée, le robot atteint la
+    position limite correspondante avant de se remettre en attente d'une
+    nouvelle demande.
+    \item \textbf{IHM} : la situation de mode manuel doit être signalée en
+    permanence par une signalisation dédiée, clignotante.
+\end{itemize}
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{A6} (\emph{Mise en conditions initiales}),
+    sur demande de retour aux conditions initiales formulée par
+    l'opérateur, à condition qu'aucun mouvement ne soit alors en cours.
+    \item Vers le mode \textbf{D1}, si une défaillance de communication est
+    détectée.
+\end{itemize}

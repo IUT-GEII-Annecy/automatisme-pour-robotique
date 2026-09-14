@@ -1,0 +1,215 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fiche d'évaluation AMC — Projet cellule robotisée (TPs 2 à 5)
+%
+% Évalue la configuration complète de l'automate M340 et la programmation
+% UniVALplc sous EtherNet/IP : configuration NOC, structure logicielle,
+% GEMMA, modes de marche, qualité du code et investissement.
+%
+% Barème : 20 pts
+%   - Configuration EtherNet/IP   : 3 pts  (1 critère)
+%   - Structure logicielle        : 4 pts  (2 critères)
+%   - GEMMA et modes de marche    : 6 pts  (3 critères)
+%   - Qualité globale du code     : 2 pts  (1 critère)
+%   - Investissement dans les séances : 5 pts (2 critères)
+%
+% Compilation : pdflatex fiche_projet.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[QCM, noCustomPackages]{UPSTI_Document}
+
+\UPSTIloadProfile{BUT_GEII}
+
+% ============================================================
+% MÉTADONNÉES
+% ============================================================
+\discipline[Autom - Robotique]{Automatisme pour la robotique}
+\newcommand{\UPSTItitreEnTete}{Évaluation projet}
+\newcommand{\UPSTItitre}{Cellule robotisée UniVALplc --- Évaluation projet}
+\newcommand{\UPSTInumero}{Projet}
+\newcommand{\sequence}{99}
+\documentVersion{E}
+\newcommand{\UPSTInumeroVersion}{--}
+\newcommand{\UPSTImessage}{}
+
+% ============================================================
+\begin{document}
+
+\AMCrandomseed{202500}
+\setdefaultgroupmode{withoutreplacement}
+
+% ============================================================
+% BANQUE DE CRITÈRES
+% ============================================================
+
+% ------------------------------------------------------------
+% Configuration EtherNet/IP — NOC_ETHIP_ROBOT (3 pts)
+% ------------------------------------------------------------
+
+\element{config}{%
+  \UPSTIcritere[3]{noc-robot}{%
+    Configuration complète du réseau \texttt{NOC\_ETHIP\_ROBOT} :
+    équipements CS9 et M221 ajoutés dans le bon ordre, adresses IP correctes,
+    tailles des données E/S configurées (Exclusive Owner / assemblage).%
+  }%
+}
+
+% ------------------------------------------------------------
+% Structure logicielle de base (4 pts)
+% ------------------------------------------------------------
+
+\element{structure}{%
+  \UPSTIcritere[2]{struct-base}{%
+    Objet \texttt{T\_StaeubliRobot} réservé ; blocs \texttt{VAL\_ReadAxesGroup}
+    et \texttt{VAL\_WriteAxesGroup} appelés aux bons moments du cycle API
+    (lecture en début, écriture en fin).%
+  }%
+}
+
+\element{structure}{%
+  \UPSTIcritere[2]{vars-echange}{%
+    Variables d'échange robot et HMI déclarées avec les bons types
+    et correctement câblées aux blocs de lecture/écriture.%
+  }%
+}
+
+% ------------------------------------------------------------
+% GEMMA et modes de marche (6 pts)
+% ------------------------------------------------------------
+
+\element{gemma}{%
+  \UPSTIcritere[2]{gemma-securite}{%
+    Modes \textbf{D1} et \textbf{D2} fonctionnels : arrêt d'urgence
+    (bras hors puissance) et reprise après défaillance
+    (reset, vidage pile, remise sous puissance).%
+  }%
+}
+
+\element{gemma}{%
+  \UPSTIcritere[2]{gemma-init}{%
+    Mode \textbf{A6} fonctionnel : mise en conditions initiales du robot
+    (séquence de déplacement conforme, position finale correcte).%
+  }%
+}
+
+\element{gemma}{%
+  \UPSTIcritere[2]{mode-f1}{%
+    Mode \textbf{F1} Production Normale fonctionnel : cycle robot + guichet
+    coordonnés, macro-étapes correctement définies.%
+  }%
+}
+
+% ------------------------------------------------------------
+% Qualité globale du code (2 pts)
+% ------------------------------------------------------------
+
+\element{qualite}{%
+  \UPSTIcritere[2]{qualite-glob}{%
+    Qualité et cohérence globale du projet : nommage conforme aux
+    conventions, structure lisible, absence de code mort.%
+  }%
+}
+
+% ------------------------------------------------------------
+% Investissement dans les séances (5 pts)
+% ------------------------------------------------------------
+
+\element{investissement}{%
+  \UPSTIcritere[2]{invt-presence}{%
+    Présence et engagement : travail effectif durant les séances,
+    sollicitation appropriée de l'enseignant.%
+  }%
+}
+
+\element{investissement}{%
+  \UPSTIcritere[3]{invt-autonomie}{%
+    Progression et autonomie : évolution observée sur la durée du projet,
+    capacité à analyser et résoudre les problèmes sans aide systématique.%
+  }%
+}
+
+% ============================================================
+% GÉNÉRATION DES COPIES NOMINATIVES
+% ============================================================
+
+\csvreader[head to column names]{etudiants.csv}{}{%
+  \exemplaire{1}{%
+
+    \UPSTIresetCritere
+    \renewcommand{\UPSTImessage}{\champnom{\nom\ \prenom}}%
+    \renewcommand{\UPSTInumeroVersion}{\id{}}%
+    \AMCassociation{\id}
+    \UPSTIbuildPage
+
+    % --------------------------------------------------------
+    % Configuration EtherNet/IP (3 pts)
+    % --------------------------------------------------------
+    \section*{Configuration EtherNet/IP
+              \hfill \normalfont\small /3~pts}
+
+    \restituegroupe{config}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{2}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % Structure logicielle de base (4 pts)
+    % --------------------------------------------------------
+    \section*{Structure logicielle de base
+              \hfill \normalfont\small /4~pts}
+
+    \restituegroupe{structure}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{2}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % GEMMA et modes de marche (6 pts)
+    % --------------------------------------------------------
+    \section*{GEMMA et modes de marche
+              \hfill \normalfont\small /6~pts}
+
+    \restituegroupe{gemma}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{3}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % Qualité globale du code (2 pts)
+    % --------------------------------------------------------
+    \section*{Qualité globale du code
+              \hfill \normalfont\small /2~pts}
+
+    \restituegroupe{qualite}
+
+    \smallskip
+    \noindent\textit{Commentaires :}\\[2pt]
+    \UPSTIquadrillage{2}
+
+    \bigskip
+
+    % --------------------------------------------------------
+    % Investissement dans les séances (5 pts)
+    % --------------------------------------------------------
+    \section*{Investissement dans les séances
+              \hfill \normalfont\small /5~pts}
+
+    \restituegroupe{investissement}
+
+    \smallskip
+    \noindent\textit{Observations :}\\[2pt]
+    \UPSTIquadrillage{4}
+
+    \AMCcleardoublepage
+  }%
+}
+
+\end{document}

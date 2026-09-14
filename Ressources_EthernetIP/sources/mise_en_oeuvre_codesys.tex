@@ -1,0 +1,67 @@
+\section{Mise en \oe uvre côté Codesys}
+\label{sec:mise_en_oeuvre_codesys}
+
+Cette partie reste volontairement générique : elle décrit les briques et la démarche, sans dépendre d'un équipement particulier, afin que vous puissiez l'appliquer à n'importe quel Adapter EtherNet/IP rencontré en TP.
+
+\subsection{Les briques de configuration}
+Dans l'arbre de configuration matérielle Codesys, la mise en \oe uvre d'une liaison EtherNet/IP repose généralement sur :
+
+\begin{itemize}
+    \item Un \textbf{scanner EtherNet/IP} ajouté sous l'interface Ethernet de l'automate (rôle Scanner/Originator).
+    \item Un ou plusieurs \textbf{devices Adapter}, ajoutés sous ce scanner, décrits par un fichier \textbf{EDS} fourni par le constructeur (ou un device générique si aucun EDS n'est disponible).
+    \item Pour chaque device : la configuration de sa/ses \textbf{connexion(s)} (choix de l'Assembly Input/Output/Config utilisé, taille, RPI).
+    \item Le \textbf{mapping} des variables d'E/S automate sur les octets/mots de chaque Assembly.
+\end{itemize}
+
+\begin{UPSTIinfor}{Où se situe la couche objet CIP ?}
+    La couche objet CIP (classes, instances, attributs, Assembly) est gérée par le \textbf{runtime EtherNet/IP} de Codesys : ouverture/maintien des connexions, sérialisation des Assembly en trames réseau, gestion du RPI. Ce que voit votre programme ST, ce sont des \textbf{variables mappées} (issues du scanner) qui reflètent le contenu des Assembly -- des octets, mots, bits bruts. La sémantique CIP (quel octet représente quel attribut) est définie une fois pour toutes à la configuration, pas dans le code applicatif.
+\end{UPSTIinfor}
+
+\subsection{Où placer la couche objet applicative}
+La conception orientée objet de votre application intervient \emph{au-dessus} du mapping brut fourni par le scanner : c'est à vous de construire l'abstraction qui donne du sens aux octets échangés.
+
+\begin{UPSTIidee}{Principe d'encapsulation appliqué à un équipement EtherNet/IP}
+    Une classe dédiée à un équipement CIP (ex. \texttt{CAdapterEthernetIP} ou une classe spécifique comme \texttt{CVariateurAxe}) peut :
+    \begin{itemize}
+        \item recevoir, en entrée de sa méthode de mise à jour cyclique, les variables brutes issues du mapping Input Assembly ;
+        \item exposer des \textbf{propriétés} de haut niveau (ex. \texttt{Vitesse}, \texttt{EtatDefaut}, \texttt{PositionCourante}) qui décodent ces octets bruts ;
+        \item exposer des \textbf{méthodes} qui construisent le contenu attendu de l'Output Assembly (ex. \texttt{Demarrer()}, \texttt{ConsigneVitesse(...)}) ;
+        \item encapsuler, si nécessaire, l'émission de requêtes de messagerie explicite pour du diagnostic ponctuel (lecture de l'objet Identity, par exemple).
+    \end{itemize}
+\end{UPSTIidee}
+
+Un squelette de structure de communication (extrait de principe, à adapter) :
+
+\begin{lstlisting}[caption={Squelette d'une classe encapsulant un échange cyclique via Assembly}]
+FUNCTION_BLOCK CAdapterEthernetIP
+VAR
+    m_diBrutIn  : DWORD;   // reflet brut de l'Input Assembly (mapping scanner)
+    m_diBrutOut : DWORD;   // reflet brut de l'Output Assembly (mapping scanner)
+    m_xDefaut   : BOOL;
+END_VAR
+
+// Méthode appelée cycliquement, en lien avec le mapping du scanner
+METHOD MActualiser
+VAR_INPUT
+    diEntreeBrute : DWORD;
+END_VAR
+    m_diBrutIn := diEntreeBrute;
+    m_xDefaut := m_diBrutIn.0; // exemple : bit 0 = défaut
+END_METHOD
+
+// Propriété de haut niveau construite à partir des données brutes
+PROPERTY EtatDefaut : BOOL
+    GET
+        EtatDefaut := m_xDefaut;
+    END_GET
+END_PROPERTY
+
+// Méthode qui prépare la sortie à transmettre au scanner
+METHOD MDemarrer
+    m_diBrutOut.0 := TRUE; // exemple : bit 0 = commande marche
+END_METHOD
+\end{lstlisting}
+
+\begin{UPSTIinfor}{Ce que ce squelette n'impose pas}
+    Ce squelette illustre uniquement le \emph{principe} d'encapsulation : la répartition exacte des bits/octets dépend entièrement de la définition de l'Assembly de l'équipement réellement utilisé en TP (voir sa documentation EDS). Ne recopiez pas ce code tel quel : concevez la structure de vos propres classes à partir de l'Assembly réel de votre Adapter.
+\end{UPSTIinfor}

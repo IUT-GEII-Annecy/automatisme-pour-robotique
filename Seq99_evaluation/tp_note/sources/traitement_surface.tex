@@ -1,0 +1,188 @@
+\section{Intégration du poste de traitement de surface}
+
+
+\subsection{Présentation du poste de traitement de surface}
+
+Le poste de traitement de surface est un système automatisé permettant de réaliser des opérations de traitement chimique ou galvanique sur des pièces. Il est composé d'un \textbf{pont roulant} motorisé qui déplace un \textbf{chariot} équipé d'un \textbf{crochet} pour immerger et transférer les pièces entre différentes \textbf{cuves de traitement}.
+
+\subsubsection{Architecture matérielle}
+
+\begin{itemize}
+    \item \textbf{Automate WAGO 750-8012} : contrôleur PFC200 gérant le poste
+    \begin{itemize}
+        \item Adresse IP : \texttt{172.16.180.185}
+        \item Communication : Ethernet/IP
+        \item Type : Little Endian
+    \end{itemize}
+
+    \item \textbf{Chariot} (axe X - transversal) :
+    \begin{itemize}
+        \item Positionnement au-dessus des cuves
+    \end{itemize}
+
+    \item \textbf{Système de levage} (axe Z - vertical) :
+    \begin{itemize}
+        \item Crochet pour suspendre les pièces
+        \item Montée/descente pour immersion dans les cuves
+    \end{itemize}
+
+    \item \textbf{Cuves de traitement} :
+    \begin{itemize}
+        \item Plusieurs cuves alignées contenant différents bains
+        \item Positions fixes et connues
+    \end{itemize}
+\end{itemize}
+
+% \subsubsection{Principe de fonctionnement}
+
+% Le cycle de traitement se déroule selon les étapes suivantes :
+
+% \begin{enumerate}
+%     \item \textbf{Chargement} : prise de la pièce à la position de chargement
+%     \item \textbf{Transfert} : déplacement du pont vers la première cuve
+%     \item \textbf{Immersion} : descente du crochet pour immerger la pièce
+%     \item \textbf{Temporisation} : maintien dans la cuve pendant le temps de traitement
+%     \item \textbf{Extraction} : remontée du crochet
+%     \item \textbf{Égouttage} : pause pour évacuation des liquides
+%     \item \textbf{Transfert suivant} : répétition pour les cuves suivantes
+%     \item \textbf{Déchargement} : dépose de la pièce traitée
+% \end{enumerate}
+
+\subsection{Rappel de la configuration actuelle}
+
+\subsubsection{Premier coupleur : NOC\_ETHIP\_CONVOYEUR}
+
+\begin{itemize}
+    \item \textbf{Adresse IP} : \texttt{172.16.180.180}
+    \item \textbf{Réseau} : \texttt{172.16.180.0/24} (classe B privée)
+    \item \textbf{Capacité} : 128 mots en entrée, 128 mots en sortie
+    \item \textbf{Équipement connecté} : PFC200 - Poste Guichet
+    \begin{itemize}
+        \item Adresse IP : \texttt{172.16.180.190}
+        \item Données produites (T→O) : 12 octets 
+        \item Données consommées (O→T) : 4 octets 
+        \item Variables créées :
+        \begin{itemize}
+            \item \texttt{guichet\_IN} : type \texttt{T\_guichet\_IN}
+            \item \texttt{guichet\_OUT} : type \texttt{T\_guichet\_OUT}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Second coupleur : NOC\_ETHIP\_ROBOT}
+
+\begin{itemize}
+    \item \textbf{Adresse IP} : \texttt{192.168.0.1}
+    \item \textbf{Réseau} : \texttt{192.168.0.0/24} (classe C privée)
+
+    \item \textbf{Capacité} : 128 mots en entrée, 128 mots en sortie
+
+    \item \textbf{Équipements connectés} (ordre d'ajout) :
+
+    \begin{enumerate}
+        \item \textbf{CS9 - Contrôleur robot Scara} (\texttt{192.168.0.10})
+        \begin{itemize}
+            \item Données produites (T→O) : 148 octets = 74 mots
+            \item Données consommées (O→T) : 124 octets = 62 mots
+            \item Variables créées :
+            \begin{itemize}
+                \item \texttt{cs9Scara\_IN} : type \texttt{T\_cs9Scara\_IN}
+                \item \texttt{cs9Scara\_OUT} : type \texttt{T\_cs9Scara\_OUT}
+            \end{itemize}
+        \end{itemize}
+
+        \item \textbf{M221 - Contrôleur E/S et HMI} (\texttt{192.168.0.11})
+        \begin{itemize}
+            \item Données produites (T→O) : 4 octets 
+            \item Données consommées (O→T) : 40 octets 
+            \item Variables créées :
+            \begin{itemize}
+                \item \texttt{m221Scara\_IN} : type \texttt{T\_m221Scara\_IN}
+                \item \texttt{m221Scara\_OUT} : type \texttt{T\_m221Scara\_OUT}
+            \end{itemize}
+        \end{itemize}
+    \end{enumerate}
+\end{itemize}
+
+
+\subsubsection{Services Ethernet/IP}
+
+La communication avec le PFC200 du traitement de surface utilisera un service d'assemblage (IO-Scanning) similaire à celui mis en place pour le Guichet. Ce service échangera les données suivantes :
+
+\begin{itemize}
+    \item \textbf{Données produites par le pont} (T→O) : état du pont (positions, capteurs, mode en cours)
+    \item \textbf{Données consommées par le pont} (O→T) : commandes vers le pont (consignes de mouvement, démarrage cycle)
+\end{itemize}
+
+\subsection{Questions}
+
+\subsubsection{Configuration réseau}
+
+\UPSTIquestion{Dessiner l'architecture réseau complète de la cellule robotisée incluant le poste de traitement de surface. Indiquer les adresses IP des différents équipements et automate.}
+
+\subsubsection{Cartographie de la mémoire}
+\UPSTIquestion{En analysant les adresses des appareils et en \textbf{justifiant votre réponse}, déterminer sur quel coupleur réseau (NOC) de l'automate M340 on configurera la liaison Ethernet/IP avec le contrôleur WAGO du traitement de surface ?}
+
+Le module de traitement de surface produit et consomme les données suivantes, dans cet ordre :
+
+\begin{center}
+    \begin{tabular}{l|l}
+        \textbf{Données   produites (T→O)}                              & \textbf{ Type }       \\\hline
+        Etat du chariot \texttt{Arrêté, En mouvement, En Erreur, etc.}  & \textit{SINT}  \\
+        Cuve de destination en cours                                    & \textit{USINT} \\
+        Dernière position détectée                                      & \textit{USINT} \\
+        Code Erreur Chariot                                             & \textit{SINT}  \\
+        Etat de la pince (0. Entre deux, 1. En haut, 2. En bas)         & \textit{USINT} \\
+        Code Erreur Pince                                               & \textit{SINT}  \\\hline\hline
+        \textbf{Données consommées  (O→T)  }                            & \textbf{ Type}        \\\hline 
+        Commande Chariot \texttt{Aller vers Cuve, Arrêter, etc.}        & \textit{SINT}  \\
+        Cuve de destination                                             & \textit{USINT} \\
+        Commande pince \texttt{Monter, Arrêter, Descendre}               & \textit{USINT} \\\hline
+    \end{tabular}
+\end{center}
+
+
+\UPSTIquestion{
+A partir des informations ci-dessus, établir la nouvelle cartographie mémoire. Elle devra contenir, au minimum : 
+\begin{itemize}
+    \item Les éléments de la configuration actuelle : 
+    \begin{itemize}
+        \item Les variables associées au premier coupleur (\texttt{172.16.180.180}) : adresses mémoires de base, taille mémoire en entrée/sortie, équipements connectés aves les adresses des variables associées
+        \item Les variables associées au second coupleur (\texttt{192.168.0.1}) : adresses mémoires de base, taille mémoire en entrée/sortie, équipements connectés aves les adresses des variables associées
+    \end{itemize}
+    \item Les nouveaux éléments liés au poste de traitement de surface :
+    \begin{itemize}
+    \item Les adresses de début et de fin pour les entrées (T→O)
+    \item Les adresses de début et de fin pour les sorties (O→T)
+    \end{itemize}
+\end{itemize}
+}
+
+
+\subsubsection{Déclaration des variables}
+Deux types ont été créés dans le fichier donné : \texttt{TFromPontTS} et \texttt{TToPontTS}. Ils sont créé pour récupérer les données en provenance et à destination du module. 
+
+\UPSTIquestion{
+    Donner les déclaration des deux variables suivantes avec les adresses à leur affecter. 
+\begin{itemize}
+    \item \texttt{fromPontTS} de type \texttt{TFromPontTS} pour représenter les données produites
+    \item \texttt{toPontTS} de type \texttt{TToPontTS} pour représenter les données consommées
+\end{itemize}
+
+Donner la syntaxe complète de déclaration avec les adresses mémoire appropriées.
+
+\textit{Note : Les types \texttt{TFromPontTS} et \texttt{TToPontTS} sont fournis}
+}
+
+\subsubsection{Programmation de la communication}
+
+\UPSTIquestion{
+À quel moment du cycle automate la lecture des données produites par le module de traitement de surface doit-elle se faire ?
+}
+
+\UPSTIquestion{
+À quel moment du cycle automate l'écriture des données consommées par le module doit-elle se faire ?
+}
+
+

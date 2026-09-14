@@ -1,0 +1,50 @@
+\section{Étape 2 -- Configuration matérielle du coupleur}
+\label{secEtapeConfigMaterielle}
+
+Cette étape consiste à déclarer le coupleur BMX~NOC~0401.2 dans la
+configuration matérielle du rack de l'automate, à l'aide de l'éditeur
+graphique de configuration (double clic sur le dossier \emph{Configuration}
+de l'explorateur du projet).
+
+\subsection{Déclaration de l'emplacement}
+
+Dans l'emplacement (slot) du rack destiné à recevoir le coupleur, ajouter
+un module \textbf{BMX~NOC~0401.2} (module 4 ports Ethernet RJ45 10/100).
+Sur la cellule considérée, deux coupleurs sont ainsi déclarés, un par
+emplacement.
+
+\subsection{Renseignement du DTM}
+
+L'ajout d'un module BMX~NOC~0401.2 fait apparaître une boîte de dialogue à
+plusieurs onglets, dans laquelle il convient de renseigner :
+
+\begin{itemize}
+    \item l'\textbf{onglet Général} : le nom du DTM à donner au coupleur
+    (par exemple \texttt{NOC\_ETHIP\_CONVOYEUR} ou
+    \texttt{NOC\_ETHIP\_ROBOT}) ;
+    \item l'\textbf{onglet Information sur le protocole} : le protocole à
+    utiliser, à savoir \textbf{CIP (EtherNet/IP)} -- il s'agit normalement
+    du protocole sélectionné par défaut.
+\end{itemize}
+
+\subsection{Configuration complémentaire du processeur}
+
+Si l'application n'utilise pas le réseau CANopen intégré au processeur, il
+convient de configurer sa voie en ne réservant aucun objet \texttt{\%M} ni
+\texttt{\%MW} pour ce réseau, ni en entrée ni en sortie (double clic sur la
+prise DB9 du réseau CANopen du processeur pour faire apparaître sa boîte
+de dialogue de configuration).
+
+\subsection{Sauvegarde et vérification}
+
+Une fois la configuration matérielle établie :
+
+\begin{enumerate}
+    \item sauvegarder l'application ;
+    \item la compiler ;
+    \item vérifier, à l'aide de l'éditeur de données (variables dérivées),
+    que les zones mémoire allouées aux coupleurs BMX~NOC~0401.2
+    correspondent à l'attendu. La compilation crée automatiquement, pour
+    chaque coupleur, les types de données nécessaires pour représenter ses
+    zones d'entrée et de sortie.
+\end{enumerate}

@@ -1,0 +1,27 @@
+\section{Checklist de conception}
+\label{sec:checklist_conception}
+
+\begin{UPSTIidee}{À décider avant de commencer le TP}
+    Avant d'ouvrir Codesys, formalisez par écrit les points suivants pour votre système. Cette fiche peut être complétée directement et conservée comme mémo de conception.
+\end{UPSTIidee}
+
+\begin{enumerate}
+    \item \textbf{Rôles} : quel équipement est Scanner ? Quel(s) équipement(s) sont Adapter(s) ? (\ref{sec:architecture_reseau})
+    \item \textbf{Adressage} : quelle adresse IP pour chaque équipement ? Sont-elles sur le même sous-réseau ?
+    \item \textbf{Données échangées} : lister précisément, pour chaque Adapter, les données à transmettre du Scanner vers l'Adapter (commandes) et de l'Adapter vers le Scanner (états/mesures).
+    \item \textbf{Dimensionnement des Assembly} : taille en octets de l'Input Assembly, de l'Output Assembly, et de la Configuration Assembly le cas échéant. (\ref{sec:objets_assembly})
+    \item \textbf{RPI} : quelle période de rafraîchissement cyclique choisir pour chaque connexion, en cohérence avec la dynamique du procédé et la charge réseau tolérable ? (\ref{sec:messagerie})
+    \item \textbf{Messagerie explicite} : quelles informations ne nécessitent qu'une lecture/écriture ponctuelle (identification, diagnostic, paramétrage) plutôt qu'un échange cyclique ?
+    \item \textbf{Gestion des erreurs de connexion} : comment le programme détecte-t-il une perte de connexion avec un Adapter (bit de statut du scanner, timeout) ? Quel comportement de repli adopter (arrêt sécurisé, dernière valeur connue, signalisation) ?
+    \item \textbf{Découpage objet} : quelle classe (ou quel ensemble de classes) va encapsuler la communication avec chaque équipement ? Quelles propriétés et méthodes seront exposées au reste de l'application ? (\ref{sec:mise_en_oeuvre_codesys})
+    \item \textbf{Documentation constructeur} : le fichier EDS de l'équipement est-il disponible ? Quels objets/Assembly spécifiques au métier de l'équipement propose-t-il, au-delà des objets standards ?
+\end{enumerate}
+
+\begin{UPSTIinfor}{Erreurs fréquentes à anticiper}
+    \begin{itemize}
+        \item Confondre le sens Input/Output entre le point de vue de l'Adapter (documentation constructeur) et celui du Scanner (votre programme).
+        \item Ne pas gérer explicitement la perte de connexion : un Adapter déconnecté peut laisser des données figées sur leur dernière valeur si aucune détection n'est mise en place.
+        \item Sous-dimensionner ou surdimensionner un Assembly par rapport aux besoins réels, rendant le mapping confus ou gaspillant de la bande passante.
+        \item Placer la logique métier directement sur les variables brutes du mapping, au lieu de l'encapsuler dans une classe dédiée -- ce qui rend le code difficile à faire évoluer si l'équipement change.
+    \end{itemize}
+\end{UPSTIinfor}

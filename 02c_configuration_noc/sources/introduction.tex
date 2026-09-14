@@ -1,0 +1,44 @@
+\section{Introduction}
+
+Ce document décrit la \textbf{procédure de configuration}, sous l'atelier
+logiciel Control Expert, d'un coupleur Ethernet/IP \textbf{BMX~NOC~0401.2}
+équipant l'automate Schneider M340 de la cellule robotique. Cette
+procédure est établie à partir du support \emph{RIF\_GT\_TP1\_2024}, qui
+l'illustre sur les deux réseaux effectivement présents sur l'installation :
+
+\begin{itemize}
+    \item le réseau \textbf{NOC\_ETHIP\_CONVOYEUR}, qui scrute le
+    contrôleur PFC200 assurant la commande du poste guichet ;
+    \item le réseau \textbf{NOC\_ETHIP\_ROBOT}, qui scrute la baie CS9 du
+    robot et le contrôleur M221.
+\end{itemize}
+
+\begin{UPSTIinfor}{Objet du document}
+La procédure décrite ici est \textbf{générique} : elle s'applique à la
+configuration de tout coupleur BMX~NOC~0401.2 destiné à scruter un ou
+plusieurs équipements Ethernet/IP. Elle est illustrée, à chaque étape, par
+son application au réseau \texttt{NOC\_ETHIP\_CONVOYEUR} (scrutation du
+PFC200), qui constitue l'exemple le plus complet et le plus simple à
+suivre.
+\end{UPSTIinfor}
+
+\subsection{Étapes de la procédure}
+
+La configuration d'un coupleur NOC et de son réseau associé s'effectue en
+cinq étapes, à réaliser dans l'ordre :
+
+\begin{enumerate}
+    \item \textbf{Importation des fichiers EDS} décrivant les équipements
+    à scruter (préalable, une seule fois par équipement) ;
+    \item \textbf{Configuration matérielle} du coupleur dans le rack de
+    l'automate (emplacement, nom du DTM, protocole) ;
+    \item \textbf{Configuration réseau} du coupleur (adressage IP) ;
+    \item \textbf{Ajout et configuration d'un équipement} sur le réseau
+    ainsi créé (DTM de l'équipement, paramètres d'échange, adressage,
+    nommage des données) ;
+    \item \textbf{Vérification} de la configuration obtenue (compilation,
+    éditeur de données, contrôle de la cartographie mémoire) avant tout
+    téléchargement dans l'automate.
+\end{enumerate}
+
+Chacune de ces étapes est détaillée dans les sections suivantes.

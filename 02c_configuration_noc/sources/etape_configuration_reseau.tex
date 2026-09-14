@@ -1,0 +1,36 @@
+\section{Étape 3 -- Configuration réseau du coupleur}
+\label{secEtapeConfigReseau}
+
+Cette étape consiste à attribuer au coupleur les paramètres réseau
+(adresse IP, masque, passerelle) qui lui permettront de communiquer avec
+les équipements qu'il doit scruter.
+
+\subsection{Accès à la configuration réseau}
+
+Ouvrir le navigateur de DTM (menu \emph{Outils -> Navigateur de DTM}), puis
+double-cliquer sur le réseau concerné pour faire apparaître sa fenêtre de
+configuration.
+
+\subsection{Paramétrage de la voie}
+
+Dans la rubrique \textbf{TCP/IP} de cette fenêtre, renseigner :
+
+\begin{itemize}
+    \item l'\textbf{adresse IP} du coupleur, conforme au plan d'adressage
+    de l'installation ;
+    \item le \textbf{masque de sous-réseau} ;
+    \item la \textbf{passerelle}, le cas échéant (une valeur
+    \texttt{0.0.0.0} indique l'absence de passerelle).
+\end{itemize}
+
+\UPSTIremarque[Exemple -- réseau NOC\_ETHIP\_CONVOYEUR]{
+Adresse IP : \texttt{172.16.180.180} ; masque : \texttt{255.255.255.0} ;
+passerelle : \texttt{172.16.180.254}.
+}
+
+\UPSTIremarque[Exemple -- réseau NOC\_ETHIP\_ROBOT]{
+Adresse IP : \texttt{192.168.0.1} ; masque : \texttt{255.255.255.0} ; pas de
+passerelle (\texttt{0.0.0.0}). Sur cette installation, la configuration par
+défaut du coupleur répond déjà à cette attente : il convient néanmoins de
+la vérifier systématiquement.
+}

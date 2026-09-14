@@ -1,0 +1,55 @@
+\section{Mode F1 -- Production normale (couplé à A2)}
+\label{secModeF1}
+
+\subsection{Conditions d'entrée}
+
+Le mode F1 est atteint depuis le mode A1, sur demande de marche automatique
+formulée par l'opérateur.
+
+\subsection{Comportement attendu}
+
+L'objectif de ce mode est le transfert, par le robot, du gobelet porté par
+une palette pleine arrivée dans le guichet, vers la prochaine palette vide
+détectée dans le guichet.
+
+\begin{itemize}
+    \item \textbf{Convoyeur / guichet} : la \textbf{capacité du guichet
+    doit rester unitaire} en toute circonstance : une palette ne peut
+    entrer dans le guichet que si celui-ci est libre. Le maintien en poste
+    d'une palette doit permettre au robot d'y effectuer la saisie ou la
+    dépose d'un gobelet lorsque la palette est immobilisée.
+    \item \textbf{Robot} : le robot doit réaliser la saisie du gobelet sur
+    la palette pleine présente dans le guichet, puis sa dépose sur la
+    prochaine palette vide détectée dans le guichet. Le transfert engagé
+    doit toujours être mené à son terme, sans interruption prématurée par
+    un changement de mode.
+    \item \textbf{IHM} : l'état du guichet doit être signalé à l'opérateur
+    à chaque étape du cycle (poste libre, palette en cours d'arrivée,
+    palette en poste avec gobelet à traiter, palette en cours de
+    libération), par une signalisation dédiée et distincte à chaque étape.
+\end{itemize}
+
+\begin{UPSTIwarning}{Contrainte de capacité unitaire du guichet}
+Comme rappelé dans le TD de conception, le guichet fonctionne comme un
+\textbf{sas} : sa capacité est unitaire. Cette contrainte, déjà valable en
+fonctionnement du guichet seul, reste impérative en mode F1, y compris
+pendant les phases où le robot manipule un gobelet.
+\end{UPSTIwarning}
+
+\subsection{Articulation avec le mode A2}
+
+Le mode F1 est couplé à un mode d'arrêt A2 (\emph{arrêt en fin de cycle}) :
+une demande d'arrêt formulée par l'opérateur pendant que le robot est en
+train de transférer un gobelet ne doit pas interrompre ce transfert en
+cours ; l'installation ne rejoint le mode A2 qu'une fois le transfert de
+gobelet en cours effectivement terminé.
+
+\subsection{Conditions de sortie}
+
+\begin{itemize}
+    \item Vers le mode \textbf{A2}, sur demande d'arrêt de l'opérateur, une
+    fois le transfert de gobelet en cours terminé.
+    \item Retour vers le mode \textbf{F1} depuis A2, dès que la demande
+    d'arrêt n'est plus active.
+    \item Depuis A2 vers le mode \textbf{A1}, en fin de cycle, une fois la partie opérative en conditions initiales.q
+\end{itemize}

@@ -1,0 +1,22 @@
+\section{Prise et dépose de gobelets}
+\subsection{Objectif du TP}
+
+Dans ce TP, on s'interessera à la prise et à la dépose d'un gobelet par le robot. 
+
+\UPSTIrappel{Le mode \texttt{A1}, développé dans les TPs précédents, a arrêté le robot en position \texttt{X=90, Y=-410, Z=150, RX=-180, RY=0, RZ=0}.}
+
+La prise des gobelets se fera en position \texttt{X=90, Y=-410, Z=16, RX=-180, RY=0, RZ=0}.
+
+Ces actions seront encapsulées dans des macros-étapes \texttt{F1\_MS1} et \texttt{F1\_MS2} afin de simplifier la lecture du programme et les modifications futures.
+
+\subsection{Mode F1 : Production normale}
+\UPSTIboiteCentrale{Cahier des charges : Déplacement d'un gobelet d'une palette à l'autre}{
+    Lorsqu'une palette se présente avec un gobelet, le robot doit le prendre puis le déposer sur la prochaine palette vide. 
+}
+
+\subsection{Modification du GMMA}
+En fonctionnement normal, le robot effectue un traitement sur les gobelets (aujourd'hui une simple prise et dépose, puis, ulterieurement un traitement plus complexe). Le mode F2 se déclenche lorsque le mode \texttt{Auto} n'est plus demandé. Le robot termine alors l'éventuel cycle en cours, puis on retourne en mode \texttt{A1}.
+\begin{UPSTIPreparation}[Transitions du GMMA]
+    \UPSTIquestion{Donner les transitions \texttt{A1\_to\_F1}, \texttt{F1\_to\_A2} et \texttt{A2\_to\_A1}.}
+    \vspace{2.7cm}
+\end{UPSTIPreparation}

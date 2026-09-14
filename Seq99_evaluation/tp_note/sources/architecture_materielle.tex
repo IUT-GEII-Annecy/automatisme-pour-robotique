@@ -1,0 +1,108 @@
+\subsection{Architecture matérielle de la cellule}
+
+La cellule robotisée de la salle C180 est composée des équipements suivants :
+
+\subsubsection{Robot et contrôleur}
+\begin{itemize}
+    \item \textbf{Robot Stäubli Scara TS240 collaboratif} : robot 4 axes avec les caractéristiques suivantes :
+    \begin{itemize}
+        \item Rayon de travail : 150 mm (min) à 460 mm (max)
+        \item Axe 1 (J1) : [-180°, 180°] à 550°/s
+        \item Axe 2 (J2) : [-141°, 141°] à 720°/s
+        \item Axe 3 (J3 - vertical) : [0, 200 mm] à 2500 mm/s
+        \item Axe 4 (J4) : [-400°, 400°] à 2500°/s
+        \item Système de préhension : venturi avec ventouse, commandé par distributeur pneumatique bistable
+    \end{itemize}
+    \item \textbf{Contrôleur CS9} : baie de commande du robot équipée du serveur UniVALplc
+    \begin{itemize}
+        \item Pendant MCP (Manual Control Pendant)
+        \item Sélecteur de modes de marche WMS9
+        \item Interfaces réseau : J204 (10.102.180.30), J205 (172.16.180.30), J207/J208 (192.168.0.10)
+        \item E/S rapides TOR sur connecteur J212 pour commande du préhenseur
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Convoyeur et poste Guichet}
+\begin{itemize}
+    \item \textbf{Convoyeur TS2plus Bosch RexRoth} : transport de palettes portant des gobelets
+    \item \textbf{Poste Guichet} : zone d'interaction robot/convoyeur avec :
+    \begin{itemize}
+        \item Capteurs de position : \texttt{aid} (Autorisation mesure gobelet), \texttt{dpp} (palette présente), \texttt{dpo} (palette sortie), \texttt{dgt} (détection d'un gobelet)
+        \item Bloqueurs pneumatiques : \texttt{BE} (entrée) et \texttt{BP} (sortie)
+        \item Colonne lumineuse RVB pour signalisation de l'état
+        \item Capacité unitaire (fonctionnement type sas)
+    \end{itemize}
+    \item \textbf{Contrôleur PFC200 (WAGO)} : gestion du guichet, accessible via Ethernet/IP (@IP : 172.16.180.190)
+\end{itemize}
+
+\subsubsection{Architecture d'automatisme}
+\begin{itemize}
+    \item \textbf{Automate Schneider M340} : coordinateur de la cellule (@IP primaire : 172.16.180.180)
+    \begin{itemize}
+        \item Programmation sous Control Expert (Little Endian)
+        \item Deux coupleurs réseau BMX NOC 0401.2 :
+        \begin{itemize}
+            \item Premier réseau (172.16.180.0/24) : communication avec PCs et PFC200
+            \item Second réseau (192.168.0.0/24) : Ethernet/IP avec CS9 et M221
+        \end{itemize}
+        \item Bibliothèque client UniVALplc intégrée
+        \item Blocs fonctionnels PLCopen pour commandes de mouvement
+    \end{itemize}
+    \item \textbf{Contrôleur M221} : gestion du pupitre opérateur (@IP : 192.168.0.11)
+    \begin{itemize}
+        \item Accès aux éléments de commande via Ethernet/IP
+        \item Communication avec HMI via Modbus-TCP
+    \end{itemize}
+    \item \textbf{Interface HMI} : supervision et commande manuelle (@IP : 192.168.0.12)
+\end{itemize}
+
+
+
+\subsection{Solution UniVALplc de Stäubli}
+
+La solution UniVALplc permet d'intégrer le robot comme un objet industriel connecté dans l'architecture d'automatisme :
+
+\begin{itemize}
+    \item \textbf{Architecture client/serveur} :
+    \begin{itemize}
+        \item Serveur UniVALplc installé sur le contrôleur CS9
+        \item Bibliothèque cliente dans l'automate M340
+        \item Communication périodique via service IO-Scanning sous Ethernet/IP
+    \end{itemize}
+
+    \item \textbf{Principe de fonctionnement} :
+    \begin{itemize}
+        \item Le contrôleur CS9 conserve l'aspect « motion » (interpolateur de trajectoires)
+        \item L'automate M340 assure le séquencement des mouvements
+        \item Échange cyclique des données via structure \texttt{T\_StaeubliRobot}
+        \item Lecture des états du robot : \texttt{VAL\_ReadAxesGroup}
+        \item Écriture des commandes : \texttt{VAL\_WriteAxesGroup}
+    \end{itemize}
+
+    \item \textbf{Types de commandes disponibles} :
+    \begin{itemize}
+        \item Contrôle de mouvement (norme PLCopen) :
+        \begin{itemize}
+            \item \texttt{MC\_GroupPower} : mise sous/hors puissance du bras
+            \item \texttt{MC\_GroupReset} : acquittement des erreurs
+            \item \texttt{MC\_GroupStop} : arrêt et vidage de la pile de mouvements
+            \item \texttt{MC\_GroupInterrupt} / \texttt{MC\_GroupContinue} : pause/reprise
+        \end{itemize}
+        \item Commandes de mouvement :
+        \begin{itemize}
+            \item \texttt{MC\_MoveAxisAbsolute} : interpolation articulaire (position joints)
+            \item \texttt{MC\_MoveDirectAbsolute} : interpolation articulaire (position cartésienne)
+            \item \texttt{MC\_MoveLinearAbsolute} : mouvement linéaire
+            \item \texttt{MC\_MoveCircularAbsolute} : mouvement circulaire
+        \end{itemize}
+        \item Entrées/Sorties : \texttt{VAL\_ReadWriteIO} pour accès aux E/S du connecteur J212
+    \end{itemize}
+
+    \item \textbf{Gestion de la pile de mouvements} :
+    \begin{itemize}
+        \item Structure FIFO pour les commandes de mouvement
+        \item Modes de buffer : Aborting, Buffered, BlendingJoint, BlendingCartesian
+        \item Lissage possible entre trajectoires successives
+        \item Conservation de la pile même bras hors puissance
+    \end{itemize}
+\end{itemize}

@@ -1,0 +1,38 @@
+\section{Tableau récapitulatif et glossaire}
+\label{sec:glossaire}
+
+\subsection{Objets CIP standards à connaître}
+
+\begin{center}
+    \begin{tabular}{|p{2.3cm}|p{5cm}|p{7cm}|}
+        \hline
+        \textbf{Code} & \textbf{Objet} & \textbf{Usage principal} \\
+        \hline
+        0x01 & Identity Object & Identification de l'équipement, diagnostic de base. \\
+        \hline
+        0x04 & Assembly Object & Regroupement de données pour l'échange cyclique. \\
+        \hline
+        0x06 & Connection Manager Object & Gestion des connexions CIP. \\
+        \hline
+        0xF5 & TCP/IP Interface Object & Configuration réseau IP. \\
+        \hline
+        0xF6 & Ethernet Link Object & Statistiques et état de la liaison Ethernet. \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Glossaire}
+
+\begin{description}
+    \item[CIP] \emph{Common Industrial Protocol} -- protocole applicatif orienté objet commun à EtherNet/IP, DeviceNet et ControlNet.
+    \item[Scanner (Originator)] Équipement qui initie les connexions CIP ; typiquement l'automate maître.
+    \item[Adapter (Target)] Équipement qui répond aux connexions établies par un Scanner ; typiquement un équipement de terrain.
+    \item[Assembly Object] Objet CIP (classe 0x04) regroupant plusieurs attributs en un bloc de données unique, pour l'échange cyclique.
+    \item[Messagerie explicite] Échange CIP requête/réponse, ponctuel, généralement sur TCP.
+    \item[Messagerie implicite] Échange CIP cyclique via une connexion établie, généralement sur UDP.
+    \item[RPI] \emph{Requested Packet Interval} -- période de rafraîchissement d'une connexion cyclique.
+    \item[EDS] \emph{Electronic Data Sheet} -- fichier texte normalisé fourni par le constructeur, décrivant les objets, Assembly et paramètres d'un équipement CIP.
+    \item[Producteur/consommateur] Modèle d'échange où une donnée est publiée une fois par un producteur et reçue par un ou plusieurs consommateurs.
+    \item[ODVA] \emph{Open DeviceNet Vendors Association} -- organisation qui édite et maintient les standards CIP/EtherNet/IP.
+    \item[Class/Instance/Attribute (C/I/A)] Triplet identifiant de façon unique une donnée CIP au sein d'un équipement.
+\end{description}

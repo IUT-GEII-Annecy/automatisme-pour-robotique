@@ -1,0 +1,28 @@
+\section{Contraintes de conception}
+\label{secContraintes}
+
+Votre conception devra impérativement respecter les contraintes suivantes.
+
+\begin{UPSTIwarning}{Séparation réseau}
+Pour des raisons de \textbf{sécurité}, le robot et l'automate gérant l'IHM
+devront se trouver sur un \textbf{réseau séparé} du réseau de l'entreprise.
+\end{UPSTIwarning}
+
+\begin{UPSTIinfor}{Adressage existant}
+Les ordinateurs de la salle occupent déjà les adresses IP suivantes, sur le
+réseau de l'entreprise :
+\begin{center}
+    \texttt{172.16.180.1/24} à \texttt{172.16.180.17/24}
+\end{center}
+Ces adresses sont des données imposées : votre plan d'adressage pour le
+réseau séparé de la cellule robotique devra en tenir compte et rester
+cohérent avec cette contrainte.
+\end{UPSTIinfor}
+
+\begin{UPSTIinfor}{Protocole de commande}
+La commande de la cellule devra se faire via le protocole
+\textbf{EtherNet/IP}. Reportez-vous au document ressource \emph{EtherNet/IP}
+fourni en support de cours (ainsi qu'au cours au tableau) pour tous les
+éléments théoriques nécessaires : modèle producteur/consommateur, objets CIP,
+messagerie implicite/explicite, objets Assembly, etc.
+\end{UPSTIinfor}
