@@ -9,7 +9,7 @@ supervision Modbus-TCP vers l'écran HMI. Il produit 4 octets et consomme
 40 octets. Les échanges sont structurés autour d'un objet de type
 \texttt{THmi}.
 
-\begin{UPSTIremarque}[Le M221 est lui aussi réservé en mémoire]
+\UPSTIremarque[Le M221 est lui aussi réservé en mémoire]{
 Comme pour le PFC200 et la baie CS9, les données produites et consommées
 par le M221 transitent par le service d'IO-Scanning Ethernet/IP : elles
 occupent donc, elles aussi, une zone réservée de l'espace mémoire
@@ -18,7 +18,7 @@ cartographie retenue pour le coupleur \texttt{NOC\_ETHIP\_ROBOT}. Cette
 adresse n'est pas donnée ici : sa détermination (cf. document
 \texttt{02c\_configuration\_noc}) fait partie du travail demandé aux
 étudiants.
-\end{UPSTIremarque}
+}
 
 \subsection{Structure \texttt{THmi}}
 
@@ -141,9 +141,9 @@ traitement \\
 \end{tabular}
 \end{center}
 
-\begin{UPSTIremarque}[Rôle de supervision]
+\UPSTIremarque[Rôle de supervision]{
 Ces informations ne participent à aucune commande directe de la partie
 opérative : elles renseignent l'opérateur, via l'écran HMI, sur l'état
 d'avancement du traitement dans chacune des cuves ainsi que sur le mode
 GEMMA actif.
-\end{UPSTIremarque}
+}

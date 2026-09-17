@@ -1,0 +1,52 @@
+\section{Configuration du coupleur \texttt{NOC\_ETHIP\_CONVOYEUR}}
+\label{secConfigurationNocConvoyeur}
+
+Il s'agit maintenant d'appliquer, sous Control Expert, la procédure
+générique de configuration d'un coupleur \texttt{BMX~NOC~0401.2}
+(document \texttt{02c\_configuration\_noc}) au cas particulier du
+coupleur \texttt{NOC\_ETHIP\_CONVOYEUR}, avec les paramètres numériques
+propres à cet exercice.
+
+\begin{UPSTIManipulation}{Configuration matérielle et réseau}
+    \UPSTIetape{\textbf{Étape~1} (\ref{secEtapeImportEds}) : vérifier que
+    le fichier EDS du PFC200 (\emph{WAGO~2759-101~EN/IP}) est bien
+    disponible dans le catalogue DTM.}
+
+    \UPSTIetape{\textbf{Étape~2} (\ref{secEtapeConfigMaterielle}) :
+    déclarer le coupleur \texttt{BMX~NOC~0401.2} correspondant, en le
+    nommant \texttt{NOC\_ETHIP\_CONVOYEUR}.}
+
+    \UPSTIetape{\textbf{Étape~3} (\ref{secEtapeConfigReseau}) : paramétrer
+    la voie \texttt{TCP/IP} du coupleur avec les valeurs déjà données pour
+    ce réseau (adresse IP, masque, passerelle).}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}{Ajout et paramétrage du PFC200}
+    \UPSTIetape{\textbf{Étape~4} (\ref{secEtapeAjoutEquipement}) :
+    ajouter l'équipement PFC200 sur le réseau, le nommer \texttt{guichet},
+    puis paramétrer le service d'échange \emph{Exclusive Owner} avec une
+    taille d'entrée de \textbf{12~octets} et une taille de sortie de
+    \textbf{4~octets}, conformément à la volumétrie donnée en
+    \ref{secDonneesGuichet}.}
+
+    \UPSTIetape{Renseigner l'adresse IP réelle du PFC200 dans l'onglet
+    \emph{Paramétrage de l'adresse}.}
+
+    \UPSTIetape{Choisir le mode d'importation manuel des items, puis nommer
+    chacun des bits produits et consommés en réutilisant les références
+    données en \ref{secDonneesGuichet} (préfixes \texttt{m\_nix} et
+    \texttt{m\_nqx}).}
+\end{UPSTIManipulation}
+
+\begin{UPSTIManipulation}{Vérification avant téléchargement}
+    \UPSTIetape{\textbf{Étape~5} (\ref{secEtapeVerification}) :
+    sauvegarder et compiler l'application.}
+
+    \UPSTIetape{À l'aide de l'éditeur de données, contrôler que les
+    variables \texttt{guichet\_IN} et \texttt{guichet\_OUT} sont bien
+    positionnées aux adresses \texttt{\%MW} déterminées en
+    \cref{secCartographieMemoire}.}
+
+    \UPSTIetape{Faire vérifier la configuration avant tout téléchargement
+    dans l'automate.}
+\end{UPSTIManipulation}

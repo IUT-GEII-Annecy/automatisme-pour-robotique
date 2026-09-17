@@ -1,0 +1,39 @@
+\section{Cartographie mémoire \texttt{\%MW} des coupleurs NOC}
+\label{secCartographieMemoire}
+
+L'automate M340 de la cellule embarque deux coupleurs
+\texttt{BMX~NOC~0401.2} (\ref{secEtapeConfigMaterielle}), dont la
+réservation mémoire respective a été fixée comme suit :
+
+\begin{itemize}
+    \item le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR}, qui ne scrute que le
+    contrôleur PFC200 (\ref{secDonneesGuichet}), réserve \textbf{32 mots
+    en entrée} à partir de \texttt{\%MW0}, puis \textbf{32 mots en
+    sortie} juste après ;
+    \item le coupleur \texttt{NOC\_ETHIP\_ROBOT}, dont l'image mémoire est
+    \textbf{contiguë} à celle du premier coupleur, réserve \textbf{128 mots
+    en entrée}, puis \textbf{128 mots en sortie}. Les équipements qu'il
+    scrute ne sont pas détaillés ici.
+\end{itemize}
+
+\begin{UPSTIpreparation}[][Cartographie complète de l'espace \texttt{\%MW}]
+    \UPSTIquestion{Établir la cartographie complète de l'espace
+    \texttt{\%MW} occupé par les deux coupleurs : pour chacune des quatre
+    zones (entrée et sortie de chaque coupleur), donner les bornes des
+    zones \texttt{HEALTH\_BITS} et \texttt{CONTROL\_BITS} et celles de la zone
+    image des données.}
+
+    \UPSTIquestion{En déduire, par chevauchement (\emph{alias}) avec les
+    mots de la zone image de données du coupleur
+    \texttt{NOC\_ETHIP\_CONVOYEUR}, les adresses \texttt{\%MW.bit} exactes
+    des quatre capteurs et des cinq actionneurs du poste guichet définis en
+    \ref{secDonneesGuichet} (rappel : le PFC200 produit 12~octets et n'en
+    consomme que 4, seul le premier octet de chaque zone étant
+    significatif).}
+\end{UPSTIpreparation}
+
+\UPSTIremarque[Utilité de cette cartographie]{Cette cartographie sera
+nécessaire pour vérifier, à l'\textbf{étape~5} de la procédure de
+configuration (\ref{secEtapeVerification}), que l'éditeur de données de
+Control Expert affiche bien les variables \texttt{guichet\_IN} et
+\texttt{guichet\_OUT} aux adresses attendues.}

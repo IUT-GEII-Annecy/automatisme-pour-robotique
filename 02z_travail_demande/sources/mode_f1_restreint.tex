@@ -1,0 +1,64 @@
+\section{Programmation du mode F1 -- convoyeur/guichet seul}
+\label{secModeF1Restreint}
+
+\begin{UPSTIwarning}{Version restreinte du mode F1}
+Le mode~F1 décrit en \ref{secModeF1} couple le comportement du
+convoyeur/guichet, celui du \textbf{robot} et celui de l'\textbf{IHM}. Ici,
+on ne programme \textbf{que la partie convoyeur/guichet} de ce mode : ni le
+robot, ni la signalisation détaillée sur IHM ne sont traités dans ce
+travail. Le guichet doit donc être commandé de façon autonome, sans
+attendre une quelconque action du robot.
+\end{UPSTIwarning}
+
+
+\subsection{Niveau 1 -- Capacité unitaire du guichet}
+
+\begin{UPSTIPreparation}[Cahier des charges -- niveau 1]
+On souhaite, dans un premier temps, commander les seuls bloqueurs
+(\texttt{BE}, \texttt{BP}) de façon à garantir la \textbf{capacité
+unitaire} du guichet (\ref{secModeF1}), \textbf{sans distinguer} le cas
+d'une palette pleine de celui d'une palette vide : toute palette entrée
+dans le guichet y est immobilisée jusqu'à ce que le poste soit à nouveau
+libéré manuellement par le montage suivant (aucune temporisation n'est
+demandée à ce niveau). La colonne lumineuse du guichet
+(\texttt{CR}/\texttt{CV}/\texttt{CB}) reste \textbf{éteinte}.
+
+\UPSTIquestion{Etablir la commande permettant de garantir la capacité unitaire du guichet.}
+
+\end{UPSTIPreparation}
+
+% \subsection{Niveau 2 -- Maintien temporisé des palettes pleines}
+
+% \begin{UPSTIPreparation}[Cahier des charges -- niveau 2]
+% On complète le comportement précédent : une palette \textbf{portant un
+% gobelet} (couple \texttt{aid}/\texttt{dgt} $=(1,1)$, cf.
+% \ref{secDonneesGuichet}) doit désormais être \textbf{maintenue en poste
+% pendant une durée \texttt{T\#3s}} avant d'être libérée, alors qu'une
+% palette \textbf{vide} ($(1,0)$) continue d'être libérée sans délai. La
+% capacité unitaire du guichet établie au niveau~1 doit rester garantie en
+% toute circonstance.
+
+% \UPSTIquestion{Modifier le grafcet du niveau~1 pour introduire la
+% temporisation \texttt{T\#3s} sur les seules palettes portant un gobelet,
+% sans remettre en cause la capacité unitaire du guichet.}
+
+% \UPSTIquestion{Préciser la condition de branchement permettant de
+% distinguer les deux cas (palette pleine / palette vide) à partir des
+% capteurs \texttt{aid} et \texttt{dgt}.}
+% \end{UPSTIPreparation}
+
+% \begin{UPSTIManipulation}{Implémentation}
+%     \UPSTIetape{Créer les sections \texttt{F1\_Guichet} (SFC principal) et
+%     \texttt{F1\_Guichet\_Actions} (actions associées).}
+
+%     \UPSTIetape{Implémenter le grafcet du niveau~2 (qui intègre le
+%     niveau~1).}
+
+%     \UPSTIetape{Rédiger, dans une section ST dédiée, la \textbf{synthèse
+%     des sorties} \texttt{m\_nqxBE}, \texttt{m\_nqxBP},
+%     \texttt{m\_nqxCR}, \texttt{m\_nqxCV} et \texttt{m\_nqxCB} à partir des
+%     étapes actives du grafcet (la colonne lumineuse restant éteinte,
+%     conformément au cahier des charges de ce travail).}
+
+%     \UPSTIetape{Faire vérifier avant de tester sur l'installation.}
+% \end{UPSTIManipulation}

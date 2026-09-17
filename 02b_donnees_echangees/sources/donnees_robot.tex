@@ -9,13 +9,12 @@ de type \texttt{T\_StaeubliRobot}, utilisé comme paramètre d'entrée/sortie
 par la quasi-totalité des blocs fonctionnels de la bibliothèque
 \texttt{uniVALplc}.
 
-\begin{UPSTIremarque}[Adresses mémoire non données]
+\UPSTIremarque[Adresses mémoire non données]{
 Les adresses \texttt{\%MW} de base des zones produites et consommées par
 la baie CS9 ne sont pas données ici : leur détermination, à partir de la
 cartographie mémoire du coupleur \texttt{NOC\_ETHIP\_ROBOT} (cf. document
 \texttt{02c\_configuration\_noc}), fait partie du travail demandé aux
-étudiants.
-\end{UPSTIremarque}
+étudiants.}
 
 \subsection{Principe des échanges}
 
@@ -116,7 +115,7 @@ pour le mouvement \\
 \end{tabular}
 \end{center}
 
-\begin{UPSTIinfor}[Objet central des échanges]
+\begin{UPSTIinfor}{Objet central des échanges}
 L'objet \texttt{T\_StaeubliRobot} constitue le point de passage obligé de
 tous les échanges avec la baie CS9 : c'est à la fois l'image de l'état du
 robot (champ \texttt{Status}) et le support des ordres qui lui sont

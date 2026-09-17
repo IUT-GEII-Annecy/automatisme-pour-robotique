@@ -1,0 +1,23 @@
+\documentclass[TP, noCustomPackages]{UPSTI_Document}
+\usepackage{IUT_Annecy}
+\usepackage{logos_iut}
+\usepackage[french]{cleveref}
+\usepackage{xr-hyper} % références croisées vers d'autres documents du dépôt
+\externaldocument{../02_analyse_fonctionnelle/AnalyseFonctionnelle}
+\externaldocument{../02b_donnees_echangees/DonneesEchangees}
+\externaldocument{../02c_configuration_noc/ConfigurationNOC}
+
+\input{preamble.tex}
+\input{../preamble_module.tex}
+
+\documentVersion{E}
+\newcommand{\UPSTInumero}{1}
+\newcommand{\UPSTIduree}{4h}
+\newcommand{\UPSTImessage}{Configuration réseau et mode F1 restreint au guichet}
+\newcommand{\UPSTInumeroVersion}{1.0}
+
+\begin{document}
+
+\input{main.tex}
+
+\end{document}

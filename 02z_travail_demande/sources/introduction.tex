@@ -1,0 +1,51 @@
+\section*{Conventions de nommage}
+On réutilise la structuration et les conventions de nommage suivante : 
+\begin{description}
+    \item[sections SFC] \texttt{<Mode>\_<NomDuMode>} ou \texttt{<Mode>\_<NomDuMode>\_Actions}
+    \begin{itemize}
+        \item Exemple : \texttt{F1\_ProductionNormale} pour le mode F1 complet ou \texttt{F1\_ProductionNormale\_Guichet} pour la partie guichet seule.
+    \end{itemize}
+    \item[transitions] \texttt{T\_<ModeSource>\_to\_<ModeCible>}
+    \begin{itemize}
+        \item Exemple : \texttt{T\_F1\_to\_F2} pour la transition du mode F1 vers le mode F2.
+    \end{itemize}
+    \item[macro-étapes] \texttt{<Mode>\_MS<n>\_<Action>}
+    \begin{itemize}
+        \item Exemple : \texttt{F1\_MS1\_PriseGobelet} pour la macro-étape 1 du mode F1, qui consiste à prendre un gobelet dans le guichet.
+    \end{itemize}   
+\end{description}
+
+
+\section{Introduction}
+\label{secIntroduction}
+
+Ce document rassemble le \textbf{travail demandé} pour finaliser la mise en
+service du poste guichet de la cellule robotique, en s'appuyant sur les
+documents déjà établis :
+
+\begin{itemize}
+    \item \texttt{01\_conception} pour la présentation du système et le
+    synoptique réseau ;
+    \item \texttt{02\_analyse\_fonctionnelle} (mode~F1,
+    \ref{secModeF1}) pour le comportement attendu de l'installation en
+    production normale ;
+    \item \texttt{02b\_donnees\_echangees} (\ref{secDonneesGuichet}) pour
+    la description des capteurs et actionneurs du poste guichet gérés par
+    le contrôleur PFC200 ;
+    \item \texttt{02c\_configuration\_noc} pour la procédure générique de
+    configuration d'un coupleur \texttt{BMX~NOC~0401.2} sous Control
+    Expert.
+\end{itemize}
+
+\begin{UPSTIinfor}{Objet du document}
+Durant ce TP, vous serez amenés à réaliser trois tâches principales :
+\begin{enumerate}
+    \item l'établissement de la \textbf{cartographie mémoire} \texttt{\%MW}
+    des deux coupleurs NOC de l'installation, et la détermination des
+    adresses exactes des capteurs et actionneurs du guichet ;
+    \item l'application concrète de la procédure de configuration du
+    coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} sous Control Expert ;
+    \item la programmation du mode~F1, \textbf{restreint au seul
+    convoyeur/guichet} (sans le robot).
+\end{enumerate}
+\end{UPSTIinfor}

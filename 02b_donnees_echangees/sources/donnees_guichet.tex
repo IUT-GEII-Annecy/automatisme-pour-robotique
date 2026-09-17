@@ -27,21 +27,20 @@ dpo & \texttt{nixDpo} & Capteur de détection que le poste est occupé \\
 \end{tabular}
 \end{center}
 
-\begin{UPSTIremarque}[Codage de l'état de la palette]
+\UPSTIremarque[Codage de l'état de la palette]{
 Le couple (aid, dgt) code l'état de la palette détectée : $(1,0)$ signifie
-que la palette est vide, $(1,1)$ signifie qu'elle porte un gobelet.
-\end{UPSTIremarque}
+que la palette est vide, $(1,1)$ signifie qu'elle porte un gobelet.}
 
 Ces quatre informations occupent les bits 0 à 3 de l'octet~0 de la zone de
 données produites (\texttt{Guichet\_IN}). Les octets 1 à 3 sont réservés
 pour une utilisation future.
 
-\begin{UPSTIremarque}[Durée d'immobilisation des palettes pleines]
+\UPSTIremarque[Durée d'immobilisation des palettes pleines]{
 Les octets 4 à 7 de cette même zone portent une donnée de type
 \texttt{TIME} codée en Little Endian, et les octets 8 à 11 la même
 information codée en Big Endian : il s'agit de la durée d'immobilisation
 des palettes pleines dans le guichet (valeur d'exemple : \texttt{T\#4s}).
-\end{UPSTIremarque}
+}
 
 \subsection{Données consommées (O->T) -- actionneurs du guichet}
 
@@ -69,13 +68,13 @@ Ces cinq commandes occupent les bits 0 à 4 de l'octet~0 de la zone de
 données consommées (\texttt{Guichet\_OUT}). Les octets 1 à 3 sont réservés
 pour une utilisation future.
 
-\begin{UPSTIremarque}[Adresses mémoire non données]
+\UPSTIremarque[Adresses mémoire non données]{
 Les adresses \texttt{\%MW} de base de ces deux zones ne sont pas données
 ici : leur détermination, à partir de la cartographie mémoire des
 coupleurs \texttt{BMX~NOC~0401.2} (cf. document
 \texttt{02c\_configuration\_noc}), fait partie du travail demandé aux
 étudiants.
-\end{UPSTIremarque}
+}
 
 \subsection{Volumétrie globale}
 
