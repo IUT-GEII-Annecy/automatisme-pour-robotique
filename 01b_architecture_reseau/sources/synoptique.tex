@@ -1,0 +1,57 @@
+\section{Schéma synoptique de l'architecture réseau}
+\label{secSynoptique}
+
+La figure~\ref{figSynoptiqueReseau} représente l'ensemble des organes de la partie
+opérative, répartis sur les deux réseaux séparés, avec l'adresse IP de
+chaque interface.
+
+\begin{figure}[h]
+    \centering
+    \resizebox{\linewidth}{!}{%
+    \begin{tikzpicture}[
+        equip/.style = {draw, rounded corners, fill=blue!8, minimum width=3.4cm,
+                        minimum height=1.1cm, align=center, font=\footnotesize},
+        cpu/.style = {draw, rounded corners, fill=orange!15, minimum width=3.2cm,
+                        minimum height=1.3cm, align=center, font=\footnotesize},
+        noc/.style = {draw, rounded corners, fill=orange!30, minimum width=2cm,
+                        minimum height=1cm, align=center, font=\scriptsize},
+        oor/.style = {draw, rounded corners, fill=gray!12, minimum width=3.4cm,
+                        minimum height=1.1cm, align=center, font=\footnotesize},
+        net/.style = {draw, thick, rounded corners, dashed},
+        lien/.style = {thick},
+        ]
+
+        % --- Placement explicite sur une grille de coordonnées (cm) ---
+        \node[equip] (pcs)    at (-6.5,  1.8) {PCs de développement\\\texttt{172.16.180.\textit{i}}\\($i=1..17$)};
+        \node[equip] (pfc200) at (-6.5, -1.8) {Contrôleur PFC200\\(poste Guichet)\\\texttt{172.16.180.190}};
+        \node[noc]   (noc1)   at (-2.5,  0)   {Coupleur\\NOC~1\\\texttt{172.16.180.180}};
+        \node[cpu]   (m340)   at ( 0,    0)   {\textbf{Automate M340}\\BMX P34 20102};
+        \node[noc]   (noc2)   at ( 2.5,  0)   {Coupleur\\NOC~2\\\texttt{192.168.0.1}};
+        \node[equip] (cs9)    at ( 6.5,  1.8) {Baie robot CS9\\(uniVALplc)\\\texttt{192.168.0.10}};
+        \node[equip] (m221)   at ( 6.5, -1.8) {Contrôleur M221\\(pupitre opérateur)\\\texttt{192.168.0.11}};
+        \node[oor]   (j204)   at (11.5,  1.8) {Réseau tiers\\(hors périmètre)\\J204 : \texttt{10.102.180.30}};
+        \node[equip] (hmi)    at (11.5, -1.8) {Écran HMI (Magelis)\\\texttt{192.168.0.12}};
+
+        % --- Bus réseau 1 (gauche) ---
+        \draw[net, blue!60!black] ($(pcs.north west)+(-0.3,0.3)$) rectangle ($(pfc200.south east)+(0.3,-0.3)$);
+        \node[font=\bfseries, blue!60!black, anchor=south west] at ($(pcs.north west)+(-0.3,0.35)$) {Réseau 1 -- Ethernet/IP -- \texttt{172.16.180.0/24}};
+
+        % --- Bus réseau 2 (droite) ---
+        \draw[net, orange!70!black] ($(cs9.north west)+(-0.3,0.3)$) rectangle ($(hmi.south east)+(0.3,-0.3)$);
+        \node[font=\bfseries, orange!70!black, anchor=south west] at ($(cs9.north west)+(-0.3,0.35)$) {Réseau 2 -- Ethernet/IP -- \texttt{192.168.0.0/24}};
+
+        % --- Liaisons ---
+        \draw[lien] (pcs) -- (noc1);
+        \draw[lien] (pfc200) -- (noc1);
+        \draw[lien] (noc1) -- (m340);
+        \draw[lien] (m340) -- (noc2);
+        \draw[lien] (noc2) -- (cs9);
+        \draw[lien] (noc2) -- (m221);
+        \draw[lien] (m221) -- (hmi);
+        \node[font=\footnotesize] at ($(m221.east)!0.5!(hmi.west)+(0,0.45)$) {Modbus-TCP};
+        \draw[lien, gray, dashed] (cs9) -- (j204);
+
+    \end{tikzpicture}}
+    \caption{Synoptique de l'architecture réseau de la cellule robotique C180}
+    \label{figSynoptiqueReseau}
+\end{figure}

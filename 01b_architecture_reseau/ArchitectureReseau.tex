@@ -1,0 +1,28 @@
+\documentclass[cours, noCustomPackages,basic]{UPSTI_Document}
+\usepackage{IUT_Annecy}
+\usepackage{logos_iut}
+\usetikzlibrary{positioning, calc}
+
+% --- Références croisées vers d'autres documents du dépôt (xr-hyper) ---
+% Ces .aux sont des copies locales (voir xr_aux/) afin de ne jamais modifier
+% les dossiers cibles. Celui de 01_conception a été obtenu en compilant une
+% fois TD_conception.tex dans un dossier temporaire, puis copié ici.
+\usepackage{xr-hyper}
+\externaldocument{xr_aux/TD_conception}
+\externaldocument{../02b_donnees_echangees/DonneesEchangees}
+\externaldocument{../02c_configuration_noc/ConfigurationNOC}
+\externaldocument{../00_conventions_nommage/ConventionsNommage}
+
+% --- Git info (nécessite git et les hooks gitinfo2 activés) ---
+\usepackage{gitinfo2} % génère gitHeadInfo.gin via hooks post-commit/checkout/merge
+\input{preamble.tex}
+\input{../preamble_module.tex}
+
+\documentVersion{E}
+\newcommand{\UPSTInumeroVersion}{\gitAuthorDate\if \gitDirty*dirty \fi}
+\newcommand{\UPSTInumero}{0.1}
+\begin{document}
+
+\input{main.tex}
+
+\end{document}

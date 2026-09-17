@@ -1,0 +1,27 @@
+\section{Introduction}
+\label{secIntroductionArchiReseau}
+
+Ce document décrit l'architecture réseau \textbf{effectivement retenue} sur
+l'installation réelle de la cellule robotique de la salle C180 : organes
+physiques concernés, séparation des réseaux Ethernet/IP et adressage IP de
+chaque équipement.
+
+Pour la démarche de conception ayant conduit à ce choix (contraintes prises
+en compte, séparation des réseaux, plan d'adressage), voir le document
+\texttt{01\_conception}, en particulier la contrainte de séparation réseau
+qui y est posée (\ref{secContraintes}).
+
+Ce document renvoie par ailleurs vers d'autres documents de référence pour
+les points qui y sont détaillés, afin de ne pas les redécrire :
+\begin{itemize}
+    \item le détail des \textbf{données échangées} avec chaque équipement
+    (poste guichet, robot, IHM/pupitre) : voir le document
+    \texttt{02b\_donnees\_echangees}, sections \ref{secDonneesGuichet},
+    \ref{secDonneesRobot} et \ref{secDonneesIhm} ;
+    \item la \textbf{procédure de configuration} des coupleurs réseau de
+    l'automate M340 : voir le document \texttt{02c\_configuration\_noc},
+    section \ref{secEtapeConfigReseau} ;
+    \item les \textbf{préfixes de nommage} des variables associées au
+    pupitre opérateur : voir le document \texttt{00\_conventions\_nommage},
+    section \ref{secVariablesBooleennes}.
+\end{itemize}

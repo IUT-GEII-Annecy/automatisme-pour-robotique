@@ -1,0 +1,32 @@
+\section{Organes de la partie opérative}
+\label{secOrganes}
+
+La partie opérative de la cellule robotique de la salle C180 est constituée
+des organes physiques suivants.
+
+\begin{itemize}
+    \item \textbf{Robot Stäubli Scara TS240 collaboratif} (4 axes), équipé
+    d'un préhenseur venturi/ventouse, piloté par sa baie de commande CS9.
+
+    \item \textbf{Convoyeur TS2plus} (Bosch Rexroth), qui transporte des
+    palettes portant chacune un gobelet.
+
+    \item \textbf{Poste Guichet}, zone d'échange entre le robot et le
+    convoyeur, gérée par le contrôleur PFC200 : capteurs \texttt{aid},
+    \texttt{dgt}, \texttt{dpp}, \texttt{dpo}, bloqueurs pneumatiques
+    \texttt{BE}/\texttt{BP} et colonne lumineuse RVB. Le détail des données
+    échangées avec ce poste est donné dans \texttt{02b\_donnees\_echangees}
+    (\ref{secDonneesGuichet}), il n'est pas repris ici.
+
+    \item \textbf{Automate Schneider M340}, coordinateur de la cellule :
+    rack BMX~XBP~0600, alimentation BMX~CPS~2010, processeur
+    BMX~P34~20102, équipé de deux coupleurs réseau BMX~NOC~0401.2 (un par
+    réseau, voir \ref{secReseaux}). La procédure de configuration de ces
+    coupleurs est décrite dans \texttt{02c\_configuration\_noc}
+    (\ref{secEtapeConfigReseau}), elle n'est pas reprise ici.
+
+    \item \textbf{Pupitre opérateur et écran HMI (Magelis)} : boutons,
+    sélecteurs et voyants de commande manuelle. Les préfixes de nommage des
+    variables associées sont donnés dans \texttt{00\_conventions\_nommage}
+    (\ref{secVariablesBooleennes}).
+\end{itemize}

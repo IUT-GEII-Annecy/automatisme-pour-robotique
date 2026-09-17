@@ -1,0 +1,70 @@
+\section{Architecture réseau}
+\label{secReseaux}
+
+L'installation repose sur \textbf{deux réseaux Ethernet/IP séparés}, chacun
+porté par l'un des deux coupleurs BMX~NOC~0401.2 de l'automate M340.
+
+\begin{itemize}
+    \item \textbf{Réseau 1 -- \texttt{172.16.180.0/24}} : réseau privatif de
+    la salle C180. Il relie les postes informatiques de développement et
+    sert à la communication entre l'automate M340 et le contrôleur PFC200
+    (scrutation du poste Guichet).
+
+    \item \textbf{Réseau 2 -- \texttt{192.168.0.0/24}} : réseau Ethernet/IP
+    dédié aux échanges périodiques entre l'automate M340, la baie de
+    commande CS9 du robot et le contrôleur M221.
+\end{itemize}
+
+Les deux réseaux utilisent le protocole \textbf{Ethernet/IP}. L'automate
+M340 est le seul équipement raccordé aux deux : il joue le rôle de
+passerelle applicative entre les deux réseaux, chaque coupleur NOC scrutant
+(IO-Scanning) les seuls équipements de son propre réseau.
+
+\subsection{Plan d'adressage retenu}
+
+Le tableau~\ref{tabAdressageReseau} récapitule, pour chaque équipement, son
+interface, son adresse IP et le réseau auquel elle appartient.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|p{4.2cm}|p{3.6cm}|p{3cm}|p{2.4cm}|}
+        \hline
+        \textbf{Équipement} & \textbf{Interface} & \textbf{Adresse IP} & \textbf{Réseau} \\
+        \hline
+        PCs de développement & -- & \texttt{172.16.180.\textit{i}} ($i=1..17$) & Réseau 1 \\
+        \hline
+        \multirow{2}{4.2cm}{Automate Schneider M340} & Coupleur NOC 1 & \texttt{172.16.180.180} & Réseau 1 \\
+        \cline{2-4}
+         & Coupleur NOC 2 & \texttt{192.168.0.1} & Réseau 2 \\
+        \hline
+        Contrôleur PFC200 (WAGO, poste Guichet) & -- & \texttt{172.16.180.190} & Réseau 1 \\
+        \hline
+        \multirow{3}{4.2cm}{Baie de commande robot CS9 (Stäubli, serveur \texttt{uniVALplc})} & J204 & \texttt{10.102.180.30} & hors périmètre \\
+        \cline{2-4}
+         & J205 & \texttt{172.16.180.30} & Réseau 1 \\
+        \cline{2-4}
+         & J207/J208 & \texttt{192.168.0.10} & Réseau 2 \\
+        \hline
+        Contrôleur M221 (Schneider, îlot pupitre) & -- & \texttt{192.168.0.11} & Réseau 2 \\
+        \hline
+        Écran HMI (Magelis) & -- & \texttt{192.168.0.12} & Réseau 2 \\
+        \hline
+    \end{tabular}
+    \caption{Plan d'adressage IP de la cellule robotique}
+    \label{tabAdressageReseau}
+\end{table}
+
+L'interface J204 (\texttt{10.102.180.30}) de la baie CS9 appartient à un
+réseau tiers, distinct des deux réseaux de la cellule ; elle est hors
+périmètre de ce document et n'est pas utilisée par l'automatisme de la
+cellule.
+
+L'automate M340 possède une adresse par coupleur NOC, donc une par réseau :
+\texttt{172.16.180.180} sur le réseau 1, \texttt{192.168.0.1} sur le
+réseau 2. La procédure de configuration de ces deux coupleurs est détaillée
+en \ref{secEtapeConfigReseau}.
+
+L'écran HMI (\texttt{192.168.0.12}) n'est pas scruté directement par
+l'automate M340 : les échanges avec l'IHM transitent par le contrôleur
+M221, qui joue le rôle de passerelle Modbus-TCP entre l'îlot d'E/S du
+pupitre opérateur et l'écran.
