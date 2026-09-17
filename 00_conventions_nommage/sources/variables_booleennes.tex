@@ -1,0 +1,35 @@
+\section{Variables booléennes issues de l'IO-Scanning}
+\label{secVariablesBooleennes}
+
+Les variables booléennes obtenues par IO-Scanning Ethernet/IP (non forçables, front non
+accessible directement) suivent un préfixe générique \texttt{n} (« obtenu par IO-Scanning »).
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{6.5cm}|p{5cm}|}
+        \hline
+        \textbf{Préfixe} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{n} & Préfixe générique : donnée obtenue par IO-Scanning Ethernet/IP. & -- \\
+        \hline
+        \texttt{nix<Nom>} & Entrée booléenne produite par un équipement scruté. & \texttt{nixAid}, \texttt{nixDgt}, \texttt{nixDpp}, \texttt{nixDpo} \\
+        \hline
+        \texttt{nqx<Nom>} & Sortie booléenne consommée par un équipement scruté. & \texttt{nqxBE}, \texttt{nqxBP}, \texttt{nqxCR}, \texttt{nqxCV}, \texttt{nqxCB} \\
+        \hline
+        \texttt{m\_nix<Nom>} & Entrée physique du pupitre HMI, en tant que champ d'une structure préfixée \texttt{m\_} (cf. \ref{secTypesDonnees}). & \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto}, \texttt{m\_nixEmptyTanks} \\
+        \hline
+        \texttt{m\_nqx<Nom>} & Sortie physique du pupitre HMI, champ de structure. & \texttt{m\_nqxRedColumn} \\
+        \hline
+        \texttt{m\_na<N><Nom>} & Tableau de bits, champ de structure (\texttt{a} = array, \texttt{N} = taille optionnelle). & \texttt{m\_na4qxHex7Seg} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\UPSTIremarque[Deux familles distinctes de préfixes \texttt{ix}]{%
+Sur le pupitre M221/HMI (annexe 3 du TP2 et annexe 3 du TP5), les mêmes principes s'appliquent
+mais sans toujours le \texttt{n} initial : les documents source utilisent indifféremment
+\texttt{m\_ixJ1Plus} (entrée physique simple, sans \texttt{n}) et \texttt{m\_nixJ1Minus}
+(avec \texttt{n}) au sein de la \emph{même} structure \texttt{THmiInputs} (annexe 3, TP5). Cette
+incohérence figure telle quelle dans les documents source : le \texttt{n} de « obtenu par
+IO-Scanning » ne semble pas appliqué de façon strictement systématique sur les entrées du
+pupitre M221, alors qu'il l'est de façon rigoureuse pour les échanges avec la baie CS9 et le
+contrôleur PFC200.}

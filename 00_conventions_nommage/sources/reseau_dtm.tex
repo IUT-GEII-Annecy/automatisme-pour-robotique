@@ -1,0 +1,38 @@
+\section{Réseau et DTM}
+\label{secReseauDtm}
+
+\begin{center}
+    \begin{tabular}{|p{3.8cm}|p{6.4cm}|p{4cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{NOC\_ETHIP\_<CIBLE>} & Nom du DTM d'un coupleur réseau Ethernet/IP, suffixé par la cible scrutée. & \texttt{NOC\_ETHIP\_CONVOYEUR}, \texttt{NOC\_ETHIP\_ROBOT} \\
+        \hline
+        \texttt{<nom métier court>} & Nom d'un équipement ajouté à la configuration réseau : nom métier court, sans préfixe. & \texttt{guichet}, \texttt{cs9Scara}, \texttt{m221Scara} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Adressage IP de la cellule (rappel)}
+
+\begin{center}
+    \begin{tabular}{|p{4.6cm}|p{4.4cm}|p{5.2cm}|}
+        \hline
+        \textbf{Équipement} & \textbf{Réseau} & \textbf{Adresse} \\
+        \hline
+        PLC M340 & Privatif salle (classe B) & 172.16.180.180 (primaire) \\
+        \hline
+        PLC M340 & Ethernet/IP & 192.168.0.1 (secondaire) \\
+        \hline
+        PFC200 (Guichet) & Privatif salle & 172.16.180.190 \\
+        \hline
+        CS9 (robot) & Privatif salle / Ethernet/IP & 172.16.180.30 (J205) / 192.168.0.10 (J207-J208) \\
+        \hline
+        M221 (E/S) & Ethernet/IP & 192.168.0.11 \\
+        \hline
+        HMI & Ethernet/IP & 192.168.0.12 \\
+        \hline
+        Stations PC & Privatif salle & 172.16.180.\emph{i}, $i \in [1,17]$ \\
+        \hline
+    \end{tabular}
+\end{center}

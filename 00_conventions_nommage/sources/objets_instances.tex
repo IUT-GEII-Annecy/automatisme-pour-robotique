@@ -1,0 +1,33 @@
+\section{Objets et instances métier}
+\label{secObjetsInstances}
+
+Convention générale : \texttt{<rôle><Équipement>} en camelCase, où \texttt{<rôle>} précise la
+nature de l'échange (\texttt{from}/\texttt{to} pour un flux avec un équipement scruté) et
+\texttt{<Équipement>} est un nom métier ou un suffixe identifiant l'équipement/la station
+concernée (ex. \texttt{Scara}).
+
+\begin{center}
+    \begin{tabular}{|p{4.6cm}|p{5.4cm}|p{4.2cm}|}
+        \hline
+        \textbf{Objet} & \textbf{Rôle} & \textbf{Type} \\
+        \hline
+        \texttt{staeubliRobotScara} & Représente le robot et son contrôleur CS9. & \texttt{T\_StaeubliRobot} \\
+        \hline
+        \texttt{fromRobotScara} & Données produites par le robot, lues en début de cycle. & \texttt{T\_FromRobot} \\
+        \hline
+        \texttt{toRobotScara} & Commandes consommées par le robot, écrites en fin de cycle. & \texttt{T\_ToRobot} \\
+        \hline
+        \texttt{fromHmiScara} / \texttt{toHmiScara} & Données lues/écrites depuis/vers le pupitre HMI. & \texttt{TfromHmi} / \texttt{TtoHmi} \\
+        \hline
+        \texttt{ctrlStatusGroupRead} / \texttt{ctrlStatusGroupWrite} & Objets d'état de contrôle associés à la lecture/écriture du groupe d'axes. & \texttt{TCtrlStatusGroup} \\
+        \hline
+        \texttt{hmiScara} & Instance représentant l'état complet du pupitre HMI pour la station Scara. & \texttt{THmi} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\UPSTIremarque[Accès à un champ imbriqué]{%
+Les objets de type \texttt{THmi} s'utilisent avec la notation pointée classique de l'IEC~61131-3,
+par exemple \texttt{hmiScara.m\_Outputs.m\_Screen.m\_intStateGmma} pour écrire l'état du GEMMA en
+hexadécimal à l'écran, ou \texttt{hmiScara.m\_Outputs.m\_qToR.m\_nqxArmUnderPower} pour piloter un
+voyant de synthèse.}

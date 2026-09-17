@@ -1,0 +1,105 @@
+\section{Sections de programme, GEMMA et SFC}
+\label{secSectionsGmma}
+
+\subsection{Sections liées aux échanges Ethernet/IP}
+
+\begin{center}
+    \begin{tabular}{|p{4cm}|p{7cm}|p{3.2cm}|}
+        \hline
+        \textbf{Section} & \textbf{Rôle} & \textbf{Ordre de scrutation} \\
+        \hline
+        \texttt{ReadEthIpRobot} & Lit les échanges Ethernet/IP avec la baie robot (\texttt{VAL\_ReadAxesGroup}). & En premier dans le cycle API. \\
+        \hline
+        \texttt{WriteEthIpRobot} & Écrit les échanges Ethernet/IP vers la baie robot (\texttt{VAL\_WriteAxesGroup}). & En dernier dans le cycle API. \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Sections du GEMMA (\texttt{GM\_})}
+
+Les trois sections du GEMMA sont scrutées dans un ordre fixe, juste après \texttt{ReadEthIpRobot} :
+\texttt{GM\_GmmaPre}, puis \texttt{GM\_Gmma}, puis \texttt{GM\_GmmaPost}.
+
+\begin{center}
+    \begin{tabular}{|p{3cm}|p{9.4cm}|p{2cm}|}
+        \hline
+        \textbf{Section} & \textbf{Rôle} & \textbf{Langage} \\
+        \hline
+        \texttt{GM\_GmmaPre} & Initialise le graphe (1\textsuperscript{er} cycle en \texttt{RUN} ou erreur de communication détectée via les bits de santé) ; positionne la période du bit de vie (\texttt{Command.LifebitPeriod}). & ST \\
+        \hline
+        \texttt{GM\_Gmma} & Traduction du GEMMA en langage SFC (une étape par mode : \texttt{GM\_S\_D1}, \texttt{GM\_S\_D2}, \texttt{GM\_S\_A5}, \texttt{GM\_S\_A6}, \texttt{GM\_S\_A1}, \texttt{GM\_S\_F1}, \texttt{GM\_S\_A2}, \texttt{GM\_S\_F4}...). & SFC \\
+        \hline
+        \texttt{GM\_GmmaPost} & Positionne les bits de scrutation conditionnelle de chaque mode (\texttt{xD1}, \texttt{xD2}, \texttt{xA5}, \texttt{xA6}, \texttt{xA1}, \texttt{xF1A2}, \texttt{xF4}...) et fournit l'état hexadécimal du GEMMA à l'écran HMI. & ST \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\begin{center}
+    \begin{tabular}{|p{3.4cm}|p{6.6cm}|p{4.2cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{GM\_S\_<Mode>} & Étape SFC du GEMMA associée au mode \texttt{<Mode>}. & \texttt{GM\_S\_D1}, \texttt{GM\_S\_F1} \\
+        \hline
+        \texttt{GM\_T\_<ModeA>to<ModeB>} & Transition SFC entre deux modes du GEMMA. & \texttt{GM\_T\_D1toD2}, \texttt{GM\_T\_A1toF1}, \texttt{GM\_T\_F1toA2} \\
+        \hline
+        \texttt{GM\_AP1\_InitChart<Mode>} & Action de type \texttt{P1} associée à une étape du GEMMA, initialisant le graphe SFC du mode (utile pour les modes non répétitifs). & \texttt{GM\_AP1\_InitChartD2}, \texttt{GM\_AP1\_InitChartA5}, \texttt{GM\_AP1\_InitChartA6} \\
+        \hline
+        \texttt{x<Mode>} & Bit booléen autorisant la scrutation conditionnelle des sections d'un mode. & \texttt{xD1}, \texttt{xD2}, \texttt{xA5}, \texttt{xA6}, \texttt{xA1}, \texttt{xF1A2} (mode F1 \emph{et} A2), \texttt{xF4} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Sections d'un mode de fonctionnement}
+
+\begin{center}
+    \begin{tabular}{|p{4.2cm}|p{6.4cm}|p{2.6cm}|}
+        \hline
+        \textbf{Section} & \textbf{Rôle} & \textbf{Langage} \\
+        \hline
+        \texttt{<Mode>\_<NomDuMode>} & Traduction SFC du grafcet fonctionnel du mode (structure de Mealy). & SFC \\
+        \hline
+        \texttt{<Mode>\_<NomDuMode>Post} & Synthèse des sorties/actionneurs, scrutation des instances de blocs fonctionnels, en fonction des bits d'activité des étapes. Postérieure au graphe SFC. & ST \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Exemples rencontrés : \texttt{D1\_ArretUrgence} (ST, section unique -- pas de graphe nécessaire),
+\texttt{D2\_Diagnostic}/\texttt{D2\_DiagnosticPost}, \texttt{A5\_RemiseEnRoute}/%
+\texttt{A5\_RemiseEnRoutePost}, \texttt{A6\_MiseEnCI}/\texttt{A6\_MiseEnCIPost},
+\texttt{A1\_ArretEnCi} (ST seul), \texttt{F1\_ProductionNormale}/\texttt{F1\_ProductionNormalePost},
+\texttt{F4\_ModeManuel}/\texttt{F4\_ModeManuelPost}.
+
+\subsection{Étapes et transitions d'un grafcet fonctionnel}
+
+\begin{center}
+    \begin{tabular}{|p{3.4cm}|p{6.6cm}|p{4.2cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{XX\_S\_i} & Étape \texttt{i} du grafcet fonctionnel du mode \texttt{XX}. & \texttt{F1\_S\_0}, \texttt{F1\_S\_12} \\
+        \hline
+        \texttt{XX\_T\_<...>} & Transition nommée du grafcet fonctionnel du mode \texttt{XX}. & \texttt{F1\_T\_MiseEnService} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Macro-étapes SFC (extension Control Expert)}
+
+Règles de nommage spécifiques aux macro-étapes et à leur expansion, introduites au TP4.
+
+\begin{center}
+    \begin{tabular}{|p{3.4cm}|p{6.6cm}|p{4.2cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{XX\_MSI} & Macro-étape : \texttt{XX} = mode de fonctionnement, \texttt{MS} = Macro-Step, \texttt{I} = numéro de la macro-étape dans le mode. & \texttt{F1\_MS1}, \texttt{F1\_MS2} \\
+        \hline
+        \texttt{XX\_MSI\_J} & Étape \texttt{J} de l'expansion de la macro-étape \texttt{XX\_MSI}. & \texttt{F1\_MS0\_2} \\
+        \hline
+        \texttt{XX\_MSI\_T\_} & Préfixe d'une section de transition de la macro-étape \texttt{XX\_MSI}. & \texttt{F1\_MS0\_T\_MiseEnService} \\
+        \hline
+        \texttt{XX\_MSI\_IN} / \texttt{XX\_MSI\_OUT} & Étape d'entrée / de sortie de la macro-étape \texttt{XX\_MSI} (nom imposé). & \texttt{F1\_MS1\_IN}, \texttt{F1\_MS1\_OUT} \\
+        \hline
+    \end{tabular}
+\end{center}

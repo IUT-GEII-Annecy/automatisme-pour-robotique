@@ -1,0 +1,30 @@
+\section{Synthèse et incohérences signalées}
+\label{secGlossaire}
+
+\subsection{Récapitulatif des incohérences relevées entre documents source}
+
+\begin{center}
+    \begin{tabular}{|p{4.4cm}|p{9cm}|}
+        \hline
+        \textbf{Point ambigu} & \textbf{Description} \\
+        \hline
+        \texttt{m\_int} vs \texttt{m\_i} & Deux préfixes pour un champ \texttt{INT} (\texttt{m\_intPartNumber} au TP2, \texttt{m\_iStateGmma} au TP3) -- cf. \ref{secTypesDonnees}. \\
+        \hline
+        \texttt{m\_ix} vs \texttt{m\_nix} & Au sein d'une même structure \texttt{THmiInputs} (annexe 3, TP5), certaines entrées physiques du pupitre portent le préfixe \texttt{n} (« obtenu par IO-Scanning ») et d'autres non, sans règle explicite distinguant les deux cas -- cf. \ref{secVariablesBooleennes}. \\
+        \hline
+        \texttt{TMoveAbsolute} vs \texttt{TMoveAxisAbs} & Deux noms de type distincts pour une structure de paramétrage de mouvement quasi identique, selon que le TP source traite un mouvement cartésien (TP4) ou articulaire (TP5) -- cf. \ref{secTypesDonnees}. \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Glossaire}
+
+\begin{description}
+    \item[GEMMA] \emph{Guide d'Étude des Modes de Marches et d'Arrêts} -- outil de description des modes de fonctionnement et d'arrêt d'un système automatisé (états \texttt{D1}, \texttt{D2}, \texttt{A1}, \texttt{A5}, \texttt{A6}, \texttt{F1}, \texttt{F4}...).
+    \item[Macro-étape] Extension du langage SFC (Control Expert) permettant de regrouper une expansion d'étapes sous une étape unique, afin de limiter le niveau de détail visible dans un graphe.
+    \item[Multi-jetons] Extension du langage SFC (Control Expert) autorisant plusieurs étapes initiales dans un même graphe.
+    \item[Machine de Mealy] Structure d'implantation d'un automatisme où les sorties dépendent à la fois de l'état courant et des entrées (utilisée ici pour la partie postérieure au graphe SFC, en langage ST).
+    \item[TCP] \emph{Tool Center Point} -- point de référence de l'outil du robot, dont la trajectoire et la vitesse sont pilotées par les commandes de mouvement.
+    \item[Bit de vie] Bit rafraîchi périodiquement (champ \texttt{Command.LifebitPeriod}) permettant à la baie CS9 de détecter une perte de communication avec l'automate.
+    \item[Sas (guichet)] Principe de gestion de flux de palettes à capacité unitaire : une palette ne peut entrer dans le poste que si celui-ci est libre.
+\end{description}

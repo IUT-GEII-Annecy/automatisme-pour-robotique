@@ -1,0 +1,99 @@
+\section{Blocs fonctionnels}
+\label{secBlocsFonctionnels}
+
+\subsection{Préfixes de bibliothèque}
+
+\begin{center}
+    \begin{tabular}{|p{2.6cm}|p{6.6cm}|p{5cm}|}
+        \hline
+        \textbf{Préfixe} & \textbf{Origine / rôle} & \textbf{Exemple} \\
+        \hline
+        \texttt{VAL\_} & Bloc fonctionnel de la bibliothèque cliente \texttt{uniVALplc} (Stäubli), non spécifique au standard PLCopen. & \texttt{VAL\_ReadAxesGroup}, \texttt{VAL\_WriteAxesGroup}, \texttt{VAL\_ReadWriteIO}, \texttt{VAL\_ShiftPoint} \\
+        \hline
+        \texttt{MC\_} & Bloc fonctionnel conforme au standard \textbf{PLCopen} pour la commande de mouvement (\emph{Motion Control}). & \texttt{MC\_MoveLinearAbsolute}, \texttt{MC\_MoveDirectAbsolute}, \texttt{MC\_MoveAxisAbsolute}, \texttt{MC\_MoveCircularAbsolute}, \texttt{MC\_GroupPower}, \texttt{MC\_GroupReset}, \texttt{MC\_GroupStop}, \texttt{MC\_GroupInterrupt}, \texttt{MC\_GroupContinue} \\
+        \hline
+        \texttt{FB\_} & Bloc fonctionnel maison de l'application. & \texttt{FB\_ReadHmi}, \texttt{FB\_WriteHmi} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Blocs \texttt{VAL\_} -- échanges avec la baie CS9}
+
+\begin{center}
+    \begin{tabular}{|p{3.6cm}|p{7cm}|p{3.6cm}|}
+        \hline
+        \textbf{Bloc} & \textbf{Rôle} & \textbf{Type associé} \\
+        \hline
+        \texttt{VAL\_ReadAxesGroup} & Lit l'état du robot (baie $\to$ automate) en début de cycle. & \texttt{T\_FromRobot} (dans \texttt{T\_StaeubliRobot}) \\
+        \hline
+        \texttt{VAL\_WriteAxesGroup} & Envoie les commandes de mouvement établies durant le cycle (automate $\to$ baie) en fin de cycle. & \texttt{T\_ToRobot} \\
+        \hline
+        \texttt{VAL\_ReadWriteIO} & Accès direct aux E/S physiques du contrôleur CS9 (connecteur J212). & -- \\
+        \hline
+        \texttt{VAL\_ShiftPoint} & Calcule une position cartésienne par application d'une transformation géométrique relative (équivalent \texttt{compose()}/\texttt{appro()}). & \texttt{T\_Trsf}, \texttt{T\_CartesianPos} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Blocs \texttt{MC\_} -- commandes de mouvement (PLCopen)}
+
+\begin{center}
+    \begin{tabular}{|p{4.6cm}|p{5.4cm}|p{4.2cm}|}
+        \hline
+        \textbf{Bloc} & \textbf{Type de mouvement} & \textbf{Position finale} \\
+        \hline
+        \texttt{MC\_MoveAxisAbsolute} & Interpolation articulaire, sans modélisation d'outil (uniquement pour un Scara). & \texttt{T\_JointPos} \\
+        \hline
+        \texttt{MC\_MoveDirectAbsolute} & Interpolation articulaire. & \texttt{T\_CartesianPos} \\
+        \hline
+        \texttt{MC\_MoveLinearAbsolute} & Mouvement linéaire. & \texttt{T\_CartesianPos} \\
+        \hline
+        \texttt{MC\_MoveCircularAbsolute} & Mouvement circulaire. & \texttt{T\_CartesianPos} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Blocs \texttt{MC\_} -- commandes de contrôle de mouvement}
+
+\begin{center}
+    \begin{tabular}{|p{4.6cm}|p{9.6cm}|}
+        \hline
+        \textbf{Bloc} & \textbf{Rôle} \\
+        \hline
+        \texttt{MC\_GroupPower} & Met le bras sous/hors puissance (entrée \texttt{Enable}). \\
+        \hline
+        \texttt{MC\_GroupReset} & Acquitte les défauts pendants côté robot. \\
+        \hline
+        \texttt{MC\_GroupStop} & Arrêt contrôlé du mouvement en cours et vidage complet de la pile de commandes empilées. \\
+        \hline
+        \texttt{MC\_GroupInterrupt} & Arrête le mouvement en cours \emph{sans} vider la pile (reprise possible via \texttt{MC\_GroupContinue}). \\
+        \hline
+        \texttt{MC\_GroupContinue} & Reprend un mouvement arrêté par \texttt{MC\_GroupInterrupt}, ou autorise à nouveau l'exécution de la pile après un \texttt{MC\_GroupReset}/\texttt{MC\_GroupStop}. \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Convention de nommage des instances}
+
+Le nom d'une instance de bloc fonctionnel doit faire référence au mode qui l'utilise : par
+exemple une instance de \texttt{MC\_GroupReset} réservée pour le mode \texttt{D2} sera nommée
+\texttt{InstGroupResetD2}. De même, les objets passés en paramètre (souvent de type
+\texttt{TCtrlStatusGroup}) reprennent le suffixe du mode : \texttt{ctrlStatusGroupResetD2},
+\texttt{ctrlStatusGroupStopD2}, \texttt{ctrlStatusGroupContinueD2} (TP3), ou
+\texttt{ctrlStatusGroupStopF4}, \texttt{ctrlStatusGroupContinueF4} (TP5).
+
+\begin{center}
+    \begin{tabular}{|p{4.4cm}|p{6cm}|p{3.8cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{Inst<NomBloc><Mode>} & Instance d'un bloc fonctionnel, suffixée par le mode qui l'utilise. & \texttt{InstGroupResetD2}, \texttt{InstMoveLinearAbsoluteF1}, \texttt{InstMoveAxisAbsoluteF4} \\
+        \hline
+        \texttt{ctrlStatusGroup<Rôle><Mode>} & Objet \texttt{TCtrlStatusGroup} de passage de paramètres, suffixé par le rôle et le mode. & \texttt{ctrlStatusGroupStopF4}, \texttt{ctrlStatusGroupContinueF4} \\
+        \hline
+        \texttt{moveAxisLinearAbs<Mode>} / \texttt{moveAxisAbsolute<Mode>} & Donnée de type \texttt{TMoveAbsolute}/\texttt{TMoveAxisAbs} facilitant l'appel de l'instance, suffixée par le mode. & \texttt{moveAxisLinearAbsF1} (TP4), \texttt{moveAxisAbsoluteF4} (TP5) \\
+        \hline
+        \texttt{trsfPos<Mode>} & Objet \texttt{T\_Trsf} pour le calcul en relatif, suffixé par le mode. & \texttt{trsfPosF1} \\
+        \hline
+    \end{tabular}
+\end{center}
