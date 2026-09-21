@@ -5,60 +5,17 @@ on:
     branches: [main, master]
   workflow_dispatch: {}
 
-permissions:
-  contents: read
-  packages: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/iut-geii-annecy/texlive-upsti:latest
-    steps:
-      - name: Checkout du dépôt
-        uses: actions/checkout@v4
-        with:
-          # Historique limité mais suffisant pour dater chaque document
-          # (scripts/gen_index.py) via git log.
-          fetch-depth: 100
-
-      - name: Checkout du package LaTeX UPSTI (privé)
-        uses: actions/checkout@v4
-        with:
-          repository: GeoffreyV/UPSTI
-          ssh-key: ${{ secrets.UPSTI_DEPLOY_KEY }}
-          path: _upsti-src
-
-      - name: Installer UPSTI dans l'arborescence TEXMF personnelle
-        run: |
-          mkdir -p "$HOME/texmf/tex/latex"
-          cp -r _upsti-src "$HOME/texmf/tex/latex/UPSTI"
-          rm -rf _upsti-src
-
-      - name: Indexer UPSTI dans TeX Live (texhash)
-        run: texhash "$HOME/texmf"
-
-      - name: Compiler les documents publiables
-        run: bash scripts/build_pdfs.sh _site
-
-      - name: Upload de l'artefact Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Déploiement sur GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+  publish:
+    uses: IUT-GEII-Annecy/ci-latex-upsti/.github/workflows/build-pdfs.yml@main
+    with:
+      site-title: "Supports Automatisme & Robotique - BUT GEII"
+      site-subtitle: "Tous les supports de cours, td et tp du module Automatisme & Robotique - GEII IUT Annecy"
+      group-label: "Module"
+      classify-mode: documentclass
+      exclude-patterns: |
+        /03_DS/
+        /evaluations/
+        /Seq99_evaluation/
+        /fichiers_etudiants/
+    secrets: inherit
