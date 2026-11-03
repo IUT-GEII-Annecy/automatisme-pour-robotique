@@ -1,0 +1,61 @@
+\section{Conversion des données du contrôleur M221 (HMI)}
+\label{secConversionHmi}
+
+Le contrôleur M221 produit 4 octets et en consomme 40 (cf. document
+\texttt{02b\_donnees\_echangees}, section « Données de l'IHM et du
+pupitre opérateur »). Ces octets ne sont pas directement exploitables :
+ils doivent être lus et écrits à travers les blocs fonctionnels maison
+\texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}.
+
+\subsection{En lecture}
+
+\begin{enumerate}
+    \item L'alias \texttt{fromHmiScara}, de type \texttt{TFromHmi},
+    chevauche la zone image des données produites par le M221 dans
+    l'espace \texttt{\%MW} du coupleur \texttt{NOC\_ETHIP\_ROBOT}. Il ne
+    contient que des octets bruts, sans nom de champ exploitable.
+    \item Le bloc \texttt{FB\_ReadHmi} prend cet objet brut en entrée et
+    en extrait les informations individuelles (chaque sélecteur, chaque
+    bouton-poussoir) vers un objet \texttt{THmiInputs} dont les champs
+    portent un nom explicite : \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto},
+    \texttt{m\_nixStopRequest}...
+\end{enumerate}
+
+\begin{UPSTIinfor}{Attention au sens des contacts}
+Certains champs de \texttt{THmiInputs} correspondent à des contacts à
+ouverture (ex. \texttt{m\_nixStopRequest}, \texttt{m\_nixEmptyTank0}) :
+une valeur \texttt{FALSE} y signifie que la condition surveillée est
+\textbf{active}. \texttt{FB\_ReadHmi} ne fait qu'extraire le bit brut, il
+n'inverse pas son sens -- c'est au programme applicatif d'en tenir
+compte.
+\end{UPSTIinfor}
+
+\subsection{En écriture}
+
+Le principe est symétrique : le programme applicatif renseigne les champs
+de \texttt{THmiOutputs} (\texttt{m\_qToR} pour les voyants du pupitre,
+\texttt{m\_Screen} pour la supervision écran -- \texttt{m\_iStateGmma},
+\texttt{m\_iCurvSpeed\_mm\_per\_s}, \texttt{m\_a5tankLine}...), puis
+\texttt{FB\_WriteHmi} se charge de reconstituer, à partir de ces champs,
+l'objet brut \texttt{TToHmi} qui sera réellement écrit par le coupleur
+vers le M221.
+
+\begin{UPSTIidee}{Trois temps, toujours dans le même ordre}
+On retrouve, dans l'ordre, les trois étapes suivantes :
+\begin{enumerate}
+    \item \textbf{Lire} l'objet brut (alias sur la zone \texttt{\%MW})
+    puis le \textbf{convertir} en objet sémantique (\texttt{FB\_ReadHmi}).
+    \item \textbf{Utiliser} (ou renseigner) l'objet sémantique dans la
+    logique applicative.
+    \item \textbf{Convertir} l'objet sémantique en objet brut
+    (\texttt{FB\_WriteHmi}) puis laisser le coupleur l'\textbf{écrire}
+    physiquement.
+\end{enumerate}
+\end{UPSTIidee}
+
+\UPSTIremarque[Lien avec la préparation du TP]{
+C'est précisément ce que demande l'activité « Déclaration des objets
+\texttt{TFromHmi} et \texttt{TToHmi} » du TP suivant : déclarer, par
+chevauchement/alias, les objets \texttt{fromHmiScara} et
+\texttt{toHmiScara} qui serviront d'entrée/sortie brutes à
+\texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}.}

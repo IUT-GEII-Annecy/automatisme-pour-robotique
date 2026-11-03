@@ -1,0 +1,106 @@
+\section{Conversion des données de la baie CS9 (robot)}
+\label{secConversionRobot}
+
+La baie CS9 produit 148 octets et en consomme 124 (cf. document
+\texttt{02\_TP/TP\_02}, préparation). Ces octets sont le résultat de
+l'encodage, propre au serveur \texttt{uniVALplc}, de l'ensemble des
+informations d'état et de commande du robot : ils ne sont exploitables
+qu'à travers les blocs \texttt{VAL\_ReadAxesGroup} et
+\texttt{VAL\_WriteAxesGroup}.
+
+\subsection{En lecture : \texttt{VAL\_ReadAxesGroup}}
+
+\begin{enumerate}
+    \item L'alias \texttt{fromRobotScara}, de type \texttt{T\_FromRobot},
+    chevauche la zone image des données produites par la CS9. Comme pour
+    le M221, il ne s'agit que d'octets bruts.
+    \item \texttt{VAL\_ReadAxesGroup} prend cet objet brut en paramètre
+    \texttt{IN} et met à jour, en paramètre \texttt{AxesGroup}, un objet
+    \texttt{T\_StaeubliRobot} dont les champs ont un sens explicite.
+\end{enumerate}
+
+\texttt{T\_StaeubliRobot} se compose de trois sous-objets :
+
+\begin{center}
+\begin{tabular}{|l|p{9.5cm}|}
+\hline
+\textbf{Champ} & \textbf{Rôle} \\
+\hline
+\texttt{Status} & État courant du robot, mis à jour par
+\texttt{VAL\_ReadAxesGroup} : \texttt{IsMoving}, \texttt{Online},
+\texttt{ErrorPending}, \texttt{ActualSpeed}, \texttt{CartesianPos},
+\texttt{JointPos}, \texttt{RobotStateMachine}, \texttt{Heartbeat}... \\
+\hline
+\texttt{Command} & Commandes générales à destination du serveur, écrites
+par le programme applicatif puis transmises par
+\texttt{VAL\_WriteAxesGroup} : \texttt{OperationModeCmd},
+\texttt{OverrideCmd}, \texttt{LifebitPeriod}... \\
+\hline
+\texttt{CommandInterface} & Interface utilisée en interne par les blocs
+\texttt{MC\_} (mouvement, mise sous puissance...) pour transmettre leurs
+propres requêtes au serveur. \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{UPSTIinfor}{Le bit de vie (\texttt{Heartbeat})}
+\texttt{Status.Heartbeat} est incrémenté par le serveur \texttt{uniVALplc}
+à chaque trame produite. Un programme applicatif rigoureux surveille son
+évolution (il doit changer périodiquement, selon
+\texttt{Command.LifebitPeriod}) pour détecter une perte de communication
+que le seul bit de santé du coupleur ne révélerait pas forcément aussi
+rapidement.
+\end{UPSTIinfor}
+
+\subsection{Donner des ordres au robot}
+
+Une fois \texttt{T\_StaeubliRobot} disponible et à jour, le programme
+applicatif peut agir sur le robot de deux façons :
+
+\begin{itemize}
+    \item en renseignant directement certains champs de
+    \texttt{Command} (ex. \texttt{OperationModeCmd},
+    \texttt{LifebitPeriod}) ;
+    \item en appelant des blocs \texttt{MC\_} (\texttt{MC\_GroupPower},
+    \texttt{MC\_GroupReset}, \texttt{MC\_MoveLinearAbsolute}...), auxquels
+    on transmet l'objet \texttt{AxesGroup} : ces blocs lisent son état
+    courant (\texttt{Status}) pour déterminer si une commande peut être
+    acceptée, et déposent leur requête dans \texttt{CommandInterface} en
+    conséquence.
+\end{itemize}
+
+\begin{UPSTIwarning}{Les blocs \texttt{MC\_} ne \og parlent\fg{} jamais directement au réseau}
+Un bloc \texttt{MC\_} ne fait que préparer une requête dans l'objet
+\texttt{T\_StaeubliRobot} partagé. C'est uniquement au moment où
+\texttt{VAL\_WriteAxesGroup} est appelé que cette requête est
+effectivement sérialisée et transmise au robot -- voir ci-dessous.
+\end{UPSTIwarning}
+
+\subsection{En écriture : \texttt{VAL\_WriteAxesGroup}}
+
+Une fois les ordres déposés dans \texttt{T\_StaeubliRobot}
+(\texttt{Command}, \texttt{CommandInterface}), \texttt{VAL\_WriteAxesGroup}
+sérialise ces informations vers l'objet brut \texttt{OUT} (de type
+\texttt{T\_ToRobot}), qui est ensuite physiquement transmis à la baie CS9
+par le coupleur, via l'alias \texttt{toRobotScara}.
+
+\begin{UPSTIidee}{Toujours la même structure en trois temps}
+On retrouve, dans l'ordre, les trois étapes suivantes :
+\begin{enumerate}
+    \item \textbf{Lire} l'objet brut puis le \textbf{convertir} en objet
+    sémantique (\texttt{VAL\_ReadAxesGroup}).
+    \item \textbf{Donner des ordres} via l'objet sémantique partagé
+    (champs de \texttt{Command}, ou blocs \texttt{MC\_}).
+    \item \textbf{Convertir} l'objet sémantique en objet brut
+    (\texttt{VAL\_WriteAxesGroup}) avant que le coupleur ne
+    l'\textbf{écrive} physiquement -- c'est le \textbf{dernier} bloc
+    exécuté du cycle, après tous les blocs \texttt{MC\_}.
+\end{enumerate}
+\end{UPSTIidee}
+
+\UPSTIremarque[Lien avec la préparation du TP]{
+C'est précisément ce que demande l'activité « Déclaration des objets
+\texttt{T\_FromRobot} et \texttt{T\_ToRobot} » du TP suivant : déclarer,
+par chevauchement/alias, les objets \texttt{fromRobotScara} et
+\texttt{toRobotScara} qui serviront d'entrée/sortie brutes à
+\texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup}.}

@@ -1,0 +1,127 @@
+\section{TD d'application : mode A6, mise en conditions initiales}
+\label{secTdA6}
+
+\begin{UPSTIinfor}{Objectif}
+Mettre en œuvre le mode GEMMA \textbf{A6} du robot, en mobilisant la
+chaîne de conversion présentée ci-dessus. Les trous proposés sont de
+taille croissante : les premiers portent sur les blocs de
+\textbf{conversion} déjà présentés en détail, les derniers vous demandent
+de \textbf{choisir vous-même} le mouvement le plus adapté.
+\end{UPSTIinfor}
+
+\subsection{Rappel du comportement attendu (mode A6)}
+
+Le robot doit rejoindre sa position de référence au-dessus du guichet,
+sans jamais entraver la circulation des palettes sur le convoyeur :
+
+\begin{enumerate}
+    \item monter l'axe \textbf{J3} (vertical) jusqu'à $Z=150\;\text{mm}$,
+    sans modifier la position courante des autres axes ;
+    \item rejoindre ensuite la position cartésienne complète
+    $(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$ par une commande de
+    mouvement de type articulaire.
+\end{enumerate}
+
+Si un arrêt est demandé par l'opérateur pendant ce mode, le robot doit
+être immobilisé (sans perdre la puissance) puis reprendre sa course dès
+que la demande d'arrêt n'est plus active.
+
+\subsection{Niveau 1 -- Compléter les blocs de conversion}
+
+\begin{UPSTIactivite}[4][Appel de \texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup}][][][TD]
+\UPSTIquestion{Compléter les paramètres manquants (repérés par
+\texttt{(* A\_COMPLETER *)}) dans la section \texttt{ReadEthIpRobot} et
+dans la section \texttt{WriteEthIpRobot} ci-dessous.}
+
+\begin{lstlisting}
+(* Section ReadEthIpRobot -- premiere section executee dans le cycle *)
+InstReadAxesGroup(
+    Enable     := (* A_COMPLETER *),
+    AxesGroup  := (* A_COMPLETER *),
+    IN         := fromRobotScara
+);
+
+(* ... section WriteEthIpRobot -- derniere section executee dans le cycle *)
+InstWriteAxesGroup(
+    Enable     := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
+    AxesGroup  := staeubliRobotScara,
+    OUT        => (* A_COMPLETER *)
+);
+\end{lstlisting}
+\vspace{2cm}
+\end{UPSTIactivite}
+
+\subsection{Niveau 2 -- Compléter la mise sous puissance}
+
+\begin{UPSTIactivite}[4][Mise sous puissance du robot][][][TD]
+\UPSTIquestion{Le robot doit rester sous puissance pendant toute la durée
+du mode A6. Compléter l'appel au bloc \texttt{MC\_GroupPower}
+ci-dessous : l'entrée \texttt{Enable} doit être activée en permanence
+dans ce mode, et l'objet \texttt{AxesGroup} doit être celui de la cellule.}
+
+\begin{lstlisting}
+InstGroupPowerA6(
+    Enable     := (* A_COMPLETER : toujours actif en mode A6 *),
+    AxesGroup  := (* A_COMPLETER *)
+);
+\end{lstlisting}
+\vspace{2cm}
+\end{UPSTIactivite}
+
+\subsection{Niveau 3 -- Choisir et écrire les mouvements}
+
+À ce stade, vous disposez de tous les éléments pour écrire vous-même la
+séquence de mouvement. Deux blocs \texttt{MC\_} vus en TP peuvent
+convenir : \texttt{MC\_MoveLinearAbsolute} (mouvement linéaire) et
+\texttt{MC\_MoveDirectAbsolute} (interpolation articulaire vers une
+position cartésienne).
+
+\begin{UPSTIactivite}[4][Étape 1 -- monter l'axe J3][][][TD]
+\UPSTIquestion{L'énoncé demande de monter l'axe \textbf{J3} à
+$Z=150\;\text{mm}$ \textbf{sans modifier la position courante des autres
+axes}, par une commande de mouvement \textbf{articulaire}. Sur un robot
+Scara, l'axe J3 est l'axe vertical : une cible cartésienne qui ne change
+que $Z$, en conservant $X$, $Y$, $RX$, $RY$, $RZ$ courants, produit
+exactement ce déplacement.
+
+\begin{enumerate}
+    \item Quel bloc \texttt{MC\_} vu en TP choisissez-vous pour cette
+    étape ? Justifier.
+    \item Écrire, en complétant le squelette ci-dessous, l'instanciation
+    et l'appel de ce bloc. La position cible utilisera les coordonnées
+    \textbf{courantes} du robot pour $X$, $Y$, $RX$, $RY$, $RZ$ (déjà
+    disponibles dans \texttt{staeubliRobotScara.Status.CartesianPos}), et
+    $Z=150$.
+\end{enumerate}}
+
+\begin{lstlisting}
+targetPosA6Etape1.X  := staeubliRobotScara.Status.CartesianPos.X;
+targetPosA6Etape1.Y  := (* A_COMPLETER *);
+targetPosA6Etape1.Z  := (* A_COMPLETER : valeur numerique de l'enonce *);
+targetPosA6Etape1.RX := (* A_COMPLETER *);
+targetPosA6Etape1.RY := (* A_COMPLETER *);
+targetPosA6Etape1.RZ := (* A_COMPLETER *);
+
+(* A_COMPLETER : instanciation et appel du bloc MC_ choisi,
+   avec Execute, AxesGroup et la position cible ci-dessus *)
+\end{lstlisting}
+\vspace{3cm}
+\end{UPSTIactivite}
+
+\begin{UPSTIactivite}[4][Étape 2 -- rejoindre la position de référence][][][TD]
+\UPSTIquestion{Écrire entièrement l'appel du bloc \texttt{MC\_} permettant
+de rejoindre la position de référence
+$(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$, par une commande de
+mouvement articulaire. Vous déclarerez vous-même l'instance du bloc, la
+variable de position cible, et le \texttt{TCtrlStatusGroup} associé.}
+\vspace{6cm}
+\end{UPSTIactivite}
+
+\begin{UPSTIactivite}[4][Gestion de l'arrêt demandé][][][TD]
+\UPSTIquestion{Parmi les blocs \texttt{MC\_GroupInterrupt} et
+\texttt{MC\_GroupContinue} vus en TP, lequel utiliser pour immobiliser le
+robot sans perdre la puissance lorsque \texttt{StopRequest} est actif, et
+lequel pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
+conditions d'appel (sans écrire l'instanciation complète des blocs).}
+\vspace{4cm}
+\end{UPSTIactivite}

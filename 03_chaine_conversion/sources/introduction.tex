@@ -1,0 +1,42 @@
+\section{Introduction}
+\label{secIntroductionChaine}
+
+Le premier TP a permis de mettre en service la communication avec le
+contrôleur \textbf{PFC200} (poste guichet) : chaque bit produit ou
+consommé par cet équipement correspond directement à un capteur ou un
+actionneur, et un simple \textbf{alias mémoire} (chevauchement d'une
+variable structurée sur la zone \texttt{\%MW} du coupleur) suffit à lui
+donner un nom exploitable dans le programme.
+
+Ce document prépare la suite des TP, où deux autres équipements du réseau
+\texttt{NOC\_ETHIP\_ROBOT} doivent être mis en œuvre : le contrôleur
+\textbf{M221} (pupitre opérateur et écran de supervision) et la baie
+\textbf{CS9} du robot (serveur \texttt{uniVALplc}). Dans les deux cas, un
+alias seul ne suffit plus : les octets échangés ne portent pas
+directement une information unitaire exploitable, il faut un
+\textbf{bloc fonctionnel de conversion} pour leur donner du sens.
+
+\begin{UPSTIinfor}{Pourquoi un alias ne suffit plus}
+Pour le PFC200, chaque bit \emph{est} l'information (un capteur, une
+commande). Pour le M221 et pour la baie CS9, les octets échangés sont le
+résultat d'un \textbf{encodage} propre à la bibliothèque logicielle de
+l'équipement (empaquetage de plusieurs informations dans un même octet,
+structures imbriquées, types numériques codés sur plusieurs octets...).
+Un alias donne seulement accès à cette zone \textbf{brute} : il faut un
+bloc fonctionnel qui la décode (en lecture) ou qui l'encode (en écriture)
+pour manipuler des informations ayant un nom et un type clairs dans le
+programme.
+\end{UPSTIinfor}
+
+Ce document traite cette chaîne de conversion dans l'ordre suivant :
+
+\begin{enumerate}
+    \item le contrôleur \textbf{M221} (blocs \texttt{FB\_ReadHmi} et
+    \texttt{FB\_WriteHmi}), le cas le plus simple des deux ;
+    \item la baie \textbf{CS9} (blocs \texttt{VAL\_ReadAxesGroup} et
+    \texttt{VAL\_WriteAxesGroup}), plus riche ;
+    \item un schéma de synthèse comparant les trois chaînes de conversion
+    rencontrées (PFC200, M221, CS9) ;
+    \item un TD d'application, sur la mise en œuvre du mode GEMMA
+    \textbf{A6} (mise en conditions initiales) du robot.
+\end{enumerate}
