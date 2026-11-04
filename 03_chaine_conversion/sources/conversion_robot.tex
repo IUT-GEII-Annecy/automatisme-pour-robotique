@@ -64,10 +64,11 @@ InstReadAxesGroup(
 \texttt{ErrorPending}, \texttt{ActualSpeed}, \texttt{CartesianPos},
 \texttt{JointPos}, \texttt{RobotStateMachine}, \texttt{Heartbeat}... \\
 \hline
-\texttt{Command} & Commandes générales à destination du serveur, écrites
-par le programme applicatif puis transmises par
-\texttt{VAL\_WriteAxesGroup} : \texttt{OperationModeCmd},
-\texttt{OverrideCmd}, \texttt{LifebitPeriod}... \\
+\texttt{Command} & Commandes générales à destination du serveur
+(\texttt{OperationModeCmd}, \texttt{OverrideCmd}, \texttt{LifebitPeriod}...),
+transmises par \texttt{VAL\_WriteAxesGroup}. En TP, le programme
+applicatif ne les renseigne pas lui-même, à la seule exception de
+\texttt{LifebitPeriod} (voir ci-dessous). \\
 \hline
 \texttt{CommandInterface} & Interface utilisée en interne par les blocs
 \texttt{MC\_} (mouvement, mise sous puissance...) pour transmettre leurs
@@ -84,24 +85,31 @@ entre 100~et~1000~ms, valeur initiale \texttt{T\#200ms}) forment un mécanisme d
 l'automate et le serveur \texttt{uniVALplc} : c'est un moyen
 supplémentaire, propre à \texttt{uniVALplc}, de surveiller la liaison --
 distinct des bits de santé du coupleur NOC, présentés en section~\ref{secConversionHmi}.
+C'est le \textbf{seul} champ de \texttt{Command} que le programme écrit
+lui-même en TP : une unique affectation, au premier cycle en RUN, dans la
+section d'initialisation du GEMMA (le TP~3 impose \texttt{t\#150ms}).
 \end{UPSTIinfor}
 
 \subsection{Donner des ordres au robot}
 
 Une fois \texttt{T\_StaeubliRobot} disponible et à jour, le programme
-applicatif peut agir sur le robot de deux façons :
+applicatif agit sur le robot \textbf{exclusivement en appelant des blocs
+fonctionnels} de la bibliothèque (\texttt{MC\_GroupPower},
+\texttt{MC\_GroupReset}, \texttt{MC\_MoveLinearAbsolute}..., ou
+\texttt{VAL\_} selon le besoin), auxquels on transmet l'objet
+\texttt{staeubliRobotScara} sur leur paramètre \texttt{AxesGroup} : ces
+blocs lisent son état courant (\texttt{Status}) pour déterminer si une
+commande peut être acceptée, et déposent leur requête dans
+\texttt{CommandInterface} en conséquence.
 
-\begin{itemize}
-    \item en renseignant directement certains champs de
-    \texttt{Command} (ex. \texttt{OperationModeCmd},
-    \texttt{LifebitPeriod}) ;
-    \item en appelant des blocs \texttt{MC\_} (\texttt{MC\_GroupPower},
-    \texttt{MC\_GroupReset}, \texttt{MC\_MoveLinearAbsolute}...), auxquels
-    on transmet l'objet \texttt{AxesGroup} : ces blocs lisent son état
-    courant (\texttt{Status}) pour déterminer si une commande peut être
-    acceptée, et déposent leur requête dans \texttt{CommandInterface} en
-    conséquence.
-\end{itemize}
+\begin{UPSTIwarning}{On n'écrit pas directement dans \texttt{staeubliRobotScara}}
+Les champs de \texttt{staeubliRobotScara} (\texttt{Command},
+\texttt{CommandInterface}) ne sont \textbf{jamais} affectés à la main pour
+donner un ordre au robot : c'est le rôle des blocs, qui garantissent la
+cohérence de la requête avec l'état du robot. Seule exception :
+l'initialisation de \texttt{Command.LifebitPeriod} au premier cycle,
+décrite ci-dessus, qui est un paramétrage et non un ordre.
+\end{UPSTIwarning}
 
 \begin{UPSTIwarning}{Les blocs \texttt{MC\_} ne \og parlent\fg{} jamais directement au réseau}
 Un bloc \texttt{MC\_} ne fait que préparer une requête dans l'objet
@@ -157,8 +165,8 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
 \begin{enumerate}
     \item \textbf{Lire} l'objet brut puis le \textbf{convertir} en objet
     sémantique (\texttt{VAL\_ReadAxesGroup}).
-    \item \textbf{Donner des ordres} via l'objet sémantique partagé
-    (champs de \texttt{Command}, ou blocs \texttt{MC\_}).
+    \item \textbf{Donner des ordres} en appelant les blocs \texttt{MC\_}
+    (ou \texttt{VAL\_}), qui agissent sur l'objet sémantique partagé.
     \item \textbf{Convertir} l'objet sémantique en objet brut
     (\texttt{VAL\_WriteAxesGroup}) avant que le coupleur ne
     l'\textbf{écrive} physiquement -- c'est le \textbf{dernier} bloc
@@ -166,22 +174,47 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
 \end{enumerate}
 \end{UPSTIidee}
 
-\begin{UPSTIactivite}[4][Lire l'état et commander via \texttt{staeubliRobotScara}][][][TD]
-\UPSTIquestion{Pour chacune des informations suivantes, indiquer le
-sous-objet de \texttt{staeubliRobotScara} concerné (\texttt{Status} ou
-\texttt{Command}), si le programme applicatif la lit ou l'écrit, et quel
-bloc \texttt{VAL\_} assure son transfert avec la CS9 : le robot est en
-mouvement (\texttt{IsMoving}) ; la vitesse de consigne du moniteur
-(\texttt{OverrideCmd}) ; la position articulaire courante
-(\texttt{JointPos}) ; la période du bit de vie (\texttt{LifebitPeriod}).}
-\UPSTIquadrillage{4}
+\begin{UPSTIactivite}[4][Commander la puissance via \texttt{staeubliRobotScara}][][][TD]
+\UPSTIquestion{Le TP~3 fait déclarer le type suivant, puis un objet
+\texttt{ctrlStatusGroupPower} de ce type, pour regrouper les paramètres de
+l'instance \texttt{InstGroupPower} du bloc \texttt{MC\_GroupPower}
+(entrée \texttt{Enable : BOOL}, \texttt{VAR\_IN\_OUT AxesGroup :
+T\_StaeubliRobot}, sorties \texttt{Status : BOOL}, \texttt{Error : BOOL},
+\texttt{ErrorID : UDINT}).
+Compléter, dans la section \texttt{WriteEthIpRobot}, l'appel de ce bloc,
+puis l'affectation du voyant « bras sous puissance » du pupitre
+(\texttt{hmiScara.m\_Outputs.m\_qToR.m\_nqxArmUnderPower}) à partir de
+l'état \textbf{effectif} de la puissance.}
 
-\UPSTIquestion{Le champ \texttt{Command.OperationModeCmd} (\texttt{UINT})
-code le mode de marche demandé : 0~=~invalide, 1~=~manuel, 3~=~auto,
-4~=~commande à distance (\emph{extAut}). Écrire en ST les deux
-affectations qui demandent le mode « commande à distance » et une période
-de bit de vie de 500~ms.}
-\UPSTIquadrillage{2.5}
+\begin{lstlisting}
+TYPE
+    STRUCT TCtrlStatusGroupPower
+        m_xEnable    : BOOL;
+        m_xStatus    : BOOL;
+        m_xError     : BOOL;
+        m_udiErrorID : UDINT;
+    END_STRUCT
+END_TYPE
+
+InstGroupPower(
+    Enable    := (*@\trou{4.5cm}@*),
+    AxesGroup := (*@\trou{4.5cm}@*),
+    Status    => (*@\trou{4.5cm}@*),
+    Error     => (*@\trou{4.5cm}@*),
+    ErrorID   => (*@\trou{4.5cm}@*)
+);
+hmiScara.m_Outputs.m_qToR.m_nqxArmUnderPower := (*@\trou{4.5cm}@*);
+\end{lstlisting}
+
+\UPSTIquestion{Un étudiant, pour mettre le bras hors puissance en mode D1,
+écrit dans sa section \texttt{D1\_ArretUrgence} une affectation directe
+dans un champ de \texttt{staeubliRobotScara.Command}. Expliquer pourquoi
+ce n'est pas la démarche attendue, et écrire à la place la ligne qui
+obtient la mise hors puissance avec les objets de la question
+précédente. Quelle est la seule affectation directe d'un champ de
+\texttt{staeubliRobotScara} demandée dans les TP, dans quelle section et
+avec quelle valeur ?}
+\UPSTIquadrillage{4}
 
 \UPSTIquestion{Un étudiant place l'appel de \texttt{MC\_GroupPower}
 \textbf{après} celui de \texttt{VAL\_WriteAxesGroup} dans le cycle.

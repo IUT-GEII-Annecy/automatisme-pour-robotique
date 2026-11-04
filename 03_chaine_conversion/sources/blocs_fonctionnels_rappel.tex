@@ -29,22 +29,38 @@ démarré le mouvement demandé, afin de ne déclencher l'exécution que sur un
 sans mémoire, ne pourrait pas détecter ce front.
 
 \begin{UPSTIactivite}[4][Fonction ou bloc fonctionnel ?][][][TD]
-\UPSTIquestion{Pour chacun des traitements suivants, préciser s'il doit
-être réalisé par une \textbf{fonction} ou par un \textbf{bloc fonctionnel},
-et justifier en une phrase à partir du critère de mémorisation d'état.
+\UPSTIquestion{Les éléments suivants sont tous utilisés dans les TP de la
+cellule. Pour chacun, indiquer s'il s'agit d'une \textbf{fonction} (appel
+direct, résultat récupéré dans une variable) ou d'un \textbf{bloc
+fonctionnel} (instance à réserver dans l'éditeur de données, onglet
+\emph{Bloc fonction}), en justifiant en une phrase par le critère de
+mémorisation d'état :
 \begin{enumerate}
-    \item Convertir une température exprimée en degrés Celsius en degrés
-    Fahrenheit.
-    \item Détecter le front montant d'une entrée booléenne.
-    \item Calculer la racine carrée d'une valeur réelle.
-    \item Temporiser l'activation d'une sortie de 2~secondes après le
-    passage à \texttt{TRUE} d'une entrée.
-    \item Décoder l'objet brut \texttt{TFromHmi} en champ
-    \texttt{m\_Inputs} de l'objet \texttt{THmi}.
-    \item Compter le nombre de fronts montants reçus sur une entrée depuis
-    la mise sous tension de l'automate.
+    \item \texttt{InitChart}, appelé au premier cycle pour initialiser le
+    GEMMA, dont la valeur de retour est récupérée dans un objet
+    \texttt{xResult : BOOL} ;
+    \item \texttt{MC\_GroupReset}, déclenché sur front montant de son
+    entrée \texttt{Execute} ;
+    \item \texttt{VAL\_ReadAxesGroup} ;
+    \item la détection du front montant du bouton « Arrêt demandé » du
+    pupitre.
 \end{enumerate}}
-\UPSTIquadrillage{6}
+\UPSTIquadrillage{4}
+
+\UPSTIquestion{Le mode D2 du TP~3 utilise les blocs
+\texttt{MC\_GroupReset}, \texttt{MC\_GroupStop} et
+\texttt{MC\_GroupContinue}. En respectant la règle de nommage imposée
+(nom d'instance faisant référence au mode, par exemple
+\texttt{InstGroupResetD2}), écrire la déclaration des trois instances
+nécessaires.}
+
+\begin{lstlisting}
+VAR
+    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
+    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
+    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
+END_VAR
+\end{lstlisting}
 \end{UPSTIactivite}
 
 \UPSTIremarque[Préfixes de bibliothèque]{Les blocs fonctionnels utilisés

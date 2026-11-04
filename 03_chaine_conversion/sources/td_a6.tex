@@ -112,17 +112,24 @@ InstWriteAxesGroup(
 \subsection{Niveau 2 -- Compléter la mise sous puissance}
 
 \begin{UPSTIactivite}[4][Mise sous puissance du robot][][][TD]
-\UPSTIquestion{Le robot doit rester sous puissance pendant toute la durée
-du mode A6. Compléter l'appel au bloc \texttt{MC\_GroupPower}
-ci-dessous : l'entrée \texttt{Enable} doit être activée en permanence
-dans ce mode, et l'objet \texttt{AxesGroup} doit être celui de la cellule.}
-
-\begin{lstlisting}
-InstGroupPowerA6(
-    Enable     := (*@\trou{6.5cm}@*), (* toujours actif en mode A6 *)
-    AxesGroup  := (*@\trou{5.5cm}@*)
-);
-\end{lstlisting}
+\UPSTIquestion{Comme demandé au TP~3, l'unique instance
+\texttt{InstGroupPower} de \texttt{MC\_GroupPower} est scrutée dans la
+section \texttt{WriteEthIpRobot}, avec l'objet
+\texttt{ctrlStatusGroupPower} (type \texttt{TCtrlStatusGroupPower}) pour
+le passage des paramètres (voir section~\ref{secConversionRobot}).
+Un étudiant, pour que le robot reste sous puissance pendant le mode A6,
+déclare une seconde instance \texttt{InstGroupPowerA6} et l'appelle dans
+sa section A6 avec \texttt{Enable := TRUE}.
+\begin{enumerate}
+    \item Expliquer le problème posé par la coexistence de deux instances
+    de \texttt{MC\_GroupPower} agissant sur le même objet
+    \texttt{staeubliRobotScara}, sachant que celle du mode D1 doit
+    pouvoir mettre le bras hors puissance.
+    \item Écrire à la place la ligne à placer dans la section du mode A6,
+    puis la condition, à tester avant de lancer l'étape~1 ci-dessous,
+    qui garantit que le bras est \textbf{effectivement} sous puissance.
+\end{enumerate}}
+\UPSTIquadrillage{5}
 \end{UPSTIactivite}
 
 \subsection{Niveau 3 -- Choisir et écrire les mouvements}
