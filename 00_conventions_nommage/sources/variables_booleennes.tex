@@ -1,35 +1,31 @@
 \section{Variables booléennes issues de l'IO-Scanning}
 \label{secVariablesBooleennes}
 
-Les variables booléennes obtenues par IO-Scanning Ethernet/IP (non forçables, front non
-accessible directement) suivent un préfixe générique \texttt{n} (« obtenu par IO-Scanning »).
+Les variables booléennes \textbf{autonomes} obtenues par IO-Scanning Ethernet/IP (non forçables,
+front non accessible directement), c'est-à-dire déclarées hors d'une structure dédiée
+d'entrées/sorties, portent le préfixe \texttt{in} (entrée) ou \texttt{out} (sortie). Les champs
+des structures dédiées \texttt{inputs}/\texttt{outputs} n'ont aucun préfixe : l'appartenance à la
+structure suffit à indiquer leur nature.
 
 \begin{center}
     \begin{tabular}{|p{2.8cm}|p{6.5cm}|p{5cm}|}
         \hline
         \textbf{Préfixe} & \textbf{Signification} & \textbf{Exemple} \\
         \hline
-        \texttt{n} & Préfixe générique : donnée obtenue par IO-Scanning Ethernet/IP. & -- \\
+        \texttt{in<Nom>} & Entrée booléenne autonome produite par un équipement scruté. & \texttt{inAid}, \texttt{inDgt}, \texttt{inDpp}, \texttt{inDpo} \\
         \hline
-        \texttt{nix<Nom>} & Entrée booléenne produite par un équipement scruté. & \texttt{nixAid}, \texttt{nixDgt}, \texttt{nixDpp}, \texttt{nixDpo} \\
+        \texttt{out<Nom>} & Sortie booléenne autonome consommée par un équipement scruté. & \texttt{outBE}, \texttt{outBP}, \texttt{outCR}, \texttt{outCV}, \texttt{outCB} \\
         \hline
-        \texttt{nqx<Nom>} & Sortie booléenne consommée par un équipement scruté. & \texttt{nqxBE}, \texttt{nqxBP}, \texttt{nqxCR}, \texttt{nqxCV}, \texttt{nqxCB} \\
+        \texttt{<nom>} & Entrée physique du pupitre HMI, champ de la structure \texttt{inputs} (cf. \ref{secTypesDonnees}). & \texttt{j1Plus}, \texttt{auto}, \texttt{emptyTanks}, \texttt{stopRequest} \\
         \hline
-        \texttt{m\_nix<Nom>} & Entrée physique du pupitre HMI, en tant que champ d'une structure préfixée \texttt{m\_} (cf. \ref{secTypesDonnees}). & \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto}, \texttt{m\_nixEmptyTanks} \\
+        \texttt{<nom>} & Sortie physique du pupitre HMI, champ de la structure \texttt{outputs}. & \texttt{redColumn}, \texttt{armUnderPower} \\
         \hline
-        \texttt{m\_nqx<Nom>} & Sortie physique du pupitre HMI, champ de structure. & \texttt{m\_nqxRedColumn} \\
-        \hline
-        \texttt{m\_na<N><Nom>} & Tableau de bits, champ de structure (\texttt{a} = array, \texttt{N} = taille optionnelle). & \texttt{m\_na4qxHex7Seg} \\
+        \texttt{<nom>} & Tableau de bits, champ de structure. & \texttt{hex7Seg} \\
         \hline
     \end{tabular}
 \end{center}
 
-\UPSTIremarque[Deux familles distinctes de préfixes \texttt{ix}]{%
-Sur le pupitre M221/HMI (annexe 3 du TP2 et annexe 3 du TP5), les mêmes principes s'appliquent
-mais sans toujours le \texttt{n} initial : les documents source utilisent indifféremment
-\texttt{m\_ixJ1Plus} (entrée physique simple, sans \texttt{n}) et \texttt{m\_nixJ1Minus}
-(avec \texttt{n}) au sein de la \emph{même} structure \texttt{THmiInputs} (annexe 3, TP5). Cette
-incohérence figure telle quelle dans les documents source : le \texttt{n} de « obtenu par
-IO-Scanning » ne semble pas appliqué de façon strictement systématique sur les entrées du
-pupitre M221, alors qu'il l'est de façon rigoureuse pour les échanges avec la baie CS9 et le
-contrôleur PFC200.}
+\UPSTIremarque[Fin de l'ambiguïté \texttt{ix}/\texttt{nix}]{%
+Les documents source utilisaient indifféremment \texttt{m\_ixJ1Plus} et \texttt{m\_nixJ1Minus}
+au sein de la même structure \texttt{THmiInputs}. La convention allégée supprime ces préfixes
+dans les champs de structure : \texttt{j1Plus}, \texttt{j1Minus}. L'incohérence disparaît.}

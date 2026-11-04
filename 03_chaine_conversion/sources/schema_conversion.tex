@@ -26,7 +26,7 @@ fonctionnel de conversion).
         \node[rowlabel] (lbl1) at (-6.3, 4) {PFC200\\(déjà vu)};
         \node[noc]  (noc1)  at (-3.8, 4) {NOC};
         \node[brut] (mw1)   at (-0.9,   4) {\texttt{\%MW}\\(brut = sémantique)};
-        \node[sem]  (code1) at ( 2.9, 4) {Code\\\texttt{m\_nixAid}, \texttt{m\_nqxBE}...};
+        \node[sem]  (code1) at ( 2.9, 4) {Code\\\texttt{aid}, \texttt{be}...};
         \draw[lien] (noc1) -- (mw1);
         \draw[lien] (mw1) -- (code1);
 
@@ -35,12 +35,12 @@ fonctionnel de conversion).
         \node[noc]  (noc2)  at (-3.8, 2) {NOC};
         \node[brut] (mw2)   at (-0.9, 2) {\texttt{\%MW}\\\texttt{TFromHmi}};
         \node[fb]   (fb2)   at ( 2.3, 2) {\texttt{FB\_ReadHmi}};
-        \node[sem]  (code2) at ( 5.8, 2) {Code\\\texttt{hmiScara.m\_Inputs}};
+        \node[sem]  (code2) at ( 5.8, 2) {Code\\\texttt{hmiScara.inputs}};
         \draw[lien] (noc2) -- (mw2);
         \draw[lien] (mw2) -- (fb2);
         \draw[lien] (fb2) -- (code2);
 
-        \node[sem]  (code2b) at ( 5.8, 0.6) {Code\\\texttt{hmiScara.m\_Outputs}};
+        \node[sem]  (code2b) at ( 5.8, 0.6) {Code\\\texttt{hmiScara.outputs}};
         \node[fb]   (fb2b)   at ( 2.3, 0.6) {\texttt{FB\_WriteHmi}};
         \node[brut] (mw2b)   at (-0.9, 0.6) {\texttt{\%MW}\\\texttt{TToHmi}};
         \draw[lien] (code2b) -- (fb2b);
@@ -87,16 +87,16 @@ ou en sortie.
 pupitre. En s'appuyant sur la figure~\ref{figChaineConversion}, citer
 dans l'ordre les objets et blocs traversés par cette information, depuis
 le coupleur \texttt{NOC\_ETHIP\_ROBOT} jusqu'au champ
-\texttt{hmiScara.m\_Inputs.m\_nixJ3Up} lu par le programme applicatif.}
+\texttt{hmiScara.inputs.j3Up} lu par le programme applicatif.}
 \UPSTIquadrillage{3}
 
 \begin{UPSTIcorrectionP}{Corrigé}
 Coupleur \texttt{NOC\_ETHIP\_ROBOT} (connexion avec le M221) $\to$ zone
 \texttt{\%MW} image des données reçues du M221 $\to$ alias
 \texttt{fromHmiScara} (type \texttt{TFromHmi}, octets bruts) $\to$ bloc
-\texttt{FB\_ReadHmi} (instance \texttt{InstReadHmi}, paramètre
+\texttt{FB\_ReadHmi} (instance \texttt{readHmi}, paramètre
 \texttt{fromHmi}) $\to$ objet sémantique \texttt{hmiScara} (type
-\texttt{THmi}), champ \texttt{hmiScara.m\_Inputs.m\_nixJ3Up}.
+\texttt{THmi}), champ \texttt{hmiScara.inputs.j3Up}.
 \end{UPSTIcorrectionP}
 
 \UPSTIquestion{Faire de même pour la position cartésienne du robot

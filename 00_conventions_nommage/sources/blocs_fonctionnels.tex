@@ -75,21 +75,23 @@
 
 \subsection{Convention de nommage des instances}
 
-Le nom d'une instance de bloc fonctionnel doit faire référence au mode qui l'utilise : par
-exemple une instance de \texttt{MC\_GroupReset} réservée pour le mode \texttt{D2} sera nommée
-\texttt{InstGroupResetD2}. De même, les objets passés en paramètre (souvent de type
-\texttt{TCtrlStatusGroup}) reprennent le suffixe du mode : \texttt{ctrlStatusGroupResetD2},
-\texttt{ctrlStatusGroupStopD2}, \texttt{ctrlStatusGroupContinueD2} (TP3), ou
-\texttt{ctrlStatusGroupStopF4}, \texttt{ctrlStatusGroupContinueF4} (TP5).
+Le nom d'une instance de bloc fonctionnel ne reprend ni préfixe \texttt{Inst} ni nom technique du
+bloc : il se compose de son \textbf{rôle} (fonction résumée en un mot) suivi du mode qui
+l'utilise. Par exemple une instance de \texttt{MC\_GroupReset} réservée pour le mode \texttt{D2}
+sera nommée \texttt{resetD2}. Une instance commune à tous les modes n'a pas de suffixe :
+\texttt{readAxes}, \texttt{writeAxes}, \texttt{power}. Les objets passés en paramètre (de type
+\texttt{TCtrlStatusGroup}/\texttt{TCtrlStatusGroupPower}) sont préfixés par \texttt{status} et
+reprennent le rôle et le mode : \texttt{statusResetD2}, \texttt{statusStopD2},
+\texttt{statusContinueD2} (TP3), ou \texttt{statusStopF4}, \texttt{statusContinueF4} (TP5).
 
 \begin{center}
     \begin{tabular}{|p{4.4cm}|p{6cm}|p{3.8cm}|}
         \hline
         \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
         \hline
-        \texttt{Inst<NomBloc><Mode>} & Instance d'un bloc fonctionnel, suffixée par le mode qui l'utilise. & \texttt{InstGroupResetD2}, \texttt{InstMoveLinearAbsoluteF1}, \texttt{InstMoveAxisAbsoluteF4} \\
+        \texttt{<rôle><Mode>} & Instance d'un bloc fonctionnel, suffixée par le mode qui l'utilise (sans suffixe si commune à tous les modes). & \texttt{powerD1}, \texttt{resetD2}, \texttt{stopD2}, \texttt{continueD2}, \texttt{readAxes} \\
         \hline
-        \texttt{ctrlStatusGroup<Rôle><Mode>} & Objet \texttt{TCtrlStatusGroup} de passage de paramètres, suffixé par le rôle et le mode. & \texttt{ctrlStatusGroupStopF4}, \texttt{ctrlStatusGroupContinueF4} \\
+        \texttt{status<Rôle><Mode>} & Objet \texttt{TCtrlStatusGroup} de passage de paramètres, suffixé par le rôle et le mode. & \texttt{statusStopF4}, \texttt{statusContinueF4}, \texttt{statusPower} \\
         \hline
         \texttt{moveAxisLinearAbs<Mode>} / \texttt{moveAxisAbsolute<Mode>} & Donnée de type \texttt{TMoveAbsolute}/\texttt{TMoveAxisAbs} facilitant l'appel de l'instance, suffixée par le mode. & \texttt{moveAxisLinearAbsF1} (TP4), \texttt{moveAxisAbsoluteF4} (TP5) \\
         \hline

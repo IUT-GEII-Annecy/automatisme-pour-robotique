@@ -11,15 +11,15 @@ Contrairement au cas du robot (section~\ref{secConversionRobot}), un
 \begin{lstlisting}
 TYPE THmi
     STRUCT
-        m_Inputs  : THmiInputs ;
-        m_Outputs : THmiOutputs ;
+        inputs  : THmiInputs ;
+        outputs : THmiOutputs ;
     END_STRUCT
 END_TYPE
 \end{lstlisting}
 Un unique objet, par exemple \texttt{hmiScara} (de type \texttt{THmi}),
 est donc partagé par \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi} : le
-premier met à jour son champ \texttt{m\_Inputs}, le second lit son champ
-\texttt{m\_Outputs}.
+premier met à jour son champ \texttt{inputs}, le second lit son champ
+\texttt{outputs}.
 \end{UPSTIinfor}
 
 \begin{UPSTIinfor}{Bit de santé d'une connexion EtherNet/IP}
@@ -45,9 +45,9 @@ obsolètes ou absentes, sans nécessairement le signaler.
     contient que des octets bruts, sans nom de champ exploitable.
     \item Le bloc \texttt{FB\_ReadHmi} prend cet objet brut et en extrait
     les informations individuelles (chaque sélecteur, chaque
-    bouton-poussoir) vers le champ \texttt{m\_Inputs} de l'objet
+    bouton-poussoir) vers le champ \texttt{inputs} de l'objet
     \texttt{hmiScara}, dont les champs portent un nom explicite :
-    \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto}, \texttt{m\_nixStopRequest}...
+    \texttt{j1Plus}, \texttt{auto}, \texttt{stopRequest}...
 \end{enumerate}
 
 \texttt{FB\_ReadHmi} expose les entrées/sorties suivantes :
@@ -69,7 +69,7 @@ pour certaines informations croisées affichées à l'écran. \\
 chevauchant la zone \texttt{\%MW} image des données reçues du M221. \\
 \hline
 \texttt{hmi} & \texttt{VAR\_IN\_OUT}, \texttt{THmi} & Objet sémantique
-partagé : le bloc met à jour son champ \texttt{m\_Inputs}. \\
+partagé : le bloc met à jour son champ \texttt{inputs}. \\
 \hline
 \end{tabular}
 \end{center}
@@ -84,7 +84,7 @@ des objets qu'on lui transmet.
 \texttt{AxesGroup} doit déjà être à jour :
 
 \begin{lstlisting}
-InstReadHmi(
+readHmi(
     xEnable   := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0
                  AND NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].1,
     AxesGroup := staeubliRobotScara,
@@ -113,8 +113,8 @@ avantages concrets :
 
 \begin{UPSTIinfor}{Attention au sens des contacts}
 Certains champs de \texttt{THmiInputs} correspondent à des contacts à
-ouverture (\texttt{m\_nixEmptyTank0}, \texttt{m\_nixEmptyTank4} et
-\texttt{m\_nixStopRequest}, repérés \emph{NC} dans la déclaration du
+ouverture (\texttt{emptyTank0}, \texttt{emptyTank4} et
+\texttt{stopRequest}, repérés \emph{NC} dans la déclaration du
 type) : une valeur \texttt{FALSE} y signifie que la condition surveillée
 est \textbf{active}. \texttt{FB\_ReadHmi} ne fait qu'extraire le bit brut,
 il n'inverse pas son sens -- c'est au programme applicatif d'en tenir
@@ -124,10 +124,10 @@ compte.
 \subsection{En écriture}
 
 Le principe est symétrique : le programme applicatif renseigne les champs
-de \texttt{hmiScara.m\_Outputs} (\texttt{m\_qToR} pour les voyants du
-pupitre, \texttt{m\_Screen} pour la supervision écran --
-\texttt{m\_iStateGmma}, \texttt{m\_iCurvSpeed\_mm\_per\_s},
-\texttt{m\_a5tankLine}...), puis \texttt{FB\_WriteHmi} se charge de
+de \texttt{hmiScara.outputs} (\texttt{toR} pour les voyants du
+pupitre, \texttt{screen} pour la supervision écran --
+\texttt{stateGmma}, \texttt{curvSpeed\_mm\_per\_s},
+\texttt{tankLine}...), puis \texttt{FB\_WriteHmi} se charge de
 reconstituer, à partir de ce champ, l'objet brut \texttt{toHmiScara} (de
 type \texttt{TToHmi}) qui sera réellement écrit par le coupleur vers le
 M221.
@@ -144,7 +144,7 @@ conversion à ce cycle. \\
 Objet du robot, lu par le bloc (même rôle qu'en lecture). \\
 \hline
 \texttt{hmi} & \texttt{VAR\_IN\_OUT}, \texttt{THmi} & Objet sémantique
-partagé : le bloc lit son champ \texttt{m\_Outputs}. \\
+partagé : le bloc lit son champ \texttt{outputs}. \\
 \hline
 \texttt{toHmi} & \texttt{VAR\_OUTPUT}, \texttt{TToHmi} & Objet brut
 produit par le bloc, à écrire par le coupleur vers le M221. \\
@@ -156,7 +156,7 @@ produit par le bloc, à écrire par le coupleur vers le M221. \\
 \texttt{VAL\_WriteAxesGroup} :
 
 \begin{lstlisting}
-InstWriteHmi(
+writeHmi(
     xEnable   := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0
                  AND NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].1,
     AxesGroup := staeubliRobotScara,
@@ -180,9 +180,9 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
 
 \begin{UPSTIactivite}[4][Exploiter l'objet \texttt{hmiScara}][][][TD]
 \UPSTIquestion{L'opérateur appuie sur le bouton-poussoir « Arrêt demandé »
-du pupitre (champ \texttt{m\_nixStopRequest}, contact à ouverture
+du pupitre (champ \texttt{stopRequest}, contact à ouverture
 \emph{NC}). Quelle valeur prend alors
-\texttt{hmiScara.m\_Inputs.m\_nixStopRequest} après l'appel de
+\texttt{hmiScara.inputs.stopRequest} après l'appel de
 \texttt{FB\_ReadHmi} ? Écrire en ST l'affectation d'une variable
 \texttt{xArretDemande} (\texttt{BOOL}) valant \texttt{TRUE} lorsque
 l'arrêt est demandé.}
@@ -190,15 +190,15 @@ l'arrêt est demandé.}
 
 \begin{UPSTIcorrectionP}{Corrigé}
 Le contact étant à ouverture (\emph{NC}), l'appui \textbf{ouvre} le
-circuit : \texttt{hmiScara.m\_Inputs.m\_nixStopRequest} vaut
+circuit : \texttt{hmiScara.inputs.stopRequest} vaut
 \texttt{FALSE} (\texttt{FB\_ReadHmi} recopie le bit brut sans l'inverser).
 \begin{lstlisting}
-xArretDemande := NOT hmiScara.m_Inputs.m_nixStopRequest;
+xArretDemande := NOT hmiScara.inputs.stopRequest;
 \end{lstlisting}
 \end{UPSTIcorrectionP}
 
 \UPSTIquestion{On souhaite allumer le voyant « Arrêt demandé » du pupitre
-(champ \texttt{m\_nqxLightStopRequest} du type \texttt{THmiQTOR}).
+(champ \texttt{lightStopRequest} du type \texttt{THmiQTOR}).
 Donner le chemin complet du champ à renseigner à partir de l'objet
 \texttt{hmiScara}, puis indiquer quel bloc doit être appelé ensuite pour
 que l'ordre parvienne effectivement au M221, et via quel objet brut.}
@@ -206,11 +206,11 @@ que l'ordre parvienne effectivement au M221, et via quel objet brut.}
 
 \begin{UPSTIcorrectionP}{Corrigé}
 \begin{lstlisting}
-hmiScara.m_Outputs.m_qToR.m_nqxLightStopRequest := TRUE;
+hmiScara.outputs.toR.lightStopRequest := TRUE;
 \end{lstlisting}
-Il faut ensuite que \texttt{FB\_WriteHmi} (instance \texttt{InstWriteHmi})
+Il faut ensuite que \texttt{FB\_WriteHmi} (instance \texttt{writeHmi})
 soit appelé dans le même cycle, \textbf{après} cette affectation (et avant
-\texttt{VAL\_WriteAxesGroup}) : il lit \texttt{hmiScara.m\_Outputs} et
+\texttt{VAL\_WriteAxesGroup}) : il lit \texttt{hmiScara.outputs} et
 reconstitue l'objet brut \texttt{toHmiScara} (type \texttt{TToHmi}, sortie
 \texttt{toHmi}), alias de la zone \texttt{\%MW} que le coupleur
 \texttt{NOC\_ETHIP\_ROBOT} transmet au M221.
@@ -226,9 +226,9 @@ reconstitue l'objet brut \texttt{toHmiScara} (type \texttt{TToHmi}, sortie
 \begin{itemize}
     \item \texttt{hmi} est un objet \textbf{partagé} entre les deux blocs et
     le programme applicatif : \texttt{FB\_ReadHmi} n'en met à jour
-    qu'\textbf{une partie} (\texttt{m\_Inputs}) et doit laisser intact
-    \texttt{m\_Outputs}, renseigné par le programme ;
-    \texttt{FB\_WriteHmi} lit \texttt{m\_Outputs}. En \texttt{VAR\_IN\_OUT},
+    qu'\textbf{une partie} (\texttt{inputs}) et doit laisser intact
+    \texttt{outputs}, renseigné par le programme ;
+    \texttt{FB\_WriteHmi} lit \texttt{outputs}. En \texttt{VAR\_IN\_OUT},
     le bloc travaille directement sur l'objet transmis (passage par
     référence, sans copie) : ce qu'il modifie est immédiatement visible du
     reste du programme, et ce qu'il ne touche pas est conservé.

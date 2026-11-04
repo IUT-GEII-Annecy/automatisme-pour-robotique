@@ -46,12 +46,12 @@ présente », c'est l'opérateur d'\textbf{extraction de bit} (\texttt{.n})
 du langage ST qui isole ce bit :
 
 \begin{lstlisting}
-m_nixPalettePresente := guichetIN.3;
+inPalettePresente := guichetIN.3;
 \end{lstlisting}
 
 Cette seconde opération n'est \textbf{pas} un chevauchement : l'affectation
 \texttt{:=} \textbf{copie} la valeur du bit~3 de \texttt{guichetIN} dans la
-variable \texttt{m\_nixPalettePresente}, qui occupe son propre
+variable \texttt{inPalettePresente} (préfixe \texttt{in} : cf. section~\ref{secNotationsIoScanning}), qui occupe son propre
 emplacement mémoire, indépendant de \texttt{guichetIN}. Alias et
 extraction de bit sont donc deux opérations \textbf{distinctes et
 complémentaires} :
@@ -113,11 +113,11 @@ PFC200, à l'adresse \texttt{\%MW11}, un mot dont le bit~0 indique l'état
 du bouton d'arrêt d'urgence du poste guichet (\texttt{TRUE} = défaut). En
 complétant les lignes ci-dessous, créer l'alias \texttt{guichetIN2} puis
 en extraire le bit concerné dans une variable
-\texttt{m\_nixArretUrgenceGuichet}.}
+\texttt{inArretUrgenceGuichet}.}
 
 \begin{lstlisting}
 guichetIN2 AT (*@\trou[\%MW11]{2.2cm}@*) : (*@\trou[WORD]{1.4cm}@*);
-m_nixArretUrgenceGuichet := (*@\trou[guichetIN2.0]{2.4cm}@*);
+inArretUrgenceGuichet := (*@\trou[guichetIN2.0]{2.4cm}@*);
 \end{lstlisting}
 
 \UPSTIquestion{Le même mot comporte, sur ses bits~1 et~2, un code sur
@@ -125,7 +125,7 @@ m_nixArretUrgenceGuichet := (*@\trou[guichetIN2.0]{2.4cm}@*);
 \texttt{01} = rouge, \texttt{10} = verte, \texttt{11} = bleue). Expliquer
 en une phrase pourquoi un alias (même combiné à l'extraction de bit) ne
 permettrait \textbf{pas}, à lui seul, d'obtenir directement une variable
-\texttt{m\_couleurPalette} de type énuméré portant les noms
+\texttt{couleurPalette} de type énuméré portant les noms
 \texttt{ROUGE}/\texttt{VERTE}/\texttt{BLEUE}/\texttt{ABSENTE} : quelle
 étape supplémentaire serait alors nécessaire ?}
 \UPSTIquadrillage{3}
@@ -138,7 +138,7 @@ un nom au mot entier, l'extraction de bit ne fournit que des
 aucune de ces deux opérations ne fait correspondre un code binaire à une
 valeur nommée. Il faut une étape supplémentaire de \textbf{décodage}
 (conversion) : lire les deux bits, puis, par une structure de choix
-(\texttt{IF}/\texttt{CASE}), affecter à \texttt{m\_couleurPalette} la valeur
+(\texttt{IF}/\texttt{CASE}), affecter à \texttt{couleurPalette} la valeur
 \texttt{ABSENTE} (00), \texttt{ROUGE} (01), \texttt{VERTE} (10) ou
 \texttt{BLEUE} (11). C'est exactement le rôle d'un \textbf{bloc fonctionnel
 de conversion}, comme \texttt{FB\_ReadHmi} pour le M221.

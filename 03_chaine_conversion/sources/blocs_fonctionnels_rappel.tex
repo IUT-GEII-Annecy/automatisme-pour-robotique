@@ -60,7 +60,7 @@ mémorisation d'état :
     ne réagir qu'au \textbf{front montant} d'\texttt{Execute}, il doit
     mémoriser la valeur d'\texttt{Execute} au cycle précédent (et l'état
     d'avancement de sa requête) -- d'où l'instance
-    \texttt{InstGroupResetD2} à réserver.
+    \texttt{resetD2} à réserver.
     \item \texttt{TON} est un \textbf{bloc fonctionnel} : pour savoir si
     \texttt{IN} est à \texttt{TRUE} depuis au moins \texttt{PT}, il doit
     mémoriser d'un cycle à l'autre le temps écoulé depuis lequel
@@ -76,14 +76,14 @@ mémorisation d'état :
 \texttt{MC\_GroupReset}, \texttt{MC\_GroupStop} et
 \texttt{MC\_GroupContinue}. En respectant la règle de nommage imposée
 (nom d'instance faisant référence au mode, par exemple
-\texttt{InstGroupResetD2}), écrire la déclaration des trois instances
+\texttt{resetD2}), écrire la déclaration des trois instances
 nécessaires.}
 
 \begin{lstlisting}
 VAR
-    (*@\trou[InstGroupResetD2]{4cm}@*) : (*@\trou[MC\_GroupReset]{3.5cm}@*);
-    (*@\trou[InstGroupStopD2]{4cm}@*) : (*@\trou[MC\_GroupStop]{3.5cm}@*);
-    (*@\trou[InstGroupContinueD2]{4cm}@*) : (*@\trou[MC\_GroupContinue]{3.5cm}@*);
+    (*@\trou[resetD2]{4cm}@*) : (*@\trou[MC\_GroupReset]{3.5cm}@*);
+    (*@\trou[stopD2]{4cm}@*) : (*@\trou[MC\_GroupStop]{3.5cm}@*);
+    (*@\trou[continueD2]{4cm}@*) : (*@\trou[MC\_GroupContinue]{3.5cm}@*);
 END_VAR
 \end{lstlisting}
 \end{UPSTIactivite}

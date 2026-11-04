@@ -25,7 +25,7 @@ Si un arrêt est demandé par l'opérateur pendant ce mode, le robot doit
 être immobilisé (sans perdre la puissance) puis reprendre sa course dès
 que la demande d'arrêt n'est plus active. Ce bouton est accessible dans
 l'objet \texttt{hmiScara} via
-\texttt{hmiScara.m\_Inputs.m\_nixStopRequest} : comme rappelé en
+\texttt{hmiScara.inputs.stopRequest} : comme rappelé en
 section~\ref{secConversionHmi}, ce contact est à ouverture (\emph{NC}),
 donc un arrêt est \textbf{demandé} lorsque ce booléen vaut
 \texttt{FALSE}.
@@ -80,9 +80,9 @@ cette pile.
 \UPSTIremarque[Objet \texttt{TCtrlStatusGroup}]{Par souci de lisibilité,
 les sorties \texttt{Busy}/\texttt{Done}/\texttt{Error}/\texttt{ErrorID} de
 ces blocs sont habituellement regroupées, lors de l'appel, dans un objet
-de type \texttt{TCtrlStatusGroup} (champs \texttt{m\_xEnable},
-\texttt{m\_xBusy}, \texttt{m\_xDone}, \texttt{m\_xError},
-\texttt{m\_udiErrorID}, \texttt{m\_xTimeOut}) -- même logique que pour
+de type \texttt{TCtrlStatusGroup} (champs \texttt{enable},
+\texttt{busy}, \texttt{done}, \texttt{error},
+\texttt{errorID}, \texttt{timeOut}) -- même logique que pour
 \texttt{THmi} en section~\ref{secConversionHmi} : un seul objet nommé
 plutôt que de nombreuses variables éparpillées.}
 
@@ -95,14 +95,14 @@ dans la section \texttt{WriteEthIpRobot} ci-dessous.}
 
 \begin{lstlisting}
 (* Section ReadEthIpRobot -- premiere section executee dans le cycle *)
-InstReadAxesGroup(
+readAxes(
     Enable     := (*@\trou[NOC\_ETHIP\_ROBOT\_IN.HEALTH\_BITS\_IN[0].0]{6.5cm}@*),
     AxesGroup  := (*@\trou[staeubliRobotScara]{5.5cm}@*),
     IN         := fromRobotScara
 );
 
 (* ... section WriteEthIpRobot -- derniere section executee dans le cycle *)
-InstWriteAxesGroup(
+writeAxes(
     Enable     := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup  := staeubliRobotScara,
     OUT        => (*@\trou[toRobotScara]{5.5cm}@*)
@@ -114,12 +114,12 @@ InstWriteAxesGroup(
 
 \begin{UPSTIactivite}[4][Mise sous puissance du robot][][][TD]
 \UPSTIquestion{Comme demandé au TP~3, l'unique instance
-\texttt{InstGroupPower} de \texttt{MC\_GroupPower} est scrutée dans la
+\texttt{power} de \texttt{MC\_GroupPower} est scrutée dans la
 section \texttt{WriteEthIpRobot}, avec l'objet
-\texttt{ctrlStatusGroupPower} (type \texttt{TCtrlStatusGroupPower}) pour
+\texttt{statusPower} (type \texttt{TCtrlStatusGroupPower}) pour
 le passage des paramètres (voir section~\ref{secConversionRobot}).
 Un étudiant, pour que le robot reste sous puissance pendant le mode A6,
-déclare une seconde instance \texttt{InstGroupPowerA6} et l'appelle dans
+déclare une seconde instance \texttt{powerA6} et l'appelle dans
 sa section A6 avec \texttt{Enable := TRUE}.
 \begin{enumerate}
     \item Expliquer le problème posé par la coexistence de deux instances
@@ -136,24 +136,24 @@ sa section A6 avec \texttt{Enable := TRUE}.
 \begin{enumerate}
     \item Les deux instances déposent chacune, à chaque cycle, leur requête
     de puissance dans le même objet \texttt{staeubliRobotScara}
-    (\texttt{CommandInterface}) : \texttt{InstGroupPowerA6} demande en
-    permanence la mise sous puissance pendant qu'\texttt{InstGroupPower}
+    (\texttt{CommandInterface}) : \texttt{powerA6} demande en
+    permanence la mise sous puissance pendant qu'\texttt{power}
     peut demander l'inverse. Les requêtes sont contradictoires, l'état
     obtenu dépend de l'ordre de scrutation, et la commande hors puissance
-    du mode D1 (qui agit sur \texttt{InstGroupPower}) n'est plus garantie --
+    du mode D1 (qui agit sur \texttt{power}) n'est plus garantie --
     un problème de sécurité. Il ne doit exister qu'\textbf{une seule}
     instance de \texttt{MC\_GroupPower}, pilotée depuis les différents modes
     par son objet de paramètres.
     \item Dans la section du mode A6 :
 \begin{lstlisting}
-ctrlStatusGroupPower.m_xEnable := TRUE;
+statusPower.enable := TRUE;
 \end{lstlisting}
     Condition à tester avant l'étape~1 : la puissance \textbf{effective},
     renvoyée par la sortie \texttt{Status} du bloc :
 \begin{lstlisting}
-ctrlStatusGroupPower.m_xStatus  (* = TRUE : bras effectivement sous puissance *)
+statusPower.status  (* = TRUE : bras effectivement sous puissance *)
 \end{lstlisting}
-    (\texttt{m\_xEnable} n'est que la demande, pas l'état réel.)
+    (\texttt{enable} n'est que la demande, pas l'état réel.)
 \end{enumerate}
 \end{UPSTIcorrectionP}
 \end{UPSTIactivite}
@@ -212,35 +212,35 @@ targetPosA6Etape1.RZ := (*@\trou[staeubliRobotScara.Status.CartesianPos.RZ]{5cm}
 
 \begin{UPSTIcorrectionP}{Corrigé}
 Déclarations (instance du bloc et objet de passage de paramètres de type
-\texttt{TMoveAbsolute}, comme au TP~3) :
+\texttt{TMoveAbsolute}, comme au TP~3 ; \texttt{TMoveAbsolute} est un type maison -- préfixe \texttt{T} sans tiret bas, cf. section~\ref{secNotationsTypes} -- regroupant tous les paramètres d'appel d'un bloc \texttt{MC\_Move...Absolute}, entrées, sorties et position cible, pour en faciliter le passage) :
 \begin{lstlisting}
 VAR
-    InstMoveLinearAbsoluteA6 : MC_MoveLinearAbsolute;
+    moveLinearA6 : MC_MoveLinearAbsolute;
     moveLinearAbsA6          : TMoveAbsolute;
     targetPosA6Etape1        : T_CartesianPos;
 END_VAR
 
-InstMoveLinearAbsoluteA6(
-    Execute       := moveLinearAbsA6.m_xExecute, (* front montant a l'etape 1 *)
+moveLinearA6(
+    Execute       := moveLinearAbsA6.execute, (* front montant a l'etape 1 *)
     Position      := targetPosA6Etape1,
-    Velocity      := moveLinearAbsA6.m_rVelocity,
-    Acceleration  := moveLinearAbsA6.m_rAcceleration,
-    Deceleration  := moveLinearAbsA6.m_rDeceleration,
-    CartesianVel  := moveLinearAbsA6.m_rCartesianVel,
-    RotationalVel := moveLinearAbsA6.m_rRotationalVel,
+    Velocity      := moveLinearAbsA6.velocity,
+    Acceleration  := moveLinearAbsA6.acceleration,
+    Deceleration  := moveLinearAbsA6.deceleration,
+    CartesianVel  := moveLinearAbsA6.cartesianVel,
+    RotationalVel := moveLinearAbsA6.rotationalVel,
     CoordSystem   := 0,  (* repere world *)
     ToolNumber    := 0,  (* outil flange *)
     AxesGroup     := staeubliRobotScara,
-    Busy          => moveLinearAbsA6.m_xBusy,
-    Done          => moveLinearAbsA6.m_xDone,
-    Error         => moveLinearAbsA6.m_xError,
-    ErrorID       => moveLinearAbsA6.m_udiErrorID
+    Busy          => moveLinearAbsA6.busy,
+    Done          => moveLinearAbsA6.done,
+    Error         => moveLinearAbsA6.error,
+    ErrorID       => moveLinearAbsA6.errorID
 );
 \end{lstlisting}
 Les valeurs de vitesse/accélération (en~\% du nominal, dans
 $[0{,}01;500]$) ne sont pas imposées par l'énoncé : elles sont renseignées
 dans \texttt{moveLinearAbsA6} (action P1 de l'étape). La fin de l'étape~1
-est donnée par \texttt{moveLinearAbsA6.m\_xDone}.
+est donnée par \texttt{moveLinearAbsA6.done}.
 \end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
@@ -258,7 +258,7 @@ Mouvement articulaire vers une cible cartésienne :
 \texttt{MC\_MoveDirectAbsolute}.
 \begin{lstlisting}
 VAR
-    InstMoveDirectAbsoluteA6 : MC_MoveDirectAbsolute;
+    moveDirectA6 : MC_MoveDirectAbsolute;
     moveDirectAbsA6          : TMoveAbsolute;
     cartesianPosInitialeA6   : T_CartesianPos;
 END_VAR
@@ -271,21 +271,21 @@ cartesianPosInitialeA6.RX := -180.0;
 cartesianPosInitialeA6.RY := 0.0;
 cartesianPosInitialeA6.RZ := 0.0;
 
-InstMoveDirectAbsoluteA6(
-    Execute       := moveDirectAbsA6.m_xExecute, (* apres moveLinearAbsA6.m_xDone *)
+moveDirectA6(
+    Execute       := moveDirectAbsA6.execute, (* apres moveLinearAbsA6.done *)
     Position      := cartesianPosInitialeA6,
-    Velocity      := moveDirectAbsA6.m_rVelocity,
-    Acceleration  := moveDirectAbsA6.m_rAcceleration,
-    Deceleration  := moveDirectAbsA6.m_rDeceleration,
-    CartesianVel  := moveDirectAbsA6.m_rCartesianVel,
-    RotationalVel := moveDirectAbsA6.m_rRotationalVel,
+    Velocity      := moveDirectAbsA6.velocity,
+    Acceleration  := moveDirectAbsA6.acceleration,
+    Deceleration  := moveDirectAbsA6.deceleration,
+    CartesianVel  := moveDirectAbsA6.cartesianVel,
+    RotationalVel := moveDirectAbsA6.rotationalVel,
     CoordSystem   := 0,
     ToolNumber    := 0,
     AxesGroup     := staeubliRobotScara,
-    Busy          => moveDirectAbsA6.m_xBusy,
-    Done          => moveDirectAbsA6.m_xDone,
-    Error         => moveDirectAbsA6.m_xError,
-    ErrorID       => moveDirectAbsA6.m_udiErrorID
+    Busy          => moveDirectAbsA6.busy,
+    Done          => moveDirectAbsA6.done,
+    Error         => moveDirectAbsA6.error,
+    ErrorID       => moveDirectAbsA6.errorID
 );
 \end{lstlisting}
 Au TP~3, \texttt{cartesianPosInitialeA6} est initialisé directement à la
@@ -301,7 +301,7 @@ robot sans perdre la puissance lorsqu'un arrêt est demandé, et lequel
 pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
 conditions d'appel (sur l'entrée \texttt{Execute} de chaque bloc, sans
 écrire l'instanciation complète), en utilisant
-\texttt{hmiScara.m\_Inputs.m\_nixStopRequest}.}
+\texttt{hmiScara.inputs.stopRequest}.}
 \UPSTIquadrillage{4}
 
 \begin{UPSTIcorrectionP}{Corrigé}
@@ -312,9 +312,9 @@ la pile). L'arrêt est demandé quand le contact \emph{NC} vaut
 \texttt{FALSE} ; les blocs réagissant au front montant d'\texttt{Execute} :
 \begin{lstlisting}
 (* MC_GroupInterrupt : front montant a l'apparition de la demande d'arret *)
-Execute := NOT hmiScara.m_Inputs.m_nixStopRequest;
+Execute := NOT hmiScara.inputs.stopRequest;
 (* MC_GroupContinue : front montant a la disparition de la demande *)
-Execute := hmiScara.m_Inputs.m_nixStopRequest;
+Execute := hmiScara.inputs.stopRequest;
 \end{lstlisting}
 (On peut en plus conditionner ces entrées par l'activité du mode A6,
 \texttt{xA6}.)
@@ -397,11 +397,11 @@ Grafcet linéaire (séquence unique, non répétitive) :
 \texttt{MC\_GroupContinue} & \texttt{Done} de \texttt{MC\_GroupContinue} \\
 \hline
 4 & Mise sous puissance (action mémorisée, type P1 au TP~3 :
-\texttt{ctrlStatusGroupPower.m\_xEnable := TRUE}) & \texttt{Status} de
-\texttt{MC\_GroupPower} (\texttt{ctrlStatusGroupPower.m\_xStatus}) \\
+\texttt{statusPower.enable := TRUE}) & \texttt{Status} de
+\texttt{MC\_GroupPower} (\texttt{statusPower.status}) \\
 \hline
 5 & Fin de séquence (attente du passage en A5, transition
-\texttt{GM\_T\_D2toA5} du GEMMA) & -- \\
+\texttt{GM\_T\_D2toA5} du GEMMA, cf. section~\ref{secNotationsGmma}) & -- \\
 \hline
 \end{tabular}
 \end{center}
@@ -427,53 +427,53 @@ sa composante rouge) et des deux bloqueurs du Poste Guichet.}
 Exemple de solution (graphe SFC \texttt{D2\_Diagnostic} d'étapes
 \texttt{D2\_S\_0}\dots\texttt{D2\_S\_5}, section ST
 \texttt{D2\_DiagnosticPost} ; objets de type \texttt{TCtrlStatusGroup}
-complété du champ \texttt{m\_xExecute}, comme demandé au TP~3) :
+complété du champ \texttt{execute}, comme demandé au TP~3 ; \texttt{\%S6} est un bit système de l'automate fournissant une base de temps de 1~s, déclaré ici sous le nom \texttt{sxBaseTemps1s}) :
 \begin{lstlisting}
 VAR
-    InstGroupResetD2          : MC_GroupReset;
-    InstGroupStopD2           : MC_GroupStop;
-    InstGroupContinueD2       : MC_GroupContinue;
-    ctrlStatusGroupResetD2    : TCtrlStatusGroup;
-    ctrlStatusGroupStopD2     : TCtrlStatusGroup;
-    ctrlStatusGroupContinueD2 : TCtrlStatusGroup;
+    resetD2          : MC_GroupReset;
+    stopD2           : MC_GroupStop;
+    continueD2       : MC_GroupContinue;
+    statusResetD2    : TCtrlStatusGroup;
+    statusStopD2     : TCtrlStatusGroup;
+    statusContinueD2 : TCtrlStatusGroup;
     sxBaseTemps1s AT %S6      : BOOL;  (* base de temps 1 s *)
 END_VAR
 
 (* Activation des blocs selon l'avancement du graphe *)
-ctrlStatusGroupResetD2.m_xExecute    := D2_S_1.x;
-ctrlStatusGroupStopD2.m_xExecute     := D2_S_2.x;
-ctrlStatusGroupContinueD2.m_xExecute := D2_S_3.x;
+statusResetD2.execute    := D2_S_1.x;
+statusStopD2.execute     := D2_S_2.x;
+statusContinueD2.execute := D2_S_3.x;
 
-InstGroupResetD2(Execute := ctrlStatusGroupResetD2.m_xExecute,
+resetD2(Execute := statusResetD2.execute,
     AxesGroup := staeubliRobotScara,
-    Busy => ctrlStatusGroupResetD2.m_xBusy, Done => ctrlStatusGroupResetD2.m_xDone,
-    Error => ctrlStatusGroupResetD2.m_xError, ErrorID => ctrlStatusGroupResetD2.m_udiErrorID);
-InstGroupStopD2(Execute := ctrlStatusGroupStopD2.m_xExecute,
+    Busy => statusResetD2.busy, Done => statusResetD2.done,
+    Error => statusResetD2.error, ErrorID => statusResetD2.errorID);
+stopD2(Execute := statusStopD2.execute,
     AxesGroup := staeubliRobotScara,
-    Busy => ctrlStatusGroupStopD2.m_xBusy, Done => ctrlStatusGroupStopD2.m_xDone,
-    Error => ctrlStatusGroupStopD2.m_xError, ErrorID => ctrlStatusGroupStopD2.m_udiErrorID);
-InstGroupContinueD2(Execute := ctrlStatusGroupContinueD2.m_xExecute,
+    Busy => statusStopD2.busy, Done => statusStopD2.done,
+    Error => statusStopD2.error, ErrorID => statusStopD2.errorID);
+continueD2(Execute := statusContinueD2.execute,
     AxesGroup := staeubliRobotScara,
-    Busy => ctrlStatusGroupContinueD2.m_xBusy, Done => ctrlStatusGroupContinueD2.m_xDone,
-    Error => ctrlStatusGroupContinueD2.m_xError, ErrorID => ctrlStatusGroupContinueD2.m_udiErrorID);
+    Busy => statusContinueD2.busy, Done => statusContinueD2.done,
+    Error => statusContinueD2.error, ErrorID => statusContinueD2.errorID);
 
 (* Mise sous puissance : action P1 D2_AP1_ArmPowerOn de l'etape D2_S_4 *)
-(*   ctrlStatusGroupPower.m_xEnable := TRUE;                              *)
-(* L'instance unique InstGroupPower reste scrutee dans WriteEthIpRobot.   *)
+(*   statusPower.enable := TRUE;                              *)
+(* L'instance unique power reste scrutee dans WriteEthIpRobot.   *)
 
 (* Poste Guichet : acces interdit, rouge clignotant 1 Hz *)
-m_nqxBE := FALSE;   (* bloqueur d'entree leve (actif au repos) *)
-m_nqxBP := FALSE;   (* bloqueur du poste leve *)
-m_nqxCR := sxBaseTemps1s;
-m_nqxCV := FALSE;
-m_nqxCB := FALSE;
+be := FALSE;   (* bloqueur d'entree leve (actif au repos) *)
+bp := FALSE;   (* bloqueur du poste leve *)
+cr := sxBaseTemps1s;
+cv := FALSE;
+cb := FALSE;
 \end{lstlisting}
-Transitions du graphe : \texttt{ctrlStatusGroupResetD2.m\_xDone},
-\texttt{ctrlStatusGroupStopD2.m\_xDone},
-\texttt{ctrlStatusGroupContinueD2.m\_xDone}, puis
-\texttt{ctrlStatusGroupPower.m\_xStatus}. Les noms des sorties du guichet
-(\texttt{nqxBE}, \texttt{nqxBP}, \texttt{nqxCR/CV/CB} au TP~1) sont à
-adapter aux déclarations de chacun ; \texttt{nqxBE}/\texttt{nqxBP}
+Transitions du graphe : \texttt{statusResetD2.done},
+\texttt{statusStopD2.done},
+\texttt{statusContinueD2.done}, puis
+\texttt{statusPower.status}. Les noms des sorties du guichet
+(\texttt{outBE}, \texttt{outBP}, \texttt{outCR/CV/CB} au TP~1) sont à
+adapter aux déclarations de chacun ; \texttt{outBE}/\texttt{outBP}
 commandent l'\emph{abaissement} des bloqueurs, d'où la valeur
 \texttt{FALSE} pour les maintenir levés. Aucune affectation n'est faite sur
 le préhenseur (distributeur bistable, état conservé). L'affectation

@@ -17,44 +17,39 @@ Les documents source distinguent nettement deux familles de types, à ne pas con
     \end{tabular}
 \end{center}
 
-\subsection{Préfixes de champs de structure}
+\subsection{Nommage des champs de structure}
 
-Quel que soit le type de la structure, ses champs suivent un préfixe indiquant leur type
-élémentaire.
+Quel que soit le type de la structure, ses champs portent simplement leur \textbf{nom métier} en
+camelCase, avec une minuscule initiale, \textbf{sans} préfixe \texttt{m\_} ni lettre de type.
 
 \begin{center}
     \begin{tabular}{|p{2.6cm}|p{5.4cm}|p{6.2cm}|}
         \hline
-        \textbf{Préfixe} & \textbf{Type de champ} & \textbf{Exemple} \\
+        \textbf{Forme} & \textbf{Type de champ} & \textbf{Exemple} \\
         \hline
-        \texttt{m\_x<Nom>} & \texttt{BOOL} & \texttt{m\_xEnable}, \texttt{m\_xBusy}, \texttt{m\_xDone}, \texttt{m\_xError}, \texttt{m\_xExecute}, \texttt{m\_xActive} \\
+        \texttt{<nom>} & \texttt{BOOL} & \texttt{enable}, \texttt{busy}, \texttt{done}, \texttt{error}, \texttt{execute}, \texttt{active} \\
         \hline
-        \texttt{m\_udi<Nom>} & \texttt{UDINT} & \texttt{m\_udiErrorID} \\
+        \texttt{<nom>} & \texttt{UDINT} & \texttt{errorID} \\
         \hline
-        \texttt{m\_t<Nom>} & \texttt{TIME} & \texttt{m\_tElapsedTime} \\
+        \texttt{<nom>} & \texttt{TIME} & \texttt{elapsedTime} \\
         \hline
-        \texttt{m\_i<Nom>} & \texttt{INT} & \texttt{m\_iStateGmma}, \texttt{m\_iCurvSpeed\_mm\_per\_s}, \texttt{m\_iMovementID} \\
+        \texttt{<nom>} & \texttt{INT} & \texttt{stateGmma}, \texttt{curvSpeed\_mm\_per\_s}, \texttt{movementID}, \texttt{partNumber} \\
         \hline
-        \texttt{m\_int<Nom>} & \texttt{INT} (variante rencontrée) & \texttt{m\_intPartNumber} \\
+        \texttt{<nom>} & \texttt{REAL} & \texttt{velocity}, \texttt{acceleration}, \texttt{cartesianVel} \\
         \hline
-        \texttt{m\_r<Nom>} & \texttt{REAL} & \texttt{m\_rVelocity}, \texttt{m\_rAcceleration}, \texttt{m\_rCartesianVel} \\
+        \texttt{<nom>} & \texttt{UINT} & \texttt{coordSystem}, \texttt{toolNumber}, \texttt{bufferMode} \\
         \hline
-        \texttt{m\_ui<Nom>} & \texttt{UINT} & \texttt{m\_uiCoordSystem}, \texttt{m\_uiToolNumber}, \texttt{m\_uiBufferMode} \\
+        \texttt{<nom>} & \texttt{ARRAY} & \texttt{hex7Seg}, \texttt{tankLine} (\texttt{ARRAY OF TTank}) \\
         \hline
-        \texttt{m\_a<N><Nom>} ou \texttt{m\_a<Nom>} & \texttt{ARRAY} (\texttt{N} = taille optionnelle) & \texttt{m\_a4qxHex7Seg}, \texttt{m\_aStankLine} (\texttt{ARRAY OF TTank}) \\
-        \hline
-        \texttt{m\_<nomType>} & Champ typé sur un type composé (nom du champ = nom du type en minuscule initiale) & \texttt{m\_cartesianPos} (\texttt{T\_CartesianPos}), \texttt{m\_jointPos} (\texttt{T\_JointPos}), \texttt{m\_transitionParam} (\texttt{MC\_transitionParameter}), \texttt{m\_Inputs}/\texttt{m\_Outputs} (\texttt{THmiInputs}/\texttt{THmiOutputs}) \\
+        \texttt{<nom>} & Type composé & \texttt{cartesianPos} (\texttt{T\_CartesianPos}), \texttt{jointPos} (\texttt{T\_JointPos}), \texttt{transitionParam} (\texttt{MC\_transitionParameter}), \texttt{inputs}/\texttt{outputs} (\texttt{THmiInputs}/\texttt{THmiOutputs}) \\
         \hline
     \end{tabular}
 \end{center}
 
-\UPSTIremarque[Incohérence \texttt{m\_int} vs \texttt{m\_i}]{%
-Le TP2 (annexe 3) utilise \texttt{m\_intPartNumber} pour un champ \texttt{INT}, alors que le TP3
-utilise \texttt{m\_iStateGmma} pour un champ de même type. Les deux formes (\texttt{m\_int} et
-\texttt{m\_i}) coexistent dans les documents source sans qu'une règle explicite ne tranche entre
-elles : il s'agit probablement d'une variante orthographique du même préfixe plutôt que de deux
-conventions distinctes, mais ce document ne tranche pas et rapporte les deux formes telles
-qu'observées.}
+\UPSTIremarque[Fin de l'ambiguïté \texttt{m\_int}/\texttt{m\_i}]{%
+Les documents source utilisaient deux préfixes pour un champ \texttt{INT}
+(\texttt{m\_intPartNumber} au TP2, \texttt{m\_iStateGmma} au TP3). La lettre de type étant
+supprimée, ces champs deviennent \texttt{partNumber} et \texttt{stateGmma}.}
 
 \subsection{Types de transformation géométrique et de mouvement (uniVALplc)}
 
@@ -69,11 +64,11 @@ qu'observées.}
         \hline
         \texttt{T\_Trsf} & Transformation géométrique relative (offset \texttt{X, Y, Z, RX, RY, RZ}, tous \texttt{REAL}). & Utilisé avec \texttt{VAL\_ShiftPoint} pour un calcul de position relatif. \\
         \hline
-        \texttt{eMC\_BUFFER\_MODE} & Enum du mode d'empilement d'une commande de mouvement (\texttt{Aborting:=0}, \texttt{Buffered:=1}, \texttt{BlendingJoint:=6}, \texttt{BlendingCartesian:=7}). & Champ \texttt{BufferMode}/\texttt{m\_uiBufferMode} des blocs de mouvement. \\
+        \texttt{eMC\_BUFFER\_MODE} & Enum du mode d'empilement d'une commande de mouvement (\texttt{Aborting:=0}, \texttt{Buffered:=1}, \texttt{BlendingJoint:=6}, \texttt{BlendingCartesian:=7}). & Champ \texttt{BufferMode}/\texttt{bufferMode} des blocs de mouvement. \\
         \hline
-        \texttt{eMC\_TRANSITION\_MODE} & Enum du profil de transition entre deux mouvements enchaînés (\texttt{None:=0}, \texttt{Corner distance:=3}, \texttt{Blending distances:=10}). & Champ \texttt{TransitionMode}/\texttt{m\_uiTransitionMode}. \\
+        \texttt{eMC\_TRANSITION\_MODE} & Enum du profil de transition entre deux mouvements enchaînés (\texttt{None:=0}, \texttt{Corner distance:=3}, \texttt{Blending distances:=10}). & Champ \texttt{TransitionMode}/\texttt{transitionMode}. \\
         \hline
-        \texttt{MC\_TransitionParameter} & Structure \texttt{leave}/\texttt{reach} (distances de sortie/reprise de trajectoire, \texttt{REAL}). & Champ \texttt{TransitionParam}/\texttt{m\_transitionParam}. \\
+        \texttt{MC\_TransitionParameter} & Structure \texttt{leave}/\texttt{reach} (distances de sortie/reprise de trajectoire, \texttt{REAL}). & Champ \texttt{TransitionParam}/\texttt{transitionParam}. \\
         \hline
         \texttt{TMoveAbsolute} / \texttt{TMoveAxisAbs} & Type maison regroupant tous les paramètres d'appel d'un bloc \texttt{MC\_Move...Absolute} (entrées, sorties, position) pour en faciliter le passage. & \texttt{TMoveAbsolute} pour les mouvements cartésiens (TP4), \texttt{TMoveAxisAbs} pour les mouvements articulaires (TP5) -- structure quasi identique, seul le nom diffère selon le TP source. \\
         \hline

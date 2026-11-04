@@ -1,0 +1,123 @@
+\section{Notations imposées pour les noms}
+\label{secNotations}
+
+\begin{UPSTIinfor}{Une notation imposée, à respecter dans vos propres programmes}
+Les noms de variables, de types, d'objets et d'instances utilisés dans ce document
+(\texttt{stopRequest}, \texttt{resetD2}, \texttt{staeubliRobotScara}...) ne sont
+pas choisis au hasard : ils suivent les conventions de nommage imposées dans les TP (document
+« Conventions de nommage »). Le type d'une variable n'est \textbf{pas} encodé dans son nom
+(l'environnement de développement l'affiche) : un nom décrit son rôle métier, en camelCase.
+Vous devez appliquer ces mêmes règles pour nommer vos propres variables et instances dans le TD.
+\end{UPSTIinfor}
+
+\subsection{Variables obtenues par IO-Scanning}
+\label{secNotationsIoScanning}
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{6.5cm}|p{5cm}|}
+        \hline
+        \textbf{Préfixe} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{in<Nom>} & Entrée booléenne autonome produite par un équipement scruté. & \texttt{inAid}, \texttt{inDgt} \\
+        \hline
+        \texttt{out<Nom>} & Sortie booléenne autonome consommée par un équipement scruté. & \texttt{outBE}, \texttt{outBP} \\
+        \hline
+        \texttt{<nom>} & Entrée / sortie du pupitre HMI, en tant que champ des structures dédiées \texttt{inputs} / \texttt{outputs} : pas de préfixe. & \texttt{j1Plus}, \texttt{auto}, \texttt{redColumn} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Types et champs de structure}
+\label{secNotationsTypes}
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{6.5cm}|p{5cm}|}
+        \hline
+        \textbf{Préfixe de type} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{T<Nom>} & Type maison, défini par le développeur de l'application (STRUCT ou enum). & \texttt{THmi}, \texttt{THmiInputs}, \texttt{TCtrlStatusGroup}, \texttt{TMoveAbsolute} \\
+        \hline
+        \texttt{T\_<Nom>} & Type de la bibliothèque \texttt{uniVALplc} (Stäubli). & \texttt{T\_StaeubliRobot}, \texttt{T\_FromRobot}, \texttt{T\_ToRobot}, \texttt{T\_CartesianPos}, \texttt{T\_JointPos}, \texttt{T\_Trsf} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Les champs d'une structure portent simplement leur \textbf{nom métier} en camelCase, avec une
+minuscule initiale, sans préfixe ni lettre de type :
+
+\begin{center}
+    \begin{tabular}{|p{2.8cm}|p{3.2cm}|p{8.3cm}|}
+        \hline
+        \textbf{Type du champ} & \textbf{Forme} & \textbf{Exemple} \\
+        \hline
+        \texttt{BOOL} & \texttt{<nom>} & \texttt{enable}, \texttt{busy}, \texttt{done}, \texttt{error}, \texttt{execute} \\
+        \hline
+        \texttt{INT} & \texttt{<nom>} & \texttt{stateGmma}, \texttt{partNumber} \\
+        \hline
+        \texttt{UINT} / \texttt{UDINT} & \texttt{<nom>} & \texttt{coordSystem}, \texttt{bufferMode}, \texttt{errorID} \\
+        \hline
+        \texttt{REAL} / \texttt{TIME} & \texttt{<nom>} & \texttt{velocity}, \texttt{acceleration}, \texttt{elapsedTime} \\
+        \hline
+        \texttt{ARRAY} & \texttt{<nom>} & \texttt{hex7Seg} \\
+        \hline
+        Type composé & \texttt{<nom>} & \texttt{cartesianPos} (\texttt{T\_CartesianPos}), \texttt{inputs} (\texttt{THmiInputs}) \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Objets métier}
+\label{secNotationsObjets}
+
+Un objet métier se nomme \texttt{<rôle><Équipement>} en camelCase : \texttt{<rôle>} précise la
+nature de l'objet ou le sens de l'échange (\texttt{from} : données produites par l'équipement,
+\texttt{to} : données qui lui sont destinées), \texttt{<Équipement>} identifie la station
+(\texttt{Scara}).
+
+\begin{center}
+    \begin{tabular}{|p{4.6cm}|p{5.4cm}|p{4.2cm}|}
+        \hline
+        \textbf{Objet} & \textbf{Rôle} & \textbf{Type} \\
+        \hline
+        \texttt{staeubliRobotScara} & Le robot et son contrôleur CS9. & \texttt{T\_StaeubliRobot} \\
+        \hline
+        \texttt{fromRobotScara} / \texttt{toRobotScara} & Données lues depuis / écrites vers le robot. & \texttt{T\_FromRobot} / \texttt{T\_ToRobot} \\
+        \hline
+        \texttt{hmiScara} & État complet du pupitre HMI de la station. & \texttt{THmi} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Instances de blocs fonctionnels}
+\label{secNotationsInstances}
+
+Les blocs eux-mêmes sont préfixés selon leur origine : \texttt{VAL\_} (bibliothèque
+\texttt{uniVALplc}), \texttt{MC\_} (standard PLCopen \emph{Motion Control}), \texttt{FB\_} (bloc
+maison). Le nom d'une \textbf{instance} ne reprend pas le nom technique du bloc : il indique son
+\textbf{rôle} (fonction résumée en un mot) suivi du mode GEMMA qui l'utilise. L'objet
+\texttt{TCtrlStatusGroup} qui regroupe ses paramètres est préfixé par \texttt{status}.
+
+\begin{center}
+    \begin{tabular}{|p{4.4cm}|p{6cm}|p{3.8cm}|}
+        \hline
+        \textbf{Convention} & \textbf{Signification} & \textbf{Exemple} \\
+        \hline
+        \texttt{<rôle><Mode>} & Instance d'un bloc fonctionnel, suffixée par le mode qui l'utilise. & \texttt{resetD2} (\texttt{MC\_GroupReset}, mode D2) \\
+        \hline
+        \texttt{status<Rôle><Mode>} & Objet \texttt{TCtrlStatusGroup} de passage de paramètres, suffixé par le rôle et le mode. & \texttt{statusResetD2}, \texttt{statusStopF4} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\UPSTIremarque[Instances communes à tous les modes]{%
+Une instance qui n'est pas propre à un mode (lecture/écriture Ethernet/IP en début et fin de
+cycle, mise sous puissance) n'a pas de suffixe de mode : \texttt{readAxes},
+\texttt{writeAxes}, \texttt{power} et son objet \texttt{statusPower},
+comme \texttt{statusRead}/\texttt{statusWrite} dans le document « Conventions de
+nommage ».}
+
+\subsection{Sections et transitions du GEMMA}
+\label{secNotationsGmma}
+
+Dans la section SFC \texttt{GM\_Gmma}, l'étape associée au mode \texttt{<Mode>} se nomme
+\texttt{GM\_S\_<Mode>} (ex. \texttt{GM\_S\_D2}) et la transition entre deux modes
+\texttt{GM\_T\_<ModeA>to<ModeB>} (ex. \texttt{GM\_T\_D1toD2}, \texttt{GM\_T\_D2toA5}).

@@ -43,10 +43,10 @@ absence de rafraîchissement de \texttt{IN} dans le délai attendu. \\
 \end{center}
 
 \textbf{Exemple d'appel}, dans la section \texttt{ReadEthIpRobot}
-(première section exécutée du cycle) :
+(première section exécutée du cycle ; nom de l'instance \texttt{readAxes} : cf. convention de nommage des instances, section~\ref{secNotationsInstances}) :
 
 \begin{lstlisting}
-InstReadAxesGroup(
+readAxes(
     Enable    := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup := staeubliRobotScara,
     IN        := fromRobotScara
@@ -154,7 +154,7 @@ timeout détecté par le bloc. \\
 (dernière section exécutée du cycle, après tous les blocs \texttt{MC\_}) :
 
 \begin{lstlisting}
-InstWriteAxesGroup(
+writeAxes(
     Enable    := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup := staeubliRobotScara,
     OUT       => toRobotScara
@@ -177,34 +177,34 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
 
 \begin{UPSTIactivite}[4][Commander la puissance via \texttt{staeubliRobotScara}][][][TD]
 \UPSTIquestion{Le TP~3 fait déclarer le type suivant, puis un objet
-\texttt{ctrlStatusGroupPower} de ce type, pour regrouper les paramètres de
-l'instance \texttt{InstGroupPower} du bloc \texttt{MC\_GroupPower}
+\texttt{statusPower} de ce type, pour regrouper les paramètres de
+l'instance \texttt{power} du bloc \texttt{MC\_GroupPower}
 (entrée \texttt{Enable : BOOL}, \texttt{VAR\_IN\_OUT AxesGroup :
 T\_StaeubliRobot}, sorties \texttt{Status : BOOL}, \texttt{Error : BOOL},
 \texttt{ErrorID : UDINT}).
 Compléter, dans la section \texttt{WriteEthIpRobot}, l'appel de ce bloc,
 puis l'affectation du voyant « bras sous puissance » du pupitre
-(\texttt{hmiScara.m\_Outputs.m\_qToR.m\_nqxArmUnderPower}) à partir de
+(\texttt{hmiScara.outputs.toR.armUnderPower}) à partir de
 l'état \textbf{effectif} de la puissance.}
 
 \begin{lstlisting}
 TYPE
     STRUCT TCtrlStatusGroupPower
-        m_xEnable    : BOOL;
-        m_xStatus    : BOOL;
-        m_xError     : BOOL;
-        m_udiErrorID : UDINT;
+        enable    : BOOL;
+        status    : BOOL;
+        error     : BOOL;
+        errorID : UDINT;
     END_STRUCT
 END_TYPE
 
-InstGroupPower(
-    Enable    := (*@\trou[ctrlStatusGroupPower.m\_xEnable]{4.5cm}@*),
+power(
+    Enable    := (*@\trou[statusPower.enable]{4.5cm}@*),
     AxesGroup := (*@\trou[staeubliRobotScara]{4.5cm}@*),
-    Status    => (*@\trou[ctrlStatusGroupPower.m\_xStatus]{4.5cm}@*),
-    Error     => (*@\trou[ctrlStatusGroupPower.m\_xError]{4.5cm}@*),
-    ErrorID   => (*@\trou[ctrlStatusGroupPower.m\_udiErrorID]{4.5cm}@*)
+    Status    => (*@\trou[statusPower.status]{4.5cm}@*),
+    Error     => (*@\trou[statusPower.error]{4.5cm}@*),
+    ErrorID   => (*@\trou[statusPower.errorID]{4.5cm}@*)
 );
-hmiScara.m_Outputs.m_qToR.m_nqxArmUnderPower := (*@\trou[ctrlStatusGroupPower.m\_xStatus]{4.5cm}@*);
+hmiScara.outputs.toR.armUnderPower := (*@\trou[statusPower.status]{4.5cm}@*);
 \end{lstlisting}
 
 \UPSTIquestion{Un étudiant, pour mettre le bras hors puissance en mode D1,
@@ -222,11 +222,11 @@ On ne donne jamais d'ordre en écrivant directement dans
 \texttt{staeubliRobotScara.Command} : ce sont les blocs (ici
 \texttt{MC\_GroupPower}) qui garantissent la cohérence de la requête avec
 l'état courant du robot. De plus, l'unique instance
-\texttt{InstGroupPower}, scrutée dans \texttt{WriteEthIpRobot}, réécrirait
+\texttt{power}, scrutée dans \texttt{WriteEthIpRobot}, réécrirait
 sa propre requête. Dans \texttt{D1\_ArretUrgence}, on agit donc sur
 l'entrée de cette instance, via l'objet de passage de paramètres :
 \begin{lstlisting}
-ctrlStatusGroupPower.m_xEnable := FALSE;
+statusPower.enable := FALSE;
 \end{lstlisting}
 La seule affectation directe demandée est celle de la période du bit de
 vie, dans la section \texttt{GM\_GmmaPre}, au \textbf{premier cycle} en
