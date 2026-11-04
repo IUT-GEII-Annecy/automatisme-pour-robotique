@@ -95,8 +95,8 @@ dans la section \texttt{WriteEthIpRobot} ci-dessous.}
 \begin{lstlisting}
 (* Section ReadEthIpRobot -- premiere section executee dans le cycle *)
 InstReadAxesGroup(
-    Enable     := (* A_COMPLETER *),
-    AxesGroup  := (* A_COMPLETER *),
+    Enable     := (*@\trou{4.5cm}@*),
+    AxesGroup  := (*@\trou{3.5cm}@*),
     IN         := fromRobotScara
 );
 
@@ -104,10 +104,10 @@ InstReadAxesGroup(
 InstWriteAxesGroup(
     Enable     := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup  := staeubliRobotScara,
-    OUT        => (* A_COMPLETER *)
+    OUT        => (*@\trou{3.5cm}@*)
 );
 \end{lstlisting}
-\vspace{2cm}
+\UPSTIquadrillage{2}
 \end{UPSTIactivite}
 
 \subsection{Niveau 2 -- Compléter la mise sous puissance}
@@ -120,11 +120,11 @@ dans ce mode, et l'objet \texttt{AxesGroup} doit être celui de la cellule.}
 
 \begin{lstlisting}
 InstGroupPowerA6(
-    Enable     := (* A_COMPLETER : toujours actif en mode A6 *),
-    AxesGroup  := (* A_COMPLETER *)
+    Enable     := (*@\trou{4.5cm}@*), (* toujours actif en mode A6 *)
+    AxesGroup  := (*@\trou{3.5cm}@*)
 );
 \end{lstlisting}
-\vspace{2cm}
+\UPSTIquadrillage{2}
 \end{UPSTIactivite}
 
 \subsection{Niveau 3 -- Choisir et écrire les mouvements}
@@ -157,16 +157,16 @@ $RZ$ courants, produit exactement ce déplacement.
 
 \begin{lstlisting}
 targetPosA6Etape1.X  := staeubliRobotScara.Status.CartesianPos.X;
-targetPosA6Etape1.Y  := (* A_COMPLETER *);
-targetPosA6Etape1.Z  := (* A_COMPLETER : valeur numerique de l'enonce *);
-targetPosA6Etape1.RX := (* A_COMPLETER *);
-targetPosA6Etape1.RY := (* A_COMPLETER *);
-targetPosA6Etape1.RZ := (* A_COMPLETER *);
-
-(* A_COMPLETER : instanciation et appel du bloc MC_ choisi,
-   avec Execute, AxesGroup et la position cible ci-dessus *)
+targetPosA6Etape1.Y  := (*@\trou{5cm}@*);
+targetPosA6Etape1.Z  := (*@\trou{2.5cm}@*); (* valeur numerique de l'enonce *)
+targetPosA6Etape1.RX := (*@\trou{5cm}@*);
+targetPosA6Etape1.RY := (*@\trou{5cm}@*);
+targetPosA6Etape1.RZ := (*@\trou{5cm}@*);
 \end{lstlisting}
-\vspace{3cm}
+
+\textit{Instanciation et appel du bloc \texttt{MC\_} choisi, avec
+\texttt{Execute}, \texttt{AxesGroup} et la position cible ci-dessus :}
+\UPSTIquadrillage{3}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Étape 2 -- rejoindre la position de référence][][][TD]
@@ -176,7 +176,7 @@ une commande de mouvement \textbf{articulaire} (imposée par l'énoncé du
 mode A6, contrairement à l'étape~1 où le choix était à justifier). Écrire
 entièrement l'appel du bloc \texttt{MC\_} correspondant. Vous déclarerez
 vous-même l'instance du bloc et la variable de position cible.}
-\vspace{6cm}
+\UPSTIquadrillage{6}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Gestion de l'arrêt demandé][][][TD]
@@ -187,5 +187,5 @@ pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
 conditions d'appel (sur l'entrée \texttt{Execute} de chaque bloc, sans
 écrire l'instanciation complète), en utilisant
 \texttt{hmiScara.m\_Inputs.m\_nixStopRequest}.}
-\vspace{4cm}
+\UPSTIquadrillage{4}
 \end{UPSTIactivite}
