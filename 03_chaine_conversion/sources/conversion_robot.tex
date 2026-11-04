@@ -197,13 +197,13 @@ TYPE
 END_TYPE
 
 InstGroupPower(
-    Enable    := (*@\trou{4.5cm}@*),
-    AxesGroup := (*@\trou{4.5cm}@*),
-    Status    => (*@\trou{4.5cm}@*),
-    Error     => (*@\trou{4.5cm}@*),
-    ErrorID   => (*@\trou{4.5cm}@*)
+    Enable    := (*@\trou[ctrlStatusGroupPower.m\_xEnable]{4.5cm}@*),
+    AxesGroup := (*@\trou[staeubliRobotScara]{4.5cm}@*),
+    Status    => (*@\trou[ctrlStatusGroupPower.m\_xStatus]{4.5cm}@*),
+    Error     => (*@\trou[ctrlStatusGroupPower.m\_xError]{4.5cm}@*),
+    ErrorID   => (*@\trou[ctrlStatusGroupPower.m\_udiErrorID]{4.5cm}@*)
 );
-hmiScara.m_Outputs.m_qToR.m_nqxArmUnderPower := (*@\trou{4.5cm}@*);
+hmiScara.m_Outputs.m_qToR.m_nqxArmUnderPower := (*@\trou[ctrlStatusGroupPower.m\_xStatus]{4.5cm}@*);
 \end{lstlisting}
 
 \UPSTIquestion{Un étudiant, pour mettre le bras hors puissance en mode D1,
@@ -216,10 +216,44 @@ précédente. Quelle est la seule affectation directe d'un champ de
 avec quelle valeur ?}
 \UPSTIquadrillage{4}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+On ne donne jamais d'ordre en écrivant directement dans
+\texttt{staeubliRobotScara.Command} : ce sont les blocs (ici
+\texttt{MC\_GroupPower}) qui garantissent la cohérence de la requête avec
+l'état courant du robot. De plus, l'unique instance
+\texttt{InstGroupPower}, scrutée dans \texttt{WriteEthIpRobot}, réécrirait
+sa propre requête. Dans \texttt{D1\_ArretUrgence}, on agit donc sur
+l'entrée de cette instance, via l'objet de passage de paramètres :
+\begin{lstlisting}
+ctrlStatusGroupPower.m_xEnable := FALSE;
+\end{lstlisting}
+La seule affectation directe demandée est celle de la période du bit de
+vie, dans la section \texttt{GM\_GmmaPre}, au \textbf{premier cycle} en
+RUN :
+\begin{lstlisting}
+staeubliRobotScara.Command.LifebitPeriod := t#150ms;
+\end{lstlisting}
+(valeur imposée par le TP~3, comprise entre \texttt{t\#100ms} et
+\texttt{t\#1s}).
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Un étudiant place l'appel de \texttt{MC\_GroupPower}
 \textbf{après} celui de \texttt{VAL\_WriteAxesGroup} dans le cycle.
 Expliquer la conséquence sur la transmission de sa requête au robot.}
 \UPSTIquadrillage{3}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+\texttt{MC\_GroupPower} ne fait que déposer sa requête dans
+\texttt{staeubliRobotScara} (\texttt{CommandInterface}). Si
+\texttt{VAL\_WriteAxesGroup} a déjà sérialisé l'objet vers
+\texttt{toRobotScara}, la requête du cycle courant n'est \textbf{pas
+transmise} à la CS9 : elle ne pourrait l'être, au mieux, qu'au cycle
+suivant, et rien ne le garantit puisque \texttt{VAL\_ReadAxesGroup}, en
+tout début du cycle suivant, actualise lui aussi \texttt{CommandInterface}
+avant le prochain \texttt{VAL\_WriteAxesGroup}. La commande de puissance
+est donc retardée, voire ignorée : \texttt{VAL\_WriteAxesGroup} doit
+rester le \textbf{dernier} bloc exécuté du cycle.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \UPSTIremarque[Lien avec la préparation du TP]{

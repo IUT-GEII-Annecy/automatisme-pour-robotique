@@ -47,6 +47,29 @@ mémorisation d'état :
 \end{enumerate}}
 \UPSTIquadrillage{4}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+\begin{enumerate}
+    \item \texttt{InitChart} est une \textbf{fonction} : elle est appelée
+    directement (pas d'instance) et retourne une unique valeur
+    \texttt{BOOL} récupérée dans \texttt{xResult} ; son action (rendre
+    actif l'état initial du graphe passé en argument) ne nécessite aucune
+    mémoire d'un appel à l'autre.
+    \item \texttt{MC\_GroupReset} est un \textbf{bloc fonctionnel} : pour
+    ne réagir qu'au \textbf{front montant} d'\texttt{Execute}, il doit
+    mémoriser la valeur d'\texttt{Execute} au cycle précédent (et l'état
+    d'avancement \texttt{Busy}/\texttt{Done}) -- d'où l'instance
+    \texttt{InstGroupResetD2} à réserver.
+    \item \texttt{VAL\_ReadAxesGroup} est un \textbf{bloc fonctionnel}
+    (instance \texttt{InstReadAxesGroup}) : il expose plusieurs sorties
+    (\texttt{Error}, \texttt{ErrorID}, \texttt{Timeout}) et sa sortie
+    \texttt{Timeout} suppose de mémoriser depuis combien de temps
+    \texttt{IN} n'a pas été rafraîchi.
+    \item La détection de front montant est un \textbf{bloc fonctionnel}
+    (\texttt{R\_TRIG}) : détecter un front, c'est comparer la valeur
+    courante à celle du cycle précédent, qui doit donc être mémorisée.
+\end{enumerate}
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Le mode D2 du TP~3 utilise les blocs
 \texttt{MC\_GroupReset}, \texttt{MC\_GroupStop} et
 \texttt{MC\_GroupContinue}. En respectant la règle de nommage imposée
@@ -56,9 +79,9 @@ nécessaires.}
 
 \begin{lstlisting}
 VAR
-    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
-    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
-    (*@\trou{4cm}@*) : (*@\trou{3.5cm}@*);
+    (*@\trou[InstGroupResetD2]{4cm}@*) : (*@\trou[MC\_GroupReset]{3.5cm}@*);
+    (*@\trou[InstGroupStopD2]{4cm}@*) : (*@\trou[MC\_GroupStop]{3.5cm}@*);
+    (*@\trou[InstGroupContinueD2]{4cm}@*) : (*@\trou[MC\_GroupContinue]{3.5cm}@*);
 END_VAR
 \end{lstlisting}
 \end{UPSTIactivite}

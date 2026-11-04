@@ -90,9 +90,36 @@ le coupleur \texttt{NOC\_ETHIP\_ROBOT} jusqu'au champ
 \texttt{hmiScara.m\_Inputs.m\_nixJ3Up} lu par le programme applicatif.}
 \UPSTIquadrillage{3}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+Coupleur \texttt{NOC\_ETHIP\_ROBOT} (connexion avec le M221) $\to$ zone
+\texttt{\%MW} image des données reçues du M221 $\to$ alias
+\texttt{fromHmiScara} (type \texttt{TFromHmi}, octets bruts) $\to$ bloc
+\texttt{FB\_ReadHmi} (instance \texttt{InstReadHmi}, paramètre
+\texttt{fromHmi}) $\to$ objet sémantique \texttt{hmiScara} (type
+\texttt{THmi}), champ \texttt{hmiScara.m\_Inputs.m\_nixJ3Up}.
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Faire de même pour la position cartésienne du robot
 affichée sur l'écran du pupitre : depuis la baie CS9 jusqu'au M221. Quel
 objet sémantique sert de « pont » entre la chaîne du robot et celle de
 l'IHM ?}
 \UPSTIquadrillage{4}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+Baie CS9 (serveur \texttt{uniVALplc}) $\to$ coupleur
+\texttt{NOC\_ETHIP\_ROBOT} $\to$ zone \texttt{\%MW}, alias
+\texttt{fromRobotScara} (\texttt{T\_FromRobot}) $\to$
+\texttt{VAL\_ReadAxesGroup} (paramètre \texttt{IN}) $\to$
+\texttt{staeubliRobotScara.Status.CartesianPos} (\texttt{T\_StaeubliRobot})
+$\to$ \texttt{FB\_WriteHmi} (paramètre \texttt{AxesGroup}), qui construit
+$\to$ \texttt{toHmiScara} (\texttt{TToHmi}, sortie \texttt{toHmi}) $\to$
+zone \texttt{\%MW} $\to$ coupleur \texttt{NOC\_ETHIP\_ROBOT} $\to$ M221
+(écran du pupitre).
+
+L'objet « pont » est \texttt{staeubliRobotScara} (type
+\texttt{T\_StaeubliRobot}) : mis à jour par \texttt{VAL\_ReadAxesGroup}, il
+est transmis sur le paramètre \texttt{AxesGroup} des blocs
+\texttt{FB\_ReadHmi}/\texttt{FB\_WriteHmi}, d'où l'ordre d'appel imposé
+(après \texttt{VAL\_ReadAxesGroup}).
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}

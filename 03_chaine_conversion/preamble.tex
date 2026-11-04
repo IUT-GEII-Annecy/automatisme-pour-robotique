@@ -8,10 +8,16 @@
 % document, avec un délimiteur `(*@...@*)` qui ne peut pas être confondu
 % avec un commentaire ST normal `(* ... *)`.
 \lstset{escapeinside={(*@}{@*)}}
-\newcommand{\trou}[1]{%
+% Syntaxe : \trou[reponse]{largeur}
+%   - version élève (\documentVersion{E}) : rectangle vide (réponse ignorée) ;
+%   - version prof  (\documentVersion{P}) : réponse affichée en rouge dans
+%     le rectangle (via \UPSTIcorrection), qui s'élargit si nécessaire.
+% Dans un listing, la réponse est en mode LaTeX : échapper les « _ » (\_).
+\newcommand{\trou}[2][]{%
     \tikz[baseline=(trou.base)]{%
         \node[draw=gray!70, dashed, rounded corners=2pt, inner sep=2pt,
-              minimum width=#1, minimum height=1.6em, fill=white,
-              anchor=base] (trou) {\strut};%
+              minimum width=#2, minimum height=1.6em, fill=white,
+              anchor=base] (trou) {\strut\ifnumequal{1}{\UPSTIidVersionDocumentDef}%
+                {\UPSTIcorrection[1]{\ttfamily #1}}{}};%
     }%
 }

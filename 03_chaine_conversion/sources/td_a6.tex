@@ -95,8 +95,8 @@ dans la section \texttt{WriteEthIpRobot} ci-dessous.}
 \begin{lstlisting}
 (* Section ReadEthIpRobot -- premiere section executee dans le cycle *)
 InstReadAxesGroup(
-    Enable     := (*@\trou{6.5cm}@*),
-    AxesGroup  := (*@\trou{5.5cm}@*),
+    Enable     := (*@\trou[NOC\_ETHIP\_ROBOT\_IN.HEALTH\_BITS\_IN[0].0]{6.5cm}@*),
+    AxesGroup  := (*@\trou[staeubliRobotScara]{5.5cm}@*),
     IN         := fromRobotScara
 );
 
@@ -104,7 +104,7 @@ InstReadAxesGroup(
 InstWriteAxesGroup(
     Enable     := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup  := staeubliRobotScara,
-    OUT        => (*@\trou{5.5cm}@*)
+    OUT        => (*@\trou[toRobotScara]{5.5cm}@*)
 );
 \end{lstlisting}
 \end{UPSTIactivite}
@@ -130,6 +130,31 @@ sa section A6 avec \texttt{Enable := TRUE}.
     qui garantit que le bras est \textbf{effectivement} sous puissance.
 \end{enumerate}}
 \UPSTIquadrillage{5}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+\begin{enumerate}
+    \item Les deux instances déposent chacune, à chaque cycle, leur requête
+    de puissance dans le même objet \texttt{staeubliRobotScara}
+    (\texttt{CommandInterface}) : \texttt{InstGroupPowerA6} demande en
+    permanence la mise sous puissance pendant qu'\texttt{InstGroupPower}
+    peut demander l'inverse. Les requêtes sont contradictoires, l'état
+    obtenu dépend de l'ordre de scrutation, et la commande hors puissance
+    du mode D1 (qui agit sur \texttt{InstGroupPower}) n'est plus garantie --
+    un problème de sécurité. Il ne doit exister qu'\textbf{une seule}
+    instance de \texttt{MC\_GroupPower}, pilotée depuis les différents modes
+    par son objet de paramètres.
+    \item Dans la section du mode A6 :
+\begin{lstlisting}
+ctrlStatusGroupPower.m_xEnable := TRUE;
+\end{lstlisting}
+    Condition à tester avant l'étape~1 : la puissance \textbf{effective},
+    renvoyée par la sortie \texttt{Status} du bloc :
+\begin{lstlisting}
+ctrlStatusGroupPower.m_xStatus  (* = TRUE : bras effectivement sous puissance *)
+\end{lstlisting}
+    (\texttt{m\_xEnable} n'est que la demande, pas l'état réel.)
+\end{enumerate}
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \subsection{Niveau 3 -- Choisir et écrire les mouvements}
@@ -162,18 +187,60 @@ $RZ$ courants, produit exactement ce déplacement.
 \textit{Réponse à la question~1 (choix du bloc, justification) :}
 \UPSTIquadrillage{2.5}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+\texttt{MC\_MoveLinearAbsolute} : l'outil doit suivre une \textbf{droite}
+verticale (seul $Z$ varie). Un mouvement linéaire garantit cette
+trajectoire rectiligne du TCP ; un mouvement articulaire
+(\texttt{MC\_MoveDirectAbsolute}) n'impose que la position finale, la
+trajectoire intermédiaire du TCP n'étant pas maîtrisée. C'est d'ailleurs le
+choix imposé par l'énoncé du mode A6 du TP~3 (« commande de mouvement
+linéaire » pour la montée de J3).
+\end{UPSTIcorrectionP}
 \begin{lstlisting}
 targetPosA6Etape1.X  := staeubliRobotScara.Status.CartesianPos.X;
-targetPosA6Etape1.Y  := (*@\trou{5cm}@*);
-targetPosA6Etape1.Z  := (*@\trou{2.5cm}@*); (* valeur numerique de l'enonce *)
-targetPosA6Etape1.RX := (*@\trou{5cm}@*);
-targetPosA6Etape1.RY := (*@\trou{5cm}@*);
-targetPosA6Etape1.RZ := (*@\trou{5cm}@*);
+targetPosA6Etape1.Y  := (*@\trou[staeubliRobotScara.Status.CartesianPos.Y]{5cm}@*);
+targetPosA6Etape1.Z  := (*@\trou[150.0]{2.5cm}@*); (* valeur numerique de l'enonce *)
+targetPosA6Etape1.RX := (*@\trou[staeubliRobotScara.Status.CartesianPos.RX]{5cm}@*);
+targetPosA6Etape1.RY := (*@\trou[staeubliRobotScara.Status.CartesianPos.RY]{5cm}@*);
+targetPosA6Etape1.RZ := (*@\trou[staeubliRobotScara.Status.CartesianPos.RZ]{5cm}@*);
 \end{lstlisting}
 
 \textit{Instanciation et appel du bloc \texttt{MC\_} choisi, avec
 \texttt{Execute}, \texttt{AxesGroup} et la position cible ci-dessus :}
 \UPSTIquadrillage{3}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+Déclarations (instance du bloc et objet de passage de paramètres de type
+\texttt{TMoveAbsolute}, comme au TP~3) :
+\begin{lstlisting}
+VAR
+    InstMoveLinearAbsoluteA6 : MC_MoveLinearAbsolute;
+    moveLinearAbsA6          : TMoveAbsolute;
+    targetPosA6Etape1        : T_CartesianPos;
+END_VAR
+
+InstMoveLinearAbsoluteA6(
+    Execute       := moveLinearAbsA6.m_xExecute, (* front montant a l'etape 1 *)
+    Position      := targetPosA6Etape1,
+    Velocity      := moveLinearAbsA6.m_rVelocity,
+    Acceleration  := moveLinearAbsA6.m_rAcceleration,
+    Deceleration  := moveLinearAbsA6.m_rDeceleration,
+    CartesianVel  := moveLinearAbsA6.m_rCartesianVel,
+    RotationalVel := moveLinearAbsA6.m_rRotationalVel,
+    CoordSystem   := 0,  (* repere world *)
+    ToolNumber    := 0,  (* outil flange *)
+    AxesGroup     := staeubliRobotScara,
+    Busy          => moveLinearAbsA6.m_xBusy,
+    Done          => moveLinearAbsA6.m_xDone,
+    Error         => moveLinearAbsA6.m_xError,
+    ErrorID       => moveLinearAbsA6.m_udiErrorID
+);
+\end{lstlisting}
+Les valeurs de vitesse/accélération (en~\% du nominal, dans
+$[0{,}01;500]$) ne sont pas imposées par l'énoncé : elles sont renseignées
+dans \texttt{moveLinearAbsA6} (action P1 de l'étape). La fin de l'étape~1
+est donnée par \texttt{moveLinearAbsA6.m\_xDone}.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Étape 2 -- rejoindre la position de référence][][][TD]
@@ -184,6 +251,46 @@ mode A6, contrairement à l'étape~1 où le choix était à justifier). Écrire
 entièrement l'appel du bloc \texttt{MC\_} correspondant. Vous déclarerez
 vous-même l'instance du bloc et la variable de position cible.}
 \UPSTIquadrillage{6}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+Mouvement articulaire vers une cible cartésienne :
+\texttt{MC\_MoveDirectAbsolute}.
+\begin{lstlisting}
+VAR
+    InstMoveDirectAbsoluteA6 : MC_MoveDirectAbsolute;
+    moveDirectAbsA6          : TMoveAbsolute;
+    cartesianPosInitialeA6   : T_CartesianPos;
+END_VAR
+
+(* Cible (world) : X=90, Y=-410, Z=150, RX=-180, RY=0, RZ=0 *)
+cartesianPosInitialeA6.X  := 90.0;
+cartesianPosInitialeA6.Y  := -410.0;
+cartesianPosInitialeA6.Z  := 150.0;
+cartesianPosInitialeA6.RX := -180.0;
+cartesianPosInitialeA6.RY := 0.0;
+cartesianPosInitialeA6.RZ := 0.0;
+
+InstMoveDirectAbsoluteA6(
+    Execute       := moveDirectAbsA6.m_xExecute, (* apres moveLinearAbsA6.m_xDone *)
+    Position      := cartesianPosInitialeA6,
+    Velocity      := moveDirectAbsA6.m_rVelocity,
+    Acceleration  := moveDirectAbsA6.m_rAcceleration,
+    Deceleration  := moveDirectAbsA6.m_rDeceleration,
+    CartesianVel  := moveDirectAbsA6.m_rCartesianVel,
+    RotationalVel := moveDirectAbsA6.m_rRotationalVel,
+    CoordSystem   := 0,
+    ToolNumber    := 0,
+    AxesGroup     := staeubliRobotScara,
+    Busy          => moveDirectAbsA6.m_xBusy,
+    Done          => moveDirectAbsA6.m_xDone,
+    Error         => moveDirectAbsA6.m_xError,
+    ErrorID       => moveDirectAbsA6.m_udiErrorID
+);
+\end{lstlisting}
+Au TP~3, \texttt{cartesianPosInitialeA6} est initialisé directement à la
+déclaration avec ces valeurs (complétées des champs de configuration
+\texttt{CS=1}, \texttt{CE=1}, \texttt{CW=1}) plutôt que par affectation.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Gestion de l'arrêt demandé][][][TD]
@@ -195,6 +302,22 @@ conditions d'appel (sur l'entrée \texttt{Execute} de chaque bloc, sans
 écrire l'instanciation complète), en utilisant
 \texttt{hmiScara.m\_Inputs.m\_nixStopRequest}.}
 \UPSTIquadrillage{4}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+\texttt{MC\_GroupInterrupt} immobilise le robot \textbf{sans vider la pile}
+ni couper la puissance ; \texttt{MC\_GroupContinue} relance ensuite les
+mouvements interrompus (\texttt{MC\_GroupStop} ne convient pas : il vide
+la pile). L'arrêt est demandé quand le contact \emph{NC} vaut
+\texttt{FALSE} ; les blocs réagissant au front montant d'\texttt{Execute} :
+\begin{lstlisting}
+(* MC_GroupInterrupt : front montant a l'apparition de la demande d'arret *)
+Execute := NOT hmiScara.m_Inputs.m_nixStopRequest;
+(* MC_GroupContinue : front montant a la disparition de la demande *)
+Execute := hmiScara.m_Inputs.m_nixStopRequest;
+\end{lstlisting}
+(On peut en plus conditionner ces entrées par l'activité du mode A6,
+\texttt{xA6}.)
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \section{TD d'application : mode D2, diagnostic et traitement de la défaillance}
@@ -253,6 +376,41 @@ attendue jusqu'à son achèvement avant de passer à la suivante). Préciser,
 pour chaque étape, quelle sortie du bloc \texttt{MC\_} concerné autorise le
 franchissement de la transition suivante.}
 \UPSTIquadrillage{9}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+Grafcet linéaire (séquence unique, non répétitive) :
+\begin{center}
+\begin{tabular}{|c|p{6.2cm}|p{5.2cm}|}
+\hline
+\textbf{Étape} & \textbf{Action} & \textbf{Transition vers l'étape suivante} \\
+\hline
+0 (initiale) & -- & activation du mode D2 (\texttt{xD2}) \\
+\hline
+1 & Acquitter les défauts : \texttt{Execute} de \texttt{MC\_GroupReset} à
+\texttt{TRUE} & \texttt{Done} de \texttt{MC\_GroupReset} \\
+\hline
+2 & Vider la pile : \texttt{Execute} de \texttt{MC\_GroupStop} &
+\texttt{Done} de \texttt{MC\_GroupStop} \\
+\hline
+3 & Autoriser les mouvements : \texttt{Execute} de
+\texttt{MC\_GroupContinue} & \texttt{Done} de \texttt{MC\_GroupContinue} \\
+\hline
+4 & Mise sous puissance (action mémorisée, type P1 au TP~3 :
+\texttt{ctrlStatusGroupPower.m\_xEnable := TRUE}) & \texttt{Status} de
+\texttt{MC\_GroupPower} (\texttt{ctrlStatusGroupPower.m\_xStatus}) \\
+\hline
+5 & Fin de séquence (attente du passage en A5, transition
+\texttt{GM\_T\_D2toA5} du GEMMA) & -- \\
+\hline
+\end{tabular}
+\end{center}
+Pour \texttt{MC\_GroupPower}, il n'y a pas de \texttt{Done} : c'est la
+sortie \texttt{Status} (puissance effective) qui valide l'étape. Chaque
+\texttt{Execute} étant maintenu pendant l'étape, son front montant à
+l'activation de l'étape déclenche l'action une seule fois. La sortie
+\texttt{Error} de chaque bloc peut être exploitée pour signaler un échec
+(non demandé par l'énoncé).
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Programme ST du mode D2][][][TD]
@@ -263,4 +421,62 @@ choisirez vous-même les noms d'instance). Vous ajouterez également
 l'affectation combinatoire de la colonne lumineuse (clignotement 1~Hz de
 sa composante rouge) et des deux bloqueurs du Poste Guichet.}
 \UPSTIquadrillage{10}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+Exemple de solution (graphe SFC \texttt{D2\_Diagnostic} d'étapes
+\texttt{D2\_S\_0}\dots\texttt{D2\_S\_5}, section ST
+\texttt{D2\_DiagnosticPost} ; objets de type \texttt{TCtrlStatusGroup}
+complété du champ \texttt{m\_xExecute}, comme demandé au TP~3) :
+\begin{lstlisting}
+VAR
+    InstGroupResetD2          : MC_GroupReset;
+    InstGroupStopD2           : MC_GroupStop;
+    InstGroupContinueD2       : MC_GroupContinue;
+    ctrlStatusGroupResetD2    : TCtrlStatusGroup;
+    ctrlStatusGroupStopD2     : TCtrlStatusGroup;
+    ctrlStatusGroupContinueD2 : TCtrlStatusGroup;
+    sxBaseTemps1s AT %S6      : BOOL;  (* base de temps 1 s *)
+END_VAR
+
+(* Activation des blocs selon l'avancement du graphe *)
+ctrlStatusGroupResetD2.m_xExecute    := D2_S_1.x;
+ctrlStatusGroupStopD2.m_xExecute     := D2_S_2.x;
+ctrlStatusGroupContinueD2.m_xExecute := D2_S_3.x;
+
+InstGroupResetD2(Execute := ctrlStatusGroupResetD2.m_xExecute,
+    AxesGroup := staeubliRobotScara,
+    Busy => ctrlStatusGroupResetD2.m_xBusy, Done => ctrlStatusGroupResetD2.m_xDone,
+    Error => ctrlStatusGroupResetD2.m_xError, ErrorID => ctrlStatusGroupResetD2.m_udiErrorID);
+InstGroupStopD2(Execute := ctrlStatusGroupStopD2.m_xExecute,
+    AxesGroup := staeubliRobotScara,
+    Busy => ctrlStatusGroupStopD2.m_xBusy, Done => ctrlStatusGroupStopD2.m_xDone,
+    Error => ctrlStatusGroupStopD2.m_xError, ErrorID => ctrlStatusGroupStopD2.m_udiErrorID);
+InstGroupContinueD2(Execute := ctrlStatusGroupContinueD2.m_xExecute,
+    AxesGroup := staeubliRobotScara,
+    Busy => ctrlStatusGroupContinueD2.m_xBusy, Done => ctrlStatusGroupContinueD2.m_xDone,
+    Error => ctrlStatusGroupContinueD2.m_xError, ErrorID => ctrlStatusGroupContinueD2.m_udiErrorID);
+
+(* Mise sous puissance : action P1 D2_AP1_ArmPowerOn de l'etape D2_S_4 *)
+(*   ctrlStatusGroupPower.m_xEnable := TRUE;                              *)
+(* L'instance unique InstGroupPower reste scrutee dans WriteEthIpRobot.   *)
+
+(* Poste Guichet : acces interdit, rouge clignotant 1 Hz *)
+m_nqxBE := FALSE;   (* bloqueur d'entree leve (actif au repos) *)
+m_nqxBP := FALSE;   (* bloqueur du poste leve *)
+m_nqxCR := sxBaseTemps1s;
+m_nqxCV := FALSE;
+m_nqxCB := FALSE;
+\end{lstlisting}
+Transitions du graphe : \texttt{ctrlStatusGroupResetD2.m\_xDone},
+\texttt{ctrlStatusGroupStopD2.m\_xDone},
+\texttt{ctrlStatusGroupContinueD2.m\_xDone}, puis
+\texttt{ctrlStatusGroupPower.m\_xStatus}. Les noms des sorties du guichet
+(\texttt{nqxBE}, \texttt{nqxBP}, \texttt{nqxCR/CV/CB} au TP~1) sont à
+adapter aux déclarations de chacun ; \texttt{nqxBE}/\texttt{nqxBP}
+commandent l'\emph{abaissement} des bloqueurs, d'où la valeur
+\texttt{FALSE} pour les maintenir levés. Aucune affectation n'est faite sur
+le préhenseur (distributeur bistable, état conservé). L'affectation
+combinatoire peut aussi être conditionnée par \texttt{xD2} si les sorties
+sont écrites dans une section commune.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}

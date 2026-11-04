@@ -60,6 +60,15 @@ CS9. Expliquer alors, en une phrase, ce que \textbf{le serveur
 architecture, si ce n'est pas d'exécuter lui-même les blocs.}
 \UPSTIquadrillage{3}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+Les blocs du client ne font que \textbf{préparer et encoder} des requêtes
+(et décoder l'état reçu) ; c'est le serveur \texttt{uniVALplc}, sur la CS9,
+qui \textbf{reçoit ces commandes via EtherNet/IP, les interprète et génère
+réellement les mouvements} du bras (en s'appuyant sur les objets internes
+du contrôleur : points, outils, repères), et qui renvoie l'état du robot
+à l'automate.
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Pour chacune des tâches suivantes, indiquer si elle relève
 de la famille \texttt{VAL\_} ou de la famille \texttt{MC\_}, en
 justifiant par le \textbf{rôle} de chaque famille (et non en devinant le
@@ -75,6 +84,24 @@ nom du bloc) :
 \end{enumerate}}
 \UPSTIquadrillage{4}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+Rôles : les blocs \texttt{VAL\_} donnent accès aux fonctionnalités
+\textbf{propres au serveur} \texttt{uniVALplc}/CS9 ; les blocs \texttt{MC\_}
+(PLCopen) commandent de façon \textbf{normalisée} les mouvements et l'état
+du groupe d'axes.
+\begin{enumerate}
+    \item \texttt{VAL\_} : calcul faisant appel à un point de référence
+    interne au contrôleur CS9, fonctionnalité spécifique au serveur
+    (\texttt{VAL\_ShiftPoint}).
+    \item \texttt{MC\_} : commande de mouvement normalisée PLCopen
+    (\texttt{MC\_MoveLinearAbsolute}).
+    \item \texttt{VAL\_} : accès aux E/S de la baie, propre à la CS9 et
+    indépendant de tout mouvement (\texttt{VAL\_ReadWriteIO}).
+    \item \texttt{MC\_} : gestion normalisée de l'état du groupe d'axes
+    (\texttt{MC\_GroupPower}).
+\end{enumerate}
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Après une intervention de maintenance, l'automate M340
 communique bien avec la baie CS9 (bits de santé du coupleur
 \texttt{NOC\_ETHIP\_ROBOT}, section~\ref{secConversionHmi}, corrects),
@@ -83,4 +110,19 @@ commandes envoyées. Citer les deux points de configuration, indépendants
 du programme automate, à vérifier en priorité, et expliquer pour chacun
 la conséquence d'un mauvais réglage.}
 \UPSTIquadrillage{4}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+\begin{enumerate}
+    \item \textbf{L'ordre des octets} configuré sur le serveur
+    \texttt{uniVALplc} (\emph{Little Endian}, comme le M340) : en cas
+    d'erreur, tous les champs numériques multi-octets échangés (positions,
+    vitesses, codes de commande...) sont mal interprétés de part et
+    d'autre, bien que la communication soit saine ; les commandes reçues
+    par le serveur n'ont alors plus de sens.
+    \item \textbf{Le sélecteur de mode de marche du pupitre \texttt{WMS9}},
+    qui doit être sur « Commande à distance » : dans toute autre position,
+    le serveur ignore les commandes envoyées par l'automate, bien que la
+    liaison soit établie.
+\end{enumerate}
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}

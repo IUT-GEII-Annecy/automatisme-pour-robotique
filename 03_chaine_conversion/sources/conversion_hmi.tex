@@ -188,6 +188,15 @@ du pupitre (champ \texttt{m\_nixStopRequest}, contact à ouverture
 l'arrêt est demandé.}
 \UPSTIquadrillage{2.5}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+Le contact étant à ouverture (\emph{NC}), l'appui \textbf{ouvre} le
+circuit : \texttt{hmiScara.m\_Inputs.m\_nixStopRequest} vaut
+\texttt{FALSE} (\texttt{FB\_ReadHmi} recopie le bit brut sans l'inverser).
+\begin{lstlisting}
+xArretDemande := NOT hmiScara.m_Inputs.m_nixStopRequest;
+\end{lstlisting}
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{On souhaite allumer le voyant « Arrêt demandé » du pupitre
 (champ \texttt{m\_nqxLightStopRequest} du type \texttt{THmiQTOR}).
 Donner le chemin complet du champ à renseigner à partir de l'objet
@@ -195,11 +204,40 @@ Donner le chemin complet du champ à renseigner à partir de l'objet
 que l'ordre parvienne effectivement au M221, et via quel objet brut.}
 \UPSTIquadrillage{3}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+\begin{lstlisting}
+hmiScara.m_Outputs.m_qToR.m_nqxLightStopRequest := TRUE;
+\end{lstlisting}
+Il faut ensuite que \texttt{FB\_WriteHmi} (instance \texttt{InstWriteHmi})
+soit appelé dans le même cycle, \textbf{après} cette affectation (et avant
+\texttt{VAL\_WriteAxesGroup}) : il lit \texttt{hmiScara.m\_Outputs} et
+reconstitue l'objet brut \texttt{toHmiScara} (type \texttt{TToHmi}, sortie
+\texttt{toHmi}), alias de la zone \texttt{\%MW} que le coupleur
+\texttt{NOC\_ETHIP\_ROBOT} transmet au M221.
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Justifier pourquoi le paramètre \texttt{hmi} est passé en
 \texttt{VAR\_IN\_OUT} aux deux blocs \texttt{FB\_ReadHmi} et
 \texttt{FB\_WriteHmi}, alors que \texttt{toHmi} n'est qu'une
 \texttt{VAR\_OUTPUT} de \texttt{FB\_WriteHmi}.}
 \UPSTIquadrillage{3}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+\begin{itemize}
+    \item \texttt{hmi} est un objet \textbf{partagé} entre les deux blocs et
+    le programme applicatif : \texttt{FB\_ReadHmi} n'en met à jour
+    qu'\textbf{une partie} (\texttt{m\_Inputs}) et doit laisser intact
+    \texttt{m\_Outputs}, renseigné par le programme ;
+    \texttt{FB\_WriteHmi} lit \texttt{m\_Outputs}. En \texttt{VAR\_IN\_OUT},
+    le bloc travaille directement sur l'objet transmis (passage par
+    référence, sans copie) : ce qu'il modifie est immédiatement visible du
+    reste du programme, et ce qu'il ne touche pas est conservé.
+    \item \texttt{toHmi}, au contraire, est \textbf{entièrement produit} par
+    \texttt{FB\_WriteHmi} à chaque appel à partir de \texttt{hmi} : le bloc
+    n'a pas besoin de lire sa valeur précédente, une simple sortie
+    \texttt{VAR\_OUTPUT} suffit.
+\end{itemize}
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \UPSTIremarque[Lien avec la préparation du TP]{

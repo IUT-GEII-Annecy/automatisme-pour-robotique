@@ -91,9 +91,20 @@ seulement le premier mot) ne permettrait \textbf{pas} de lire cette
 mesure correctement.}
 
 \begin{lstlisting}
-vitesseConvoyeur AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
+vitesseConvoyeur AT (*@\trou[\%MW20]{2.2cm}@*) : (*@\trou[REAL]{1.4cm}@*);
 \end{lstlisting}
 \UPSTIquadrillage{3}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+L'alias \texttt{vitesseConvoyeur AT \%MW20 : REAL;} chevauche \textbf{deux}
+mots consécutifs (\texttt{\%MW20} et \texttt{\%MW21}, soit 4~octets), car
+le type \texttt{REAL} occupe 32~bits : la taille du type déclaré fixe
+l'étendue de la zone chevauchée. Un alias de type \texttt{WORD} ne
+couvrirait que les 16~bits de \texttt{\%MW20} : il manquerait la moitié du
+codage IEEE~754 du réel (\texttt{\%MW21}), et ces 16~bits seraient de plus
+interprétés comme un entier non signé et non comme un réel -- la valeur lue
+n'aurait aucun sens physique.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Chevauchement et extraction de bit sur Schneider M340][][][TD]
@@ -105,8 +116,8 @@ en extraire le bit concerné dans une variable
 \texttt{m\_nixArretUrgenceGuichet}.}
 
 \begin{lstlisting}
-guichetIN2 AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
-m_nixArretUrgenceGuichet := (*@\trou{2.4cm}@*);
+guichetIN2 AT (*@\trou[\%MW11]{2.2cm}@*) : (*@\trou[WORD]{1.4cm}@*);
+m_nixArretUrgenceGuichet := (*@\trou[guichetIN2.0]{2.4cm}@*);
 \end{lstlisting}
 
 \UPSTIquestion{Le même mot comporte, sur ses bits~1 et~2, un code sur
@@ -118,4 +129,18 @@ permettrait \textbf{pas}, à lui seul, d'obtenir directement une variable
 \texttt{ROUGE}/\texttt{VERTE}/\texttt{BLEUE}/\texttt{ABSENTE} : quelle
 étape supplémentaire serait alors nécessaire ?}
 \UPSTIquadrillage{3}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+L'information « couleur » n'est portée par \textbf{aucun bit isolé} : elle
+résulte de la \textbf{combinaison} des bits~1 et~2. L'alias donne seulement
+un nom au mot entier, l'extraction de bit ne fournit que des
+\texttt{BOOL} séparés (\texttt{guichetIN2.1}, \texttt{guichetIN2.2}) ;
+aucune de ces deux opérations ne fait correspondre un code binaire à une
+valeur nommée. Il faut une étape supplémentaire de \textbf{décodage}
+(conversion) : lire les deux bits, puis, par une structure de choix
+(\texttt{IF}/\texttt{CASE}), affecter à \texttt{m\_couleurPalette} la valeur
+\texttt{ABSENTE} (00), \texttt{ROUGE} (01), \texttt{VERTE} (10) ou
+\texttt{BLEUE} (11). C'est exactement le rôle d'un \textbf{bloc fonctionnel
+de conversion}, comme \texttt{FB\_ReadHmi} pour le M221.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}

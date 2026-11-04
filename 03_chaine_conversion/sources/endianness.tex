@@ -61,6 +61,13 @@ octets \texttt{0x64} puis \texttt{0x00}. Sachant que le serveur
 valeur numérique (en décimal) de \texttt{Status.Heartbeat}.}
 \UPSTIquadrillage{2.5}
 
+\begin{UPSTIcorrectionP}{Corrigé}
+En \emph{little endian}, le premier octet reçu est l'octet de poids
+\textbf{faible} : \texttt{0x64} (poids faible) et \texttt{0x00} (poids
+fort) donnent \texttt{0x0064}, soit
+$6\times16+4 = \mathbf{100}$.
+\end{UPSTIcorrectionP}
+
 \UPSTIquestion{Un collègue, en reprenant la configuration du serveur sur
 une autre cellule, laisse par erreur l'option \emph{Big Endian}. Quelle
 valeur le programme Control Expert lirait-il alors pour
@@ -68,4 +75,22 @@ valeur le programme Control Expert lirait-il alors pour
 \texttt{0x00} ? Ce défaut de configuration serait-il facile à détecter au
 premier démarrage de la cellule ? Justifier.}
 \UPSTIquadrillage{3.5}
+
+\begin{UPSTIcorrectionP}{Corrigé}
+En \emph{big endian}, le premier octet reçu est interprété comme l'octet de
+poids \textbf{fort} : le programme lirait \texttt{0x6400}, soit
+$100\times256 = \mathbf{25\,600}$.
+
+Ce défaut est \textbf{difficile à détecter} au premier démarrage : chaque
+octet est correctement reçu, les bits de santé du coupleur
+\texttt{NOC\_ETHIP\_ROBOT} restent à \texttt{TRUE} et les blocs
+\texttt{VAL\_ReadAxesGroup}/\texttt{VAL\_WriteAxesGroup} sont appelés
+normalement : aucune erreur de communication n'est signalée. Seules des
+valeurs numériques \textbf{incohérentes} trahissent le problème (par
+exemple une position cartésienne lue sans rapport avec celle affichée sur
+le pendant du robot, une vitesse absurde) -- encore faut-il penser à les
+comparer. Un champ comme \texttt{Heartbeat}, dont la valeur absolue n'a
+pas de signification pour l'opérateur, ne permet pas à lui seul de s'en
+apercevoir.
+\end{UPSTIcorrectionP}
 \end{UPSTIactivite}
