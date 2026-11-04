@@ -20,32 +20,83 @@ noms et de types porteurs de sens.
 \end{UPSTIinfor}
 
 \textbf{Exemple.} Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
-PFC200 un mot de données à l'adresse \texttt{\%MW10}. On chevauche
-d'abord ce mot avec une variable \texttt{WORD} nommée (c'est le même
-principe que pour \texttt{iAlpha AT~\%MW1~:~INT} vu en cours) :
+PFC200 un mot de données à l'adresse \texttt{\%MW10}. On le chevauche
+avec une variable \texttt{WORD} nommée :
 
 \begin{lstlisting}
 guichetIN AT %MW10 : WORD;
 \end{lstlisting}
 
-Si le quatrième bit de ce mot correspond au capteur « palette présente »,
-l'opérateur d'\textbf{extraction de bit} (\texttt{.n}) du langage ST
-donne directement accès à ce bit nommé, sans aucune copie :
+Les deux écritures, \texttt{\%MW10} et \texttt{guichetIN}, désignent
+désormais \textbf{exactement le même emplacement mémoire} : modifier
+l'une modifie instantanément l'autre, sans aucune copie. C'est là toute
+l'opération d'\textbf{alias/chevauchement} : donner un nom (et un type)
+à une zone mémoire existante, sans en déplacer le contenu.
+
+\begin{UPSTIwarning}{L'alias ne donne accès qu'au mot entier}
+Chevaucher un mot de 16~bits avec une variable \texttt{WORD} donne un nom
+à ces 16~bits \textbf{pris ensemble}. Si l'information utile n'occupe
+qu'un seul bit de ce mot (un capteur, un bouton-poussoir), l'alias seul ne
+permet pas encore d'y accéder individuellement : il faut une opération
+supplémentaire, \textbf{différente de l'alias}, pour isoler ce bit.
+\end{UPSTIwarning}
+
+Si le quatrième bit de \texttt{guichetIN} correspond au capteur « palette
+présente », c'est l'opérateur d'\textbf{extraction de bit} (\texttt{.n})
+du langage ST qui isole ce bit :
 
 \begin{lstlisting}
 m_nixPalettePresente := guichetIN.3;
 \end{lstlisting}
 
-Aucune conversion n'est nécessaire ici : le bit \emph{est} directement
-l'information recherchée, l'alias (associé à l'extraction de bit) suffit
-à lui donner un nom exploitable (c'est le cas « à un seul niveau » du
-PFC200, déjà rencontré en TP1). C'est précisément lorsque cela ne suffit
-plus -- lorsque l'information recherchée est encodée sur plusieurs bits,
-répartie, ou calculée à partir d'octets bruts -- qu'un bloc fonctionnel de
-conversion devient nécessaire, comme on le verra dans les sections
-suivantes pour le M221 et pour la baie CS9.
+Cette seconde opération n'est \textbf{pas} un chevauchement : l'affectation
+\texttt{:=} \textbf{copie} la valeur du bit~3 de \texttt{guichetIN} dans la
+variable \texttt{m\_nixPalettePresente}, qui occupe son propre
+emplacement mémoire, indépendant de \texttt{guichetIN}. Alias et
+extraction de bit sont donc deux opérations \textbf{distinctes et
+complémentaires} :
 
-\begin{UPSTIactivite}[4][Chevauchement sur Schneider M340][][][TD]
+\begin{center}
+\begin{tabular}{|l|p{3.6cm}|p{6.3cm}|}
+\hline
+ & \textbf{Opération} & \textbf{Effet} \\
+\hline
+Alias (\texttt{AT}) & Chevauchement & Donne un nom à une zone mémoire
+\textbf{entière}, sans copie ; les deux noms restent liés en permanence. \\
+\hline
+Extraction de bit (\texttt{.n}) & Lecture/affectation (\texttt{:=}) & Copie
+\textbf{un seul bit} d'une zone déjà nommée vers une variable
+indépendante. \\
+\hline
+\end{tabular}
+\end{center}
+
+Sur le PFC200, chaque bit \emph{est} directement l'information recherchée
+(un capteur, une commande) : un alias sur le mot, suivi d'une extraction
+de bit, suffit à obtenir une variable exploitable. C'est précisément
+lorsque cela ne suffit plus -- lorsque l'information recherchée est
+encodée sur plusieurs bits, répartie sur plusieurs mots, ou calculée à
+partir d'octets bruts -- qu'un \textbf{bloc fonctionnel de conversion}
+devient nécessaire, comme on le verra dans les sections suivantes pour le
+M221 et pour la baie CS9.
+
+\begin{UPSTIactivite}[4][Alias : faire correspondre taille et type][][][TD]
+\UPSTIquestion{Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
+PFC200, aux adresses \texttt{\%MW20} et \texttt{\%MW21} (deux mots
+consécutifs), une mesure de vitesse du convoyeur codée en réel simple
+précision (\texttt{REAL}, 4~octets). Compléter la déclaration d'alias
+\texttt{vitesseConvoyeur} ci-dessous, puis expliquer en une phrase
+pourquoi un alias \texttt{vitesseConvoyeur AT~\%MW20~:~WORD;} (chevauchant
+seulement le premier mot) ne permettrait \textbf{pas} de lire cette
+mesure correctement.}
+
+\begin{lstlisting}
+vitesseConvoyeur AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
+\end{lstlisting}
+\UPSTIquadrillage{3}
+\end{UPSTIactivite}
+
+\begin{UPSTIactivite}[4][Chevauchement et extraction de bit sur Schneider M340][][][TD]
 \UPSTIquestion{Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
 PFC200, à l'adresse \texttt{\%MW11}, un mot dont le bit~0 indique l'état
 du bouton d'arrêt d'urgence du poste guichet (\texttt{TRUE} = défaut). En

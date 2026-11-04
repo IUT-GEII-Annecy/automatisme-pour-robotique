@@ -95,8 +95,8 @@ dans la section \texttt{WriteEthIpRobot} ci-dessous.}
 \begin{lstlisting}
 (* Section ReadEthIpRobot -- premiere section executee dans le cycle *)
 InstReadAxesGroup(
-    Enable     := (*@\trou{4.5cm}@*),
-    AxesGroup  := (*@\trou{3.5cm}@*),
+    Enable     := (*@\trou{6.5cm}@*),
+    AxesGroup  := (*@\trou{5.5cm}@*),
     IN         := fromRobotScara
 );
 
@@ -104,10 +104,9 @@ InstReadAxesGroup(
 InstWriteAxesGroup(
     Enable     := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup  := staeubliRobotScara,
-    OUT        => (*@\trou{3.5cm}@*)
+    OUT        => (*@\trou{5.5cm}@*)
 );
 \end{lstlisting}
-\UPSTIquadrillage{2}
 \end{UPSTIactivite}
 
 \subsection{Niveau 2 -- Compléter la mise sous puissance}
@@ -120,18 +119,17 @@ dans ce mode, et l'objet \texttt{AxesGroup} doit être celui de la cellule.}
 
 \begin{lstlisting}
 InstGroupPowerA6(
-    Enable     := (*@\trou{4.5cm}@*), (* toujours actif en mode A6 *)
-    AxesGroup  := (*@\trou{3.5cm}@*)
+    Enable     := (*@\trou{6.5cm}@*), (* toujours actif en mode A6 *)
+    AxesGroup  := (*@\trou{5.5cm}@*)
 );
 \end{lstlisting}
-\UPSTIquadrillage{2}
 \end{UPSTIactivite}
 
 \subsection{Niveau 3 -- Choisir et écrire les mouvements}
 
 À ce stade, vous disposez de tous les éléments pour écrire vous-même la
-séquence de mouvement. Deux blocs \texttt{MC\_} vus en TP peuvent
-convenir : \texttt{MC\_MoveLinearAbsolute} (mouvement linéaire) et
+séquence de mouvement. Deux blocs \texttt{MC\_}, présentés ci-dessus,
+peuvent convenir : \texttt{MC\_MoveLinearAbsolute} (mouvement linéaire) et
 \texttt{MC\_MoveDirectAbsolute} (interpolation articulaire vers une
 position cartésienne cible).
 
@@ -154,6 +152,8 @@ $RZ$ courants, produit exactement ce déplacement.
     disponibles dans \texttt{staeubliRobotScara.Status.CartesianPos}), et
     $Z=150$.
 \end{enumerate}}
+\textit{Réponse à la question~1 (choix du bloc, justification) :}
+\UPSTIquadrillage{2.5}
 
 \begin{lstlisting}
 targetPosA6Etape1.X  := staeubliRobotScara.Status.CartesianPos.X;
@@ -181,11 +181,79 @@ vous-même l'instance du bloc et la variable de position cible.}
 
 \begin{UPSTIactivite}[4][Gestion de l'arrêt demandé][][][TD]
 \UPSTIquestion{Parmi les blocs \texttt{MC\_GroupInterrupt} et
-\texttt{MC\_GroupContinue} vus en TP, lequel utiliser pour immobiliser le
+\texttt{MC\_GroupContinue}, présentés ci-dessus, lequel utiliser pour immobiliser le
 robot sans perdre la puissance lorsqu'un arrêt est demandé, et lequel
 pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
 conditions d'appel (sur l'entrée \texttt{Execute} de chaque bloc, sans
 écrire l'instanciation complète), en utilisant
 \texttt{hmiScara.m\_Inputs.m\_nixStopRequest}.}
 \UPSTIquadrillage{4}
+\end{UPSTIactivite}
+
+\section{TD d'application : mode D2, diagnostic et traitement de la défaillance}
+\label{secTdD2}
+
+\begin{UPSTIinfor}{Objectif}
+Mettre en œuvre le mode GEMMA \textbf{D2} du robot. Contrairement au mode
+\textbf{A6} ci-dessus, aucun squelette de code n'est fourni : c'est à vous
+de rédiger entièrement le grafcet fonctionnel et le programme ST
+correspondants, à partir du seul comportement attendu décrit ci-dessous et
+des blocs \texttt{MC\_} déjà présentés en section~\ref{secTdA6}.
+\end{UPSTIinfor}
+
+\subsection{Comportement attendu (mode D2)}
+
+Le mode \textbf{D2} intervient après un \textbf{défaut} détecté sur le
+robot (par exemple un dépassement de couple, un défaut de communication
+temporairement résolu...). Il doit remettre le contrôleur du robot dans
+une configuration propre, exempte de tout défaut, avant de pouvoir
+reprendre un mode de production ou de mise en conditions initiales. Pour
+cela, il réalise \textbf{séquentiellement} les quatre actions suivantes :
+
+\begin{enumerate}
+    \item \textbf{acquitter} les défauts présents sur le groupe d'axes
+    (bloc \texttt{MC\_GroupReset}) ;
+    \item \textbf{vider} la pile des commandes de mouvement en attente
+    (bloc \texttt{MC\_GroupStop}), afin de ne pas exécuter d'anciennes
+    commandes devenues obsolètes ;
+    \item \textbf{autoriser} de nouvelles commandes de mouvement (bloc
+    \texttt{MC\_GroupContinue}) ;
+    \item remettre le bras \textbf{sous puissance} (bloc
+    \texttt{MC\_GroupPower}).
+\end{enumerate}
+
+Pendant toute la durée de ce mode, l'accès au Poste Guichet reste
+\textbf{interdit} (les deux bloqueurs du poste restent levés, comme en
+mode A6), et la composante \textbf{rouge} de la colonne lumineuse
+clignote à la fréquence de \textbf{1~Hz} (au lieu d'être fixe, comme en
+mode D1 -- arrêt d'urgence). Le système de préhension (distributeur
+bistable) conserve son état courant : aucune action combinatoire n'est à
+prévoir sur lui dans ce mode.
+
+\begin{UPSTIwarning}{\texttt{MC\_GroupReset}, \texttt{MC\_GroupStop} et \texttt{MC\_GroupContinue} suivent le squelette commun}
+Comme \texttt{MC\_GroupInterrupt} et \texttt{MC\_GroupContinue}
+(section~\ref{secTdA6}), ces trois blocs partagent le squelette
+\texttt{Execute} / \texttt{AxesGroup} / \texttt{Busy} / \texttt{Done} /
+\texttt{Error} commun à tous les blocs \texttt{MC\_} : un \texttt{Execute}
+maintenu à \texttt{TRUE} ne relance pas l'action en continu, seul un
+\textbf{front montant} la déclenche.
+\end{UPSTIwarning}
+
+\begin{UPSTIactivite}[4][Grafcet fonctionnel du mode D2][][][TD]
+\UPSTIquestion{Proposer le grafcet fonctionnel de la partie séquentielle
+du mode D2 (les quatre actions ci-dessus, dans l'ordre imposé, chacune
+attendue jusqu'à son achèvement avant de passer à la suivante). Préciser,
+pour chaque étape, quelle sortie du bloc \texttt{MC\_} concerné autorise le
+franchissement de la transition suivante.}
+\UPSTIquadrillage{9}
+\end{UPSTIactivite}
+
+\begin{UPSTIactivite}[4][Programme ST du mode D2][][][TD]
+\UPSTIquestion{À partir du grafcet précédent, rédiger entièrement le
+programme ST correspondant : déclaration des instances de blocs
+nécessaires, et appel de chacune d'elles avec ses paramètres (vous
+choisirez vous-même les noms d'instance). Vous ajouterez également
+l'affectation combinatoire de la colonne lumineuse (clignotement 1~Hz de
+sa composante rouge) et des deux bloqueurs du Poste Guichet.}
+\UPSTIquadrillage{10}
 \end{UPSTIactivite}

@@ -1,9 +1,7 @@
 \section{Conversion des données du contrôleur M221 (HMI)}
 \label{secConversionHmi}
 
-Le contrôleur M221 produit 4 octets et en consomme 40 (cf. document
-\texttt{02b\_donnees\_echangees}, section « Données de l'IHM et du
-pupitre opérateur »). Ces octets ne sont pas directement exploitables :
+Le contrôleur M221 produit 4 octets et en consomme 40. Ces octets ne sont pas directement exploitables :
 ils doivent être lus et écrits à travers les blocs fonctionnels maison
 \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}.
 
@@ -22,6 +20,20 @@ Un unique objet, par exemple \texttt{hmiScara} (de type \texttt{THmi}),
 est donc partagé par \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi} : le
 premier met à jour son champ \texttt{m\_Inputs}, le second lit son champ
 \texttt{m\_Outputs}.
+\end{UPSTIinfor}
+
+\begin{UPSTIinfor}{Bit de santé d'une connexion EtherNet/IP}
+Pour chaque connexion implicite (cyclique) qu'il établit, le coupleur
+\texttt{BMX~NOC~0401.2} maintient en permanence un bit de \textbf{santé}
+indiquant si la communication avec l'équipement distant est effectivement
+établie (\texttt{TRUE}) ou rompue (\texttt{FALSE}), indépendamment du
+contenu des données échangées. Ces bits sont regroupés, pour le coupleur
+\texttt{NOC\_ETHIP\_ROBOT}, dans le mot \texttt{HEALTH\_BITS\_IN[0]} :
+le bit~0 concerne la connexion avec la baie CS9 (robot), le bit~1 la
+connexion avec le contrôleur M221. Il faut donc conditionner
+l'activation d'un bloc de conversion par le bit de santé de la connexion
+concernée : sans cette précaution, le bloc travaillerait sur des données
+obsolètes ou absentes, sans nécessairement le signaler.
 \end{UPSTIinfor}
 
 \subsection{En lecture}
@@ -46,8 +58,8 @@ premier met à jour son champ \texttt{m\_Inputs}, le second lit son champ
 \textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
 \hline
 \texttt{xEnable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
-conversion à ce cycle (en TP, conditionnée aux bits de santé de la
-liaison avec le M221 et avec la CS9). \\
+conversion à ce cycle, à conditionner aux bits de santé (voir encart
+ci-dessus) de la liaison avec le M221 et avec la CS9. \\
 \hline
 \texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
 Objet du robot (section~\ref{secConversionRobot}), nécessaire au bloc

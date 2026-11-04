@@ -1,8 +1,7 @@
 \section{Conversion des données de la baie CS9 (robot)}
 \label{secConversionRobot}
 
-La baie CS9 produit 148 octets et en consomme 124 (cf. document
-\texttt{02\_TP/TP\_02}, préparation). Ces octets sont le résultat de
+La baie CS9 produit 148 octets et en consomme 124. Ces octets sont le résultat de
 l'encodage, propre au serveur \texttt{uniVALplc}, de l'ensemble des
 informations d'état et de commande du robot : ils ne sont exploitables
 qu'à travers les blocs \texttt{VAL\_ReadAxesGroup} et
@@ -84,7 +83,7 @@ propres requêtes au serveur ; elle est aussi actualisée en lecture par
 entre 100~et~1000~ms, valeur initiale \texttt{T\#200ms}) forment un mécanisme de bit de vie entre
 l'automate et le serveur \texttt{uniVALplc} : c'est un moyen
 supplémentaire, propre à \texttt{uniVALplc}, de surveiller la liaison --
-distinct des bits de santé du coupleur NOC déjà rencontrés en TP1.
+distinct des bits de santé du coupleur NOC, présentés en section~\ref{secConversionHmi}.
 \end{UPSTIinfor}
 
 \subsection{Donner des ordres au robot}
