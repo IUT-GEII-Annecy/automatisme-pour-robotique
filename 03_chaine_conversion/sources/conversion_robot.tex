@@ -27,12 +27,12 @@ qu'à travers les blocs \texttt{VAL\_ReadAxesGroup} et
 \texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la lecture
 à ce cycle. \\
 \hline
-\texttt{IN} & \texttt{VAR\_INPUT}, \texttt{T\_FromRobot} & Objet brut,
-chevauchant la zone \texttt{\%MW} image des données reçues de la CS9. \\
-\hline
 \texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
 Objet sémantique partagé, dont le sous-objet \texttt{Status} est mis à
 jour par le bloc (voir remarque ci-dessous sur le \texttt{VAR\_IN\_OUT}). \\
+\hline
+\texttt{IN} & \texttt{VAR\_IN\_OUT}, \texttt{T\_FromRobot} & Objet brut,
+chevauchant la zone \texttt{\%MW} image des données reçues de la CS9. \\
 \hline
 \texttt{Error}, \texttt{ErrorID} & \texttt{VAR\_OUTPUT} & Signalent une
 erreur de conversion et son code. \\
@@ -77,13 +77,12 @@ propres requêtes au serveur. \\
 \end{tabular}
 \end{center}
 
-\begin{UPSTIinfor}{Le bit de vie (\texttt{Heartbeat})}
-\texttt{Status.Heartbeat} est incrémenté par le serveur \texttt{uniVALplc}
-à chaque trame produite. Un programme applicatif rigoureux surveille son
-évolution (il doit changer périodiquement, selon
-\texttt{Command.LifebitPeriod}) pour détecter une perte de communication
-que le seul bit de santé du coupleur ne révélerait pas forcément aussi
-rapidement.
+\begin{UPSTIinfor}{Le bit de vie (\texttt{Heartbeat} / \texttt{LifebitPeriod})}
+\texttt{Status.Heartbeat} (lu) et \texttt{Command.LifebitPeriod} (écrit,
+compris entre 100~et~1000~ms) forment un mécanisme de bit de vie entre
+l'automate et le serveur \texttt{uniVALplc} : c'est un moyen
+supplémentaire, propre à \texttt{uniVALplc}, de surveiller la liaison --
+distinct des bits de santé du coupleur NOC déjà rencontrés en TP1.
 \end{UPSTIinfor}
 
 \subsection{Donner des ordres au robot}
@@ -134,6 +133,9 @@ produit par le bloc, à écrire par le coupleur vers la CS9. \\
 \hline
 \texttt{Error}, \texttt{ErrorID} & \texttt{VAR\_OUTPUT} & Signalent une
 erreur de conversion et son code. \\
+\hline
+\texttt{Timeout} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale un
+timeout détecté par le bloc. \\
 \hline
 \end{tabular}
 \end{center}

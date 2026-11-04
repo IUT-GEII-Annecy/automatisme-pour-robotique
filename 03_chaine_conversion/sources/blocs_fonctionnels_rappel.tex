@@ -22,11 +22,11 @@ la comparer à celle d'une simple fonction.
 \end{UPSTIinfor}
 
 Tous les blocs rencontrés dans ce document et dans les TP suivants sont
-des blocs fonctionnels, pour une raison commune : ils ont besoin de
-mémoriser un état entre deux cycles de l'automate (un bloc \texttt{MC\_}
-doit savoir s'il a déjà démarré le mouvement demandé ; \texttt{FB\_ReadHmi}
-doit pouvoir détecter un front sur un bouton-poussoir). Une fonction, sans
-mémoire, ne le permettrait pas.
+des blocs fonctionnels. C'est en particulier le cas des blocs \texttt{MC\_}
+(un bloc de mouvement doit savoir, d'un cycle à l'autre, s'il a déjà
+démarré le mouvement demandé, afin de ne déclencher l'exécution que sur un
+\textbf{front montant} de son entrée \texttt{Execute}) : une fonction,
+sans mémoire, ne pourrait pas détecter ce front.
 
 \begin{UPSTIactivite}[4][Fonction ou bloc fonctionnel ?][][][TD]
 \UPSTIquestion{Pour chacun des traitements suivants, préciser s'il doit

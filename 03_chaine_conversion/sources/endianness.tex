@@ -53,18 +53,17 @@ Control Expert, même si les blocs \texttt{VAL\_ReadAxesGroup} et
 \end{UPSTIinfor}
 
 \begin{UPSTIactivite}[4][Lecture d'une valeur multi-octets][][][TD]
-\UPSTIquestion{Le champ \texttt{Status.ActualSpeed} de
-\texttt{T\_StaeubliRobot} est codé sur 2~octets. Le coupleur
-\texttt{NOC\_ETHIP\_ROBOT} reçoit, dans l'ordre, les deux octets
-\texttt{0x64} puis \texttt{0x00}. Sachant que le serveur
+\UPSTIquestion{Le champ \texttt{Status.Heartbeat} de
+\texttt{T\_StaeubliRobot} est de type \texttt{UINT}, codé sur 2~octets.
+Le coupleur \texttt{NOC\_ETHIP\_ROBOT} reçoit, dans l'ordre, les deux
+octets \texttt{0x64} puis \texttt{0x00}. Sachant que le serveur
 \texttt{uniVALplc} a été configuré en \emph{little endian}, calculer la
-valeur numérique (en décimal) de \texttt{Status.ActualSpeed}.}
+valeur numérique (en décimal) de \texttt{Status.Heartbeat}.}
 
 \UPSTIquestion{Un collègue, en reprenant la configuration du serveur sur
-une autre cellule, a par erreur laissé l'option \emph{Big Endian} (valeur
-par défaut du serveur). Quelle valeur le programme Control Expert
-lirait-il alors pour \texttt{Status.ActualSpeed}, à partir des mêmes
-octets \texttt{0x64} puis \texttt{0x00} ? Ce défaut de configuration
-serait-il facile à détecter au premier démarrage de la cellule ?
-Justifier.}
+une autre cellule, laisse par erreur l'option \emph{Big Endian}. Quelle
+valeur le programme Control Expert lirait-il alors pour
+\texttt{Status.Heartbeat}, à partir des mêmes octets \texttt{0x64} puis
+\texttt{0x00} ? Ce défaut de configuration serait-il facile à détecter au
+premier démarrage de la cellule ? Justifier.}
 \end{UPSTIactivite}

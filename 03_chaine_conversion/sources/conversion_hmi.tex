@@ -7,6 +7,23 @@ pupitre opérateur »). Ces octets ne sont pas directement exploitables :
 ils doivent être lus et écrits à travers les blocs fonctionnels maison
 \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}.
 
+\begin{UPSTIinfor}{L'objet sémantique \texttt{THmi}}
+Contrairement au cas du robot (section~\ref{secConversionRobot}), un
+\textbf{seul} type structuré regroupe entrées et sorties de l'IHM :
+\begin{lstlisting}
+TYPE THmi
+    STRUCT
+        m_Inputs  : THmiInputs ;
+        m_Outputs : THmiOutputs ;
+    END_STRUCT
+END_TYPE
+\end{lstlisting}
+Un unique objet, par exemple \texttt{hmiScara} (de type \texttt{THmi}),
+est donc partagé par \texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi} : le
+premier met à jour son champ \texttt{m\_Inputs}, le second lit son champ
+\texttt{m\_Outputs}.
+\end{UPSTIinfor}
+
 \subsection{En lecture}
 
 \begin{enumerate}
@@ -14,11 +31,11 @@ ils doivent être lus et écrits à travers les blocs fonctionnels maison
     chevauche la zone image des données produites par le M221 dans
     l'espace \texttt{\%MW} du coupleur \texttt{NOC\_ETHIP\_ROBOT}. Il ne
     contient que des octets bruts, sans nom de champ exploitable.
-    \item Le bloc \texttt{FB\_ReadHmi} prend cet objet brut en entrée et
-    en extrait les informations individuelles (chaque sélecteur, chaque
-    bouton-poussoir) vers un objet \texttt{THmiInputs} dont les champs
-    portent un nom explicite : \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto},
-    \texttt{m\_nixStopRequest}...
+    \item Le bloc \texttt{FB\_ReadHmi} prend cet objet brut et en extrait
+    les informations individuelles (chaque sélecteur, chaque
+    bouton-poussoir) vers le champ \texttt{m\_Inputs} de l'objet
+    \texttt{hmiScara}, dont les champs portent un nom explicite :
+    \texttt{m\_nixJ1Plus}, \texttt{m\_nixAuto}, \texttt{m\_nixStopRequest}...
 \end{enumerate}
 
 \texttt{FB\_ReadHmi} expose les entrées/sorties suivantes :
@@ -28,46 +45,53 @@ ils doivent être lus et écrits à travers les blocs fonctionnels maison
 \hline
 \textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
 \hline
-\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
+\texttt{xEnable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
 conversion à ce cycle (en général, toujours \texttt{TRUE}). \\
 \hline
-\texttt{IN} & \texttt{VAR\_INPUT}, \texttt{TFromHmi} & Objet brut,
+\texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
+Objet du robot (section~\ref{secConversionRobot}), nécessaire au bloc
+pour certaines informations croisées affichées à l'écran. \\
+\hline
+\texttt{fromHmi} & \texttt{VAR\_IN\_OUT}, \texttt{TFromHmi} & Objet brut,
 chevauchant la zone \texttt{\%MW} image des données reçues du M221. \\
 \hline
-\texttt{Inputs} & \texttt{VAR\_OUTPUT}, \texttt{THmiInputs} & Objet
-sémantique mis à jour par le bloc, exploitable par le reste du programme. \\
-\hline
-\texttt{Error} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale une
-erreur de conversion (ex. taille de \texttt{IN} incohérente). \\
+\texttt{hmi} & \texttt{VAR\_IN\_OUT}, \texttt{THmi} & Objet sémantique
+partagé : le bloc met à jour son champ \texttt{m\_Inputs}. \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Exemple d'appel} (section exécutée en tout début de cycle) :
+Noter que \texttt{FB\_ReadHmi} n'expose \textbf{aucune} sortie
+(\texttt{VAR\_OUTPUT}) : tous ses paramètres hors \texttt{xEnable} sont en
+\texttt{VAR\_IN\_OUT}, car le bloc ne fait que mettre à jour une partie
+des objets qu'on lui transmet.
+
+\textbf{Exemple d'appel}, \textbf{après} l'appel à
+\texttt{VAL\_ReadAxesGroup} (section~\ref{secConversionRobot}), puisque
+\texttt{AxesGroup} doit déjà être à jour :
 
 \begin{lstlisting}
 InstReadHmi(
-    Enable := TRUE,
-    IN     := fromHmiScara,
-    Inputs => hmiInputsScara,
-    Error  => errorReadHmi
+    xEnable   := TRUE,
+    AxesGroup := staeubliRobotScara,
+    fromHmi   := fromHmiScara,
+    hmi       := hmiScara
 );
 \end{lstlisting}
 
-\begin{UPSTIinfor}{Pourquoi un type \texttt{THmiInputs} dédié ?}
+\begin{UPSTIinfor}{Pourquoi un type \texttt{THmi} dédié ?}
 \texttt{FB\_ReadHmi} pourrait, en théorie, exposer chaque bit décodé comme
-une sortie \texttt{VAR\_OUTPUT} séparée (\texttt{BOOL} par
-\texttt{BOOL}). Regrouper ces champs dans un \textbf{type structuré}
-dédié, \texttt{THmiInputs}, présente plusieurs avantages concrets :
+une sortie séparée (\texttt{BOOL} par \texttt{BOOL}). Regrouper ces champs
+dans un \textbf{type structuré} dédié, \texttt{THmi}, présente plusieurs
+avantages concrets :
 \begin{itemize}
     \item un \textbf{seul} paramètre suffit pour transmettre l'ensemble
     des informations à une autre partie du programme (une fonction qui
-    gère le mode automatique n'a besoin que d'un argument
-    \texttt{THmiInputs}, pas d'une dizaine de \texttt{BOOL} séparés) ;
+    gère le mode automatique n'a besoin que d'un argument \texttt{THmi},
+    pas d'une dizaine de \texttt{BOOL} séparés) ;
     \item ajouter un nouveau champ (un futur bouton-poussoir) ne change ni
     la signature du bloc ni celle des fonctions qui consomment
-    \texttt{THmiInputs} : seul le corps de \texttt{FB\_ReadHmi} est
-    modifié ;
+    \texttt{THmi} : seul le corps de \texttt{FB\_ReadHmi} est modifié ;
     \item le type documente, par ses noms de champs, la signification de
     chaque information -- contrairement à un tableau de bits anonyme.
 \end{itemize}
@@ -75,51 +99,54 @@ dédié, \texttt{THmiInputs}, présente plusieurs avantages concrets :
 
 \begin{UPSTIinfor}{Attention au sens des contacts}
 Certains champs de \texttt{THmiInputs} correspondent à des contacts à
-ouverture (ex. \texttt{m\_nixStopRequest}, \texttt{m\_nixEmptyTank0}) :
-une valeur \texttt{FALSE} y signifie que la condition surveillée est
-\textbf{active}. \texttt{FB\_ReadHmi} ne fait qu'extraire le bit brut, il
-n'inverse pas son sens -- c'est au programme applicatif d'en tenir
+ouverture (\texttt{m\_nixEmptyTank0}, \texttt{m\_nixEmptyTank4} et
+\texttt{m\_nixStopRequest}, repérés \emph{NC} dans la déclaration du
+type) : une valeur \texttt{FALSE} y signifie que la condition surveillée
+est \textbf{active}. \texttt{FB\_ReadHmi} ne fait qu'extraire le bit brut,
+il n'inverse pas son sens -- c'est au programme applicatif d'en tenir
 compte.
 \end{UPSTIinfor}
 
 \subsection{En écriture}
 
 Le principe est symétrique : le programme applicatif renseigne les champs
-de \texttt{THmiOutputs} (\texttt{m\_qToR} pour les voyants du pupitre,
-\texttt{m\_Screen} pour la supervision écran -- \texttt{m\_iStateGmma},
-\texttt{m\_iCurvSpeed\_mm\_per\_s}, \texttt{m\_a5tankLine}...), puis
-\texttt{FB\_WriteHmi} se charge de reconstituer, à partir de ces champs,
-l'objet brut \texttt{TToHmi} qui sera réellement écrit par le coupleur
-vers le M221.
+de \texttt{hmiScara.m\_Outputs} (\texttt{m\_qToR} pour les voyants du
+pupitre, \texttt{m\_Screen} pour la supervision écran --
+\texttt{m\_iStateGmma}, \texttt{m\_iCurvSpeed\_mm\_per\_s},
+\texttt{m\_a5tankLine}...), puis \texttt{FB\_WriteHmi} se charge de
+reconstituer, à partir de ce champ, l'objet brut \texttt{toHmiScara} (de
+type \texttt{TToHmi}) qui sera réellement écrit par le coupleur vers le
+M221.
 
 \begin{center}
 \begin{tabular}{|l|l|p{7.3cm}|}
 \hline
 \textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
 \hline
-\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
+\texttt{xEnable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
 conversion à ce cycle. \\
 \hline
-\texttt{Outputs} & \texttt{VAR\_INPUT}, \texttt{THmiOutputs} & Objet
-sémantique renseigné par le programme applicatif. \\
+\texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
+Objet du robot, lu par le bloc (même rôle qu'en lecture). \\
 \hline
-\texttt{OUT} & \texttt{VAR\_OUTPUT}, \texttt{TToHmi} & Objet brut produit
-par le bloc, à écrire par le coupleur vers le M221. \\
+\texttt{hmi} & \texttt{VAR\_IN\_OUT}, \texttt{THmi} & Objet sémantique
+partagé : le bloc lit son champ \texttt{m\_Outputs}. \\
 \hline
-\texttt{Error} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale une
-erreur de conversion. \\
+\texttt{toHmi} & \texttt{VAR\_OUTPUT}, \texttt{TToHmi} & Objet brut
+produit par le bloc, à écrire par le coupleur vers le M221. \\
 \hline
 \end{tabular}
 \end{center}
 
-\textbf{Exemple d'appel} (section exécutée en fin de cycle) :
+\textbf{Exemple d'appel}, \textbf{avant} l'appel à
+\texttt{VAL\_WriteAxesGroup} :
 
 \begin{lstlisting}
 InstWriteHmi(
-    Enable  := TRUE,
-    Outputs := hmiOutputsScara,
-    OUT     => toHmiScara,
-    Error   => errorWriteHmi
+    xEnable   := TRUE,
+    AxesGroup := staeubliRobotScara,
+    hmi       := hmiScara,
+    toHmi     => toHmiScara
 );
 \end{lstlisting}
 
@@ -141,4 +168,7 @@ C'est précisément ce que demande l'activité « Déclaration des objets
 \texttt{TFromHmi} et \texttt{TToHmi} » du TP suivant : déclarer, par
 chevauchement/alias, les objets \texttt{fromHmiScara} et
 \texttt{toHmiScara} qui serviront d'entrée/sortie brutes à
-\texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}.}
+\texttt{FB\_ReadHmi} et \texttt{FB\_WriteHmi}. Le TP précise également
+l'ordre d'appel imposé : \texttt{FB\_ReadHmi} \textbf{après}
+\texttt{VAL\_ReadAxesGroup}, \texttt{FB\_WriteHmi} \textbf{avant}
+\texttt{VAL\_WriteAxesGroup}.}

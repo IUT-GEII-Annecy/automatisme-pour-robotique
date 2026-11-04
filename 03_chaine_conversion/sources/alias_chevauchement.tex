@@ -20,40 +20,49 @@ noms et de types porteurs de sens.
 \end{UPSTIinfor}
 
 \textbf{Exemple.} Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
-PFC200 un octet de données à l'adresse \texttt{\%MW10} (poids faible). Si
-le quatrième bit de cet octet correspond au capteur « palette présente »,
-on déclare une variable \texttt{m\_nixPalettePresente} de type
-\texttt{BOOL}, chevauchant précisément le bit~3 de \texttt{\%MW10} :
+PFC200 un mot de données à l'adresse \texttt{\%MW10}. On chevauche
+d'abord ce mot avec une variable \texttt{WORD} nommée (c'est le même
+principe que pour \texttt{iAlpha AT~\%MW1~:~INT} vu en cours) :
 
 \begin{lstlisting}
-m_nixPalettePresente AT %MW10.3 : BOOL;
+guichetIN AT %MW10 : WORD;
+\end{lstlisting}
+
+Si le quatrième bit de ce mot correspond au capteur « palette présente »,
+l'opérateur d'\textbf{extraction de bit} (\texttt{.n}) du langage ST
+donne directement accès à ce bit nommé, sans aucune copie :
+
+\begin{lstlisting}
+m_nixPalettePresente := guichetIN.3;
 \end{lstlisting}
 
 Aucune conversion n'est nécessaire ici : le bit \emph{est} directement
-l'information recherchée, l'alias suffit à lui donner un nom exploitable
-(c'est le cas « à un seul niveau » du PFC200, déjà rencontré en TP1).
-C'est précisément lorsque cela ne suffit plus -- lorsque l'information
-recherchée est encodée sur plusieurs bits, répartie, ou calculée à partir
-d'octets bruts -- qu'un bloc fonctionnel de conversion devient nécessaire,
-comme on le verra dans les sections suivantes pour le M221 et pour la baie
-CS9.
+l'information recherchée, l'alias (associé à l'extraction de bit) suffit
+à lui donner un nom exploitable (c'est le cas « à un seul niveau » du
+PFC200, déjà rencontré en TP1). C'est précisément lorsque cela ne suffit
+plus -- lorsque l'information recherchée est encodée sur plusieurs bits,
+répartie, ou calculée à partir d'octets bruts -- qu'un bloc fonctionnel de
+conversion devient nécessaire, comme on le verra dans les sections
+suivantes pour le M221 et pour la baie CS9.
 
 \begin{UPSTIactivite}[4][Chevauchement sur Schneider M340][][][TD]
 \UPSTIquestion{Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
-PFC200, à l'adresse \texttt{\%MW11}, un octet dont le bit~0 indique l'état
+PFC200, à l'adresse \texttt{\%MW11}, un mot dont le bit~0 indique l'état
 du bouton d'arrêt d'urgence du poste guichet (\texttt{TRUE} = défaut). En
-complétant la déclaration ci-dessous, créer un alias
-\texttt{m\_nixArretUrgenceGuichet} chevauchant ce bit.}
+complétant les lignes ci-dessous, créer l'alias \texttt{guichetIN2} puis
+en extraire le bit concerné dans une variable
+\texttt{m\_nixArretUrgenceGuichet}.}
 
 \begin{lstlisting}
-m_nixArretUrgenceGuichet AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
+guichetIN2 AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
+m_nixArretUrgenceGuichet := (*@\trou{2.4cm}@*);
 \end{lstlisting}
 
-\UPSTIquestion{Le même octet comporte, sur ses bits~1 et~2, un code sur
+\UPSTIquestion{Le même mot comporte, sur ses bits~1 et~2, un code sur
 2~bits indiquant la couleur de la palette détectée (\texttt{00} = absente,
 \texttt{01} = rouge, \texttt{10} = verte, \texttt{11} = bleue). Expliquer
-en une phrase pourquoi un simple alias sur ces deux bits ne permettrait
-\textbf{pas}, à lui seul, d'obtenir directement une variable
+en une phrase pourquoi un alias (même combiné à l'extraction de bit) ne
+permettrait \textbf{pas}, à lui seul, d'obtenir directement une variable
 \texttt{m\_couleurPalette} de type énuméré portant les noms
 \texttt{ROUGE}/\texttt{VERTE}/\texttt{BLEUE}/\texttt{ABSENTE} : quelle
 étape supplémentaire serait alors nécessaire ?}

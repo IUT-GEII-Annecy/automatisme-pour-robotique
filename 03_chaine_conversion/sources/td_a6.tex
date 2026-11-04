@@ -18,13 +18,72 @@ sans jamais entraver la circulation des palettes sur le convoyeur :
     \item monter l'axe \textbf{J3} (vertical) jusqu'à $Z=150\;\text{mm}$,
     sans modifier la position courante des autres axes ;
     \item rejoindre ensuite la position cartésienne complète
-    $(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$ par une commande de
-    mouvement de type articulaire.
+    $(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$.
 \end{enumerate}
 
 Si un arrêt est demandé par l'opérateur pendant ce mode, le robot doit
 être immobilisé (sans perdre la puissance) puis reprendre sa course dès
-que la demande d'arrêt n'est plus active.
+que la demande d'arrêt n'est plus active. Ce bouton est accessible dans
+l'objet \texttt{hmiScara} via
+\texttt{hmiScara.m\_Inputs.m\_nixStopRequest} : comme rappelé en
+section~\ref{secConversionHmi}, ce contact est à ouverture (\emph{NC}),
+donc un arrêt est \textbf{demandé} lorsque ce booléen vaut
+\texttt{FALSE}.
+
+\subsection{Blocs utilisés dans ce TD}
+
+Les blocs \texttt{MC\_} de contrôle et de commande de mouvement partagent
+tous le même objet \texttt{AxesGroup} (\texttt{T\_StaeubliRobot}, déjà
+lu/écrit par \texttt{VAL\_ReadAxesGroup}/\texttt{VAL\_WriteAxesGroup}) et
+un squelette d'entrées/sorties commun :
+
+\begin{center}
+\begin{tabular}{|l|l|p{7.5cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
+\hline
+\texttt{Execute} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Déclenche
+l'exécution sur \textbf{front montant}. \\
+\hline
+\texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
+Objet du robot, commun à tous les blocs \texttt{MC\_}. \\
+\hline
+\texttt{Busy} / \texttt{Done} / \texttt{Error} & \texttt{VAR\_OUTPUT},
+\texttt{BOOL} & En cours d'exécution / terminé avec succès / terminé en
+erreur. \\
+\hline
+\end{tabular}
+\end{center}
+
+Les blocs de \textbf{mouvement} (\texttt{MC\_MoveLinearAbsolute},
+\texttt{MC\_MoveDirectAbsolute}) ajoutent notamment, en \texttt{VAR\_INPUT} :
+\texttt{Position} (\texttt{T\_CartesianPos}, la cible), \texttt{Velocity},
+\texttt{Acceleration}, \texttt{Deceleration} (en~\% de la valeur
+nominale), \texttt{CartesianVel}/\texttt{RotationalVel} (vitesses max. du
+TCP) et \texttt{CoordSystem}/\texttt{ToolNumber} (repère et outil utilisés
+-- \texttt{0} désigne respectivement le repère \texttt{world} et l'outil
+\texttt{flange}).
+
+\texttt{MC\_GroupPower} n'a qu'une entrée \texttt{Enable} (pas
+\texttt{Execute}) et une seule sortie \texttt{Status} (état effectif de la
+puissance) en plus d'\texttt{Error}/\texttt{ErrorID} -- il n'a pas de
+notion de front, le bras reste sous/hors puissance tant que
+\texttt{Enable} est à \texttt{TRUE}/\texttt{FALSE}.
+
+\texttt{MC\_GroupInterrupt} et \texttt{MC\_GroupContinue} suivent le
+squelette commun (\texttt{Execute}, \texttt{AxesGroup}, \texttt{Busy},
+\texttt{Done}, \texttt{Error}) : le premier arrête le mouvement en cours
+\emph{sans} vider la pile de commandes, le second relance l'exécution de
+cette pile.
+
+\UPSTIremarque[Objet \texttt{TCtrlStatusGroup}]{Par souci de lisibilité,
+les sorties \texttt{Busy}/\texttt{Done}/\texttt{Error}/\texttt{ErrorID} de
+ces blocs sont habituellement regroupées, lors de l'appel, dans un objet
+de type \texttt{TCtrlStatusGroup} (champs \texttt{m\_xEnable},
+\texttt{m\_xBusy}, \texttt{m\_xDone}, \texttt{m\_xError},
+\texttt{m\_udiErrorID}, \texttt{m\_xTimeOut}) -- même logique que pour
+\texttt{THmi} en section~\ref{secConversionHmi} : un seul objet nommé
+plutôt que de nombreuses variables éparpillées.}
 
 \subsection{Niveau 1 -- Compléter les blocs de conversion}
 
@@ -74,19 +133,21 @@ InstGroupPowerA6(
 séquence de mouvement. Deux blocs \texttt{MC\_} vus en TP peuvent
 convenir : \texttt{MC\_MoveLinearAbsolute} (mouvement linéaire) et
 \texttt{MC\_MoveDirectAbsolute} (interpolation articulaire vers une
-position cartésienne).
+position cartésienne cible).
 
 \begin{UPSTIactivite}[4][Étape 1 -- monter l'axe J3][][][TD]
 \UPSTIquestion{L'énoncé demande de monter l'axe \textbf{J3} à
 $Z=150\;\text{mm}$ \textbf{sans modifier la position courante des autres
-axes}, par une commande de mouvement \textbf{articulaire}. Sur un robot
-Scara, l'axe J3 est l'axe vertical : une cible cartésienne qui ne change
-que $Z$, en conservant $X$, $Y$, $RX$, $RY$, $RZ$ courants, produit
-exactement ce déplacement.
+axes}. Sur un robot Scara, l'axe J3 est l'axe vertical : une cible
+cartésienne qui ne change que $Z$, en conservant $X$, $Y$, $RX$, $RY$,
+$RZ$ courants, produit exactement ce déplacement.
 
 \begin{enumerate}
-    \item Quel bloc \texttt{MC\_} vu en TP choisissez-vous pour cette
-    étape ? Justifier.
+    \item Entre \texttt{MC\_MoveLinearAbsolute} et
+    \texttt{MC\_MoveDirectAbsolute}, quel bloc choisissez-vous pour cette
+    étape ? Justifier à partir de la trajectoire que doit suivre l'outil
+    (une translation verticale pure, sans contrainte angulaire
+    particulière).
     \item Écrire, en complétant le squelette ci-dessous, l'instanciation
     et l'appel de ce bloc. La position cible utilisera les coordonnées
     \textbf{courantes} du robot pour $X$, $Y$, $RX$, $RY$, $RZ$ (déjà
@@ -109,19 +170,22 @@ targetPosA6Etape1.RZ := (* A_COMPLETER *);
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Étape 2 -- rejoindre la position de référence][][][TD]
-\UPSTIquestion{Écrire entièrement l'appel du bloc \texttt{MC\_} permettant
-de rejoindre la position de référence
-$(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$, par une commande de
-mouvement articulaire. Vous déclarerez vous-même l'instance du bloc, la
-variable de position cible, et le \texttt{TCtrlStatusGroup} associé.}
+\UPSTIquestion{La position de référence
+$(X=90,\ Y=-410,\ Z=150,\ RX=-180,\ RY=0,\ RZ=0)$ doit être rejointe par
+une commande de mouvement \textbf{articulaire} (imposée par l'énoncé du
+mode A6, contrairement à l'étape~1 où le choix était à justifier). Écrire
+entièrement l'appel du bloc \texttt{MC\_} correspondant. Vous déclarerez
+vous-même l'instance du bloc et la variable de position cible.}
 \vspace{6cm}
 \end{UPSTIactivite}
 
 \begin{UPSTIactivite}[4][Gestion de l'arrêt demandé][][][TD]
 \UPSTIquestion{Parmi les blocs \texttt{MC\_GroupInterrupt} et
 \texttt{MC\_GroupContinue} vus en TP, lequel utiliser pour immobiliser le
-robot sans perdre la puissance lorsque \texttt{StopRequest} est actif, et
-lequel pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
-conditions d'appel (sans écrire l'instanciation complète des blocs).}
+robot sans perdre la puissance lorsqu'un arrêt est demandé, et lequel
+pour reprendre la course lorsqu'il ne l'est plus ? Rédiger les deux
+conditions d'appel (sur l'entrée \texttt{Execute} de chaque bloc, sans
+écrire l'instanciation complète), en utilisant
+\texttt{hmiScara.m\_Inputs.m\_nixStopRequest}.}
 \vspace{4cm}
 \end{UPSTIactivite}
