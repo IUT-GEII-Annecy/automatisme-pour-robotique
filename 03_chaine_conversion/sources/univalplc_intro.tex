@@ -52,12 +52,27 @@ préparer une commande qui sera transmise par \texttt{VAL\_WriteAxesGroup}.
 \end{UPSTIinfor}
 
 \begin{UPSTIactivite}[4][Client, serveur et familles de blocs][][][TD]
-\UPSTIquestion{Pour chacun des blocs suivants, indiquer s'il appartient à
-la famille \texttt{VAL\_} (spécifique \texttt{uniVALplc}) ou à la famille
-\texttt{MC\_} (PLCopen), et s'il est exécuté côté client (M340) ou côté
-serveur (CS9) : \texttt{VAL\_ReadWriteIO}, \texttt{MC\_GroupPower},
-\texttt{VAL\_ShiftPoint}, \texttt{MC\_GroupReset},
-\texttt{MC\_MoveLinearAbsolute}.}
+\UPSTIquestion{Les blocs \texttt{VAL\_} \textbf{et} les blocs \texttt{MC\_}
+s'exécutent tous les deux côté \textbf{client}, dans le programme Control
+Expert de l'automate M340 : aucun des deux ne \og tourne\fg{} sur la baie
+CS9. Expliquer alors, en une phrase, ce que \textbf{le serveur
+\texttt{uniVALplc}} (sur la CS9) apporte réellement dans cette
+architecture, si ce n'est pas d'exécuter lui-même les blocs.}
+\UPSTIquadrillage{3}
+
+\UPSTIquestion{Pour chacune des tâches suivantes, indiquer si elle relève
+de la famille \texttt{VAL\_} ou de la famille \texttt{MC\_}, en
+justifiant par le \textbf{rôle} de chaque famille (et non en devinant le
+nom du bloc) :
+\begin{enumerate}
+    \item calculer une position décalée par rapport à un point de
+    référence enregistré dans le contrôleur CS9 ;
+    \item commander un déplacement linéaire absolu du TCP vers une
+    position cartésienne donnée ;
+    \item accéder directement, depuis l'automate, à une entrée/sortie
+    physique de la baie CS9, indépendamment de tout mouvement ;
+    \item remettre le groupe d'axes sous puissance après un arrêt.
+\end{enumerate}}
 \UPSTIquadrillage{4}
 
 \UPSTIquestion{Après une intervention de maintenance, l'automate M340
