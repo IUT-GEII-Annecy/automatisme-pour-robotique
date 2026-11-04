@@ -19,6 +19,40 @@ qu'à travers les blocs \texttt{VAL\_ReadAxesGroup} et
     \texttt{T\_StaeubliRobot} dont les champs ont un sens explicite.
 \end{enumerate}
 
+\begin{center}
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
+\hline
+\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la lecture
+à ce cycle. \\
+\hline
+\texttt{IN} & \texttt{VAR\_INPUT}, \texttt{T\_FromRobot} & Objet brut,
+chevauchant la zone \texttt{\%MW} image des données reçues de la CS9. \\
+\hline
+\texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
+Objet sémantique partagé, dont le sous-objet \texttt{Status} est mis à
+jour par le bloc (voir remarque ci-dessous sur le \texttt{VAR\_IN\_OUT}). \\
+\hline
+\texttt{Error}, \texttt{ErrorID} & \texttt{VAR\_OUTPUT} & Signalent une
+erreur de conversion et son code. \\
+\hline
+\texttt{Timeout} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale une
+absence de rafraîchissement de \texttt{IN} dans le délai attendu. \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Exemple d'appel} (section exécutée en tout début de cycle) :
+
+\begin{lstlisting}
+InstReadAxesGroup(
+    Enable    := TRUE,
+    AxesGroup := staeubliRobotScara,
+    IN        := fromRobotScara
+);
+\end{lstlisting}
+
 \texttt{T\_StaeubliRobot} se compose de trois sous-objets :
 
 \begin{center}
@@ -83,6 +117,37 @@ Une fois les ordres déposés dans \texttt{T\_StaeubliRobot}
 sérialise ces informations vers l'objet brut \texttt{OUT} (de type
 \texttt{T\_ToRobot}), qui est ensuite physiquement transmis à la baie CS9
 par le coupleur, via l'alias \texttt{toRobotScara}.
+
+\begin{center}
+\begin{tabular}{|l|l|p{7cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
+\hline
+\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active l'écriture
+à ce cycle. \\
+\hline
+\texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
+Objet sémantique partagé, lu par le bloc pour construire \texttt{OUT}. \\
+\hline
+\texttt{OUT} & \texttt{VAR\_OUTPUT}, \texttt{T\_ToRobot} & Objet brut
+produit par le bloc, à écrire par le coupleur vers la CS9. \\
+\hline
+\texttt{Error}, \texttt{ErrorID} & \texttt{VAR\_OUTPUT} & Signalent une
+erreur de conversion et son code. \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Exemple d'appel} (section exécutée en toute fin de cycle, après
+tous les blocs \texttt{MC\_}) :
+
+\begin{lstlisting}
+InstWriteAxesGroup(
+    Enable    := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
+    AxesGroup := staeubliRobotScara,
+    OUT       => toRobotScara
+);
+\end{lstlisting}
 
 \begin{UPSTIidee}{Toujours la même structure en trois temps}
 On retrouve, dans l'ordre, les trois étapes suivantes :

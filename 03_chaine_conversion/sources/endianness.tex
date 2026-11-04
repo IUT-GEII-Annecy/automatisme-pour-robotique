@@ -1,0 +1,70 @@
+\section{Ordre des octets : \emph{big endian} et \emph{little endian}}
+\label{secEndianness}
+
+Dès qu'une information occupe \textbf{plusieurs octets} (un entier
+16~ou~32~bits, une position cartésienne codée en réel), la conversion ne
+se limite plus au découpage bit à bit vu dans la section précédente : il
+faut aussi savoir dans quel \textbf{ordre} ranger ces octets en mémoire.
+
+\begin{UPSTIinfor}{\emph{Big endian} / \emph{little endian}}
+Pour une donnée multi-octets, deux conventions existent :
+\begin{itemize}
+    \item \textbf{Big endian} : l'octet de poids \textbf{fort} est stocké
+    en premier (à l'adresse la plus basse).
+    \item \textbf{Little endian} : l'octet de poids \textbf{faible} est
+    stocké en premier.
+\end{itemize}
+Deux équipements qui échangent une donnée multi-octets doivent
+s'accorder sur cette convention, sous peine de lire une valeur
+totalement erronée bien que chaque octet, pris isolément, ait été reçu
+correctement.
+\end{UPSTIinfor}
+
+\textbf{Exemple.} La valeur entière \texttt{0x1234} (4660 en décimal),
+codée sur 2~octets, est rangée ainsi :
+
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+ & \textbf{Octet à l'adresse $n$} & \textbf{Octet à l'adresse $n+1$} \\
+\hline
+Big endian & \texttt{0x12} & \texttt{0x34} \\
+\hline
+Little endian & \texttt{0x34} & \texttt{0x12} \\
+\hline
+\end{tabular}
+\end{center}
+
+Un équipement qui interprèterait en \emph{big endian} une donnée envoyée
+en \emph{little endian} lirait \texttt{0x3412} (13330) au lieu de
+\texttt{0x1234} (4660).
+
+\begin{UPSTIinfor}{Application sur la cellule : configuration du serveur uniVALplc}
+Le contrôleur CS9 du robot encode les données échangées via le serveur
+\texttt{uniVALplc} selon l'ordre d'octets attendu par le client. Comme
+l'automate client de la cellule est un \textbf{M340 de Schneider}
+(processeur little endian), l'option \textbf{\emph{Little Endian}} a été
+sélectionnée lors de l'installation du serveur \texttt{uniVALplc} sur la
+baie CS9 : sans cette configuration, tous les champs numériques
+multi-octets de \texttt{T\_StaeubliRobot} (vitesses, positions
+cartésiennes, compteurs...) seraient mal interprétés par le programme
+Control Expert, même si les blocs \texttt{VAL\_ReadAxesGroup} et
+\texttt{VAL\_WriteAxesGroup} sont correctement appelés.
+\end{UPSTIinfor}
+
+\begin{UPSTIactivite}[4][Lecture d'une valeur multi-octets][][][TD]
+\UPSTIquestion{Le champ \texttt{Status.ActualSpeed} de
+\texttt{T\_StaeubliRobot} est codé sur 2~octets. Le coupleur
+\texttt{NOC\_ETHIP\_ROBOT} reçoit, dans l'ordre, les deux octets
+\texttt{0x64} puis \texttt{0x00}. Sachant que le serveur
+\texttt{uniVALplc} a été configuré en \emph{little endian}, calculer la
+valeur numérique (en décimal) de \texttt{Status.ActualSpeed}.}
+
+\UPSTIquestion{Un collègue, en reprenant la configuration du serveur sur
+une autre cellule, a par erreur laissé l'option \emph{Big Endian} (valeur
+par défaut du serveur). Quelle valeur le programme Control Expert
+lirait-il alors pour \texttt{Status.ActualSpeed}, à partir des mêmes
+octets \texttt{0x64} puis \texttt{0x00} ? Ce défaut de configuration
+serait-il facile à détecter au premier démarrage de la cellule ?
+Justifier.}
+\end{UPSTIactivite}

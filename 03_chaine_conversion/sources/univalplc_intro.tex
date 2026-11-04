@@ -1,0 +1,52 @@
+\section{Architecture \texttt{uniVALplc}}
+\label{secUnivalplcIntro}
+
+La conversion des données du robot (section~\ref{secConversionRobot})
+repose sur une architecture logicielle particulière, propre à Stäubli,
+qu'il faut rappeler avant d'en détailler les blocs fonctionnels.
+
+\begin{UPSTIinfor}{Architecture client/serveur \texttt{uniVALplc}}
+\begin{description}
+    \item[Serveur] Installé sur le contrôleur \textbf{CS9} du robot. Il
+    répond aux commandes reçues de l'automate M340 via Ethernet/IP, les
+    interprète et génère les mouvements correspondants. Il peut faire
+    référence à des objets internes du contrôleur CS9 (points, outils,
+    repères...).
+    \item[Client] Bibliothèque de blocs fonctionnels fournie par le
+    fabricant de l'automate (ici Schneider, pour Control Expert). C'est
+    cette bibliothèque qui expose les blocs \texttt{VAL\_} et les types
+    associés (\texttt{T\_FromRobot}, \texttt{T\_StaeubliRobot}...)
+    utilisés dans ce document.
+\end{description}
+\end{UPSTIinfor}
+
+Pour que cette intégration fonctionne, deux conditions de configuration
+doivent être respectées (indépendamment des blocs eux-mêmes) :
+
+\begin{itemize}
+    \item l'ordre des octets (\emph{endianness}, section~\ref{secEndianness})
+    configuré sur le serveur doit correspondre à celui de l'automate
+    client ;
+    \item le sélecteur de mode de marche du robot (pupitre \texttt{WMS9})
+    doit être positionné sur \textbf{« Commande à distance »}, sans quoi
+    les commandes envoyées par l'automate sont ignorées par le serveur.
+\end{itemize}
+
+\begin{UPSTIinfor}{Deux familles de blocs pour commander le robot}
+Comme rappelé en section~\ref{secRappelBlocsFonctionnels}, les blocs
+disponibles pour agir sur le robot se répartissent en deux familles :
+\begin{itemize}
+    \item les blocs \texttt{VAL\_}, spécifiques à \texttt{uniVALplc}, qui
+    donnent accès aux fonctionnalités propres au serveur (lecture/écriture
+    de l'état global, accès direct aux E/S de la baie CS9 via
+    \texttt{VAL\_ReadWriteIO}, calcul de positions relatives via
+    \texttt{VAL\_ShiftPoint}) ;
+    \item les blocs \texttt{MC\_}, conformes au standard \textbf{PLCopen},
+    qui commandent les mouvements et l'état du groupe d'axes de façon
+    normalisée (indépendante du fabricant de robot).
+\end{itemize}
+Les deux familles partagent le \textbf{même} objet \texttt{AxesGroup}
+(\texttt{T\_StaeubliRobot}) : c'est ce partage qui permet à un bloc
+\texttt{MC\_} de connaître l'état lu par \texttt{VAL\_ReadAxesGroup} et de
+préparer une commande qui sera transmise par \texttt{VAL\_WriteAxesGroup}.
+\end{UPSTIinfor}

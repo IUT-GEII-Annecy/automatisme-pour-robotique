@@ -1,0 +1,60 @@
+\section{Alias et chevauchement mémoire}
+\label{secAliasChevauchement}
+
+Avant de pouvoir convertir quoi que ce soit, il faut d'abord pouvoir
+\textbf{nommer} la zone mémoire brute échangée avec le réseau. C'est le
+rôle de l'\textbf{alias}.
+
+\begin{UPSTIinfor}{Alias et chevauchement mémoire}
+Sous Control Expert, une variable peut être déclarée par
+\textbf{chevauchement} (\emph{overlap}) d'une autre : elle occupe alors
+exactement le même espace mémoire que la variable qu'elle chevauche, sans
+qu'aucune copie ne soit effectuée. On parle d'\textbf{alias} parce que les
+deux variables désignent le même contenu physique sous deux noms et,
+éventuellement, deux types différents.
+
+Cette technique est indispensable chaque fois qu'un coupleur réseau
+(comme le \texttt{BMX~NOC~0401.2}) ne connaît que des zones \texttt{\%MW}
+génériques, numérotées, alors que le programme applicatif a besoin de
+noms et de types porteurs de sens.
+\end{UPSTIinfor}
+
+\textbf{Exemple.} Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
+PFC200 un octet de données à l'adresse \texttt{\%MW10} (poids faible). Si
+le quatrième bit de cet octet correspond au capteur « palette présente »,
+on déclare une variable \texttt{m\_nixPalettePresente} de type
+\texttt{BOOL}, chevauchant précisément le bit~3 de \texttt{\%MW10} :
+
+\begin{lstlisting}
+m_nixPalettePresente AT %MW10.3 : BOOL;
+\end{lstlisting}
+
+Aucune conversion n'est nécessaire ici : le bit \emph{est} directement
+l'information recherchée, l'alias suffit à lui donner un nom exploitable
+(c'est le cas « à un seul niveau » du PFC200, déjà rencontré en TP1).
+C'est précisément lorsque cela ne suffit plus -- lorsque l'information
+recherchée est encodée sur plusieurs bits, répartie, ou calculée à partir
+d'octets bruts -- qu'un bloc fonctionnel de conversion devient nécessaire,
+comme on le verra dans les sections suivantes pour le M221 et pour la baie
+CS9.
+
+\begin{UPSTIactivite}[4][Chevauchement sur Schneider M340][][][TD]
+\UPSTIquestion{Le coupleur \texttt{NOC\_ETHIP\_CONVOYEUR} reçoit du
+PFC200, à l'adresse \texttt{\%MW11}, un octet dont le bit~0 indique l'état
+du bouton d'arrêt d'urgence du poste guichet (\texttt{TRUE} = défaut). En
+complétant la déclaration ci-dessous, créer un alias
+\texttt{m\_nixArretUrgenceGuichet} chevauchant ce bit.}
+
+\begin{lstlisting}
+m_nixArretUrgenceGuichet AT (*@\trou{2.2cm}@*) : (*@\trou{1.4cm}@*);
+\end{lstlisting}
+
+\UPSTIquestion{Le même octet comporte, sur ses bits~1 et~2, un code sur
+2~bits indiquant la couleur de la palette détectée (\texttt{00} = absente,
+\texttt{01} = rouge, \texttt{10} = verte, \texttt{11} = bleue). Expliquer
+en une phrase pourquoi un simple alias sur ces deux bits ne permettrait
+\textbf{pas}, à lui seul, d'obtenir directement une variable
+\texttt{m\_couleurPalette} de type énuméré portant les noms
+\texttt{ROUGE}/\texttt{VERTE}/\texttt{BLEUE}/\texttt{ABSENTE} : quelle
+étape supplémentaire serait alors nécessaire ?}
+\end{UPSTIactivite}

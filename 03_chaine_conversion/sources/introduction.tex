@@ -31,10 +31,15 @@ programme.
 Ce document traite cette chaîne de conversion dans l'ordre suivant :
 
 \begin{enumerate}
+    \item un rappel sur la nature des blocs fonctionnels, et sur l'intérêt
+    de l'alias/chevauchement mémoire et de l'ordre des octets (\emph{big}/
+    \emph{little endian}) -- notions transversales nécessaires à tout ce
+    qui suit ;
     \item le contrôleur \textbf{M221} (blocs \texttt{FB\_ReadHmi} et
     \texttt{FB\_WriteHmi}), le cas le plus simple des deux ;
-    \item la baie \textbf{CS9} (blocs \texttt{VAL\_ReadAxesGroup} et
-    \texttt{VAL\_WriteAxesGroup}), plus riche ;
+    \item l'architecture \texttt{uniVALplc} et la baie \textbf{CS9}
+    (blocs \texttt{VAL\_ReadAxesGroup} et \texttt{VAL\_WriteAxesGroup}),
+    plus riche ;
     \item un schéma de synthèse comparant les trois chaînes de conversion
     rencontrées (PFC200, M221, CS9) ;
     \item un TD d'application, sur la mise en œuvre du mode GEMMA

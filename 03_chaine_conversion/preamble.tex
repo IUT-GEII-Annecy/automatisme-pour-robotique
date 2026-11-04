@@ -2,3 +2,16 @@
 \newcommand{\UPSTItitre}{De la donnée NOC au bloc fonctionnel : comprendre la chaîne de conversion}
 \newcommand{\UPSTItitreEnTetePages}{Chaîne de conversion NOC -- Code applicatif}
 \newcommand{\UPSTIsousTitreEnTete}{Préparation -- HMI et robot}
+
+% Trou de complétion inséré DANS un listing, au point exact où l'étudiant
+% doit écrire (même principe que dans le DS1 S1) : escapeinside dédié à ce
+% document, avec un délimiteur `(*@...@*)` qui ne peut pas être confondu
+% avec un commentaire ST normal `(* ... *)`.
+\lstset{escapeinside={(*@}{@*)}}
+\newcommand{\trou}[1]{%
+    \tikz[baseline=(trou.base)]{%
+        \node[draw=gray!70, dashed, rounded corners=2pt, inner sep=2pt,
+              minimum width=#1, minimum height=1.6em, fill=white,
+              anchor=base] (trou) {\strut};%
+    }%
+}

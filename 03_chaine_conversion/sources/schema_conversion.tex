@@ -23,43 +23,43 @@ fonctionnel de conversion).
         ]
 
         % --- Ligne 1 : PFC200 (rappel, un seul niveau) ---
-        \node[rowlabel] (lbl1) at (-5.3, 4) {PFC200\\(déjà vu)};
-        \node[noc]  (noc1)  at (-3.2, 4) {NOC};
-        \node[brut] (mw1)   at ( 0,   4) {\texttt{\%MW}\\(brut = sémantique)};
-        \node[sem]  (code1) at ( 3.2, 4) {Code\\\texttt{nixAid}, \texttt{nqxBE}...};
+        \node[rowlabel] (lbl1) at (-6.3, 4) {PFC200\\(déjà vu)};
+        \node[noc]  (noc1)  at (-3.8, 4) {NOC};
+        \node[brut] (mw1)   at (-0.9,   4) {\texttt{\%MW}\\(brut = sémantique)};
+        \node[sem]  (code1) at ( 2.9, 4) {Code\\\texttt{nixAid}, \texttt{nqxBE}...};
         \draw[lien] (noc1) -- (mw1);
         \draw[lien] (mw1) -- (code1);
 
         % --- Ligne 2 : M221 (HMI) ---
-        \node[rowlabel] (lbl2) at (-5.3, 2) {M221\\(HMI)};
-        \node[noc]  (noc2)  at (-3.2, 2) {NOC};
-        \node[brut] (mw2)   at (-0.6, 2) {\texttt{\%MW}\\\texttt{TFromHmi}};
-        \node[fb]   (fb2)   at ( 2,   2) {\texttt{FB\_ReadHmi}};
-        \node[sem]  (code2) at ( 5.2, 2) {Code\\\texttt{THmiInputs}};
+        \node[rowlabel] (lbl2) at (-6.3, 2) {M221\\(HMI)};
+        \node[noc]  (noc2)  at (-3.8, 2) {NOC};
+        \node[brut] (mw2)   at (-0.9, 2) {\texttt{\%MW}\\\texttt{TFromHmi}};
+        \node[fb]   (fb2)   at ( 2.3, 2) {\texttt{FB\_ReadHmi}};
+        \node[sem]  (code2) at ( 5.8, 2) {Code\\\texttt{THmiInputs}};
         \draw[lien] (noc2) -- (mw2);
         \draw[lien] (mw2) -- (fb2);
         \draw[lien] (fb2) -- (code2);
 
-        \node[sem]  (code2b) at ( 5.2, 0.9) {Code\\\texttt{THmiOutputs}};
-        \node[fb]   (fb2b)   at ( 2,   0.9) {\texttt{FB\_WriteHmi}};
-        \node[brut] (mw2b)   at (-0.6, 0.9) {\texttt{\%MW}\\\texttt{TToHmi}};
+        \node[sem]  (code2b) at ( 5.8, 0.6) {Code\\\texttt{THmiOutputs}};
+        \node[fb]   (fb2b)   at ( 2.3, 0.6) {\texttt{FB\_WriteHmi}};
+        \node[brut] (mw2b)   at (-0.9, 0.6) {\texttt{\%MW}\\\texttt{TToHmi}};
         \draw[lien] (code2b) -- (fb2b);
         \draw[lien] (fb2b) -- (mw2b);
         \draw[lien] (mw2b) -- (noc2);
 
         % --- Ligne 3 : CS9 (robot) ---
-        \node[rowlabel] (lbl3) at (-5.3, -0.9) {CS9\\(robot)};
-        \node[noc]  (noc3)  at (-3.2, -0.9) {NOC};
-        \node[brut] (mw3)   at (-0.6, -0.9) {\texttt{\%MW}\\\texttt{T\_FromRobot}};
-        \node[fb]   (fb3)   at ( 2,   -0.9) {\texttt{VAL\_Read-}\\\texttt{AxesGroup}};
-        \node[sem]  (code3) at ( 5.2, -0.9) {\texttt{T\_StaeubliRobot}\\(\texttt{Status})};
+        \node[rowlabel] (lbl3) at (-6.3, -1.1) {CS9\\(robot)};
+        \node[noc]  (noc3)  at (-3.8, -1.1) {NOC};
+        \node[brut] (mw3)   at (-0.9, -1.1) {\texttt{\%MW}\\\texttt{T\_FromRobot}};
+        \node[fb]   (fb3)   at ( 2.3, -1.1) {\texttt{VAL\_Read-}\\\texttt{AxesGroup}};
+        \node[sem]  (code3) at ( 5.8, -1.1) {\texttt{T\_StaeubliRobot}\\(\texttt{Status})};
         \draw[lien] (noc3) -- (mw3);
         \draw[lien] (mw3) -- (fb3);
         \draw[lien] (fb3) -- (code3);
 
-        \node[sem]  (ordres) at ( 5.2, -2.3) {Ordres\\(\texttt{Command}, blocs \texttt{MC\_})};
-        \node[fb]   (fb3b)   at ( 2,   -2.3) {\texttt{VAL\_Write-}\\\texttt{AxesGroup}};
-        \node[brut] (mw3b)   at (-0.6, -2.3) {\texttt{\%MW}\\\texttt{T\_ToRobot}};
+        \node[sem]  (ordres) at ( 5.8, -2.7) {Ordres\\(\texttt{Command}, blocs \texttt{MC\_})};
+        \node[fb]   (fb3b)   at ( 2.3, -2.7) {\texttt{VAL\_Write-}\\\texttt{AxesGroup}};
+        \node[brut] (mw3b)   at (-0.9, -2.7) {\texttt{\%MW}\\\texttt{T\_ToRobot}};
         \draw[lien] (code3) -- (ordres);
         \draw[lien] (ordres) -- (fb3b);
         \draw[lien] (fb3b) -- (mw3b);

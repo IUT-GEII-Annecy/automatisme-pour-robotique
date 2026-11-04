@@ -21,6 +21,58 @@ ils doivent être lus et écrits à travers les blocs fonctionnels maison
     \texttt{m\_nixStopRequest}...
 \end{enumerate}
 
+\texttt{FB\_ReadHmi} expose les entrées/sorties suivantes :
+
+\begin{center}
+\begin{tabular}{|l|l|p{7.3cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
+\hline
+\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
+conversion à ce cycle (en général, toujours \texttt{TRUE}). \\
+\hline
+\texttt{IN} & \texttt{VAR\_INPUT}, \texttt{TFromHmi} & Objet brut,
+chevauchant la zone \texttt{\%MW} image des données reçues du M221. \\
+\hline
+\texttt{Inputs} & \texttt{VAR\_OUTPUT}, \texttt{THmiInputs} & Objet
+sémantique mis à jour par le bloc, exploitable par le reste du programme. \\
+\hline
+\texttt{Error} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale une
+erreur de conversion (ex. taille de \texttt{IN} incohérente). \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Exemple d'appel} (section exécutée en tout début de cycle) :
+
+\begin{lstlisting}
+InstReadHmi(
+    Enable := TRUE,
+    IN     := fromHmiScara,
+    Inputs => hmiInputsScara,
+    Error  => errorReadHmi
+);
+\end{lstlisting}
+
+\begin{UPSTIinfor}{Pourquoi un type \texttt{THmiInputs} dédié ?}
+\texttt{FB\_ReadHmi} pourrait, en théorie, exposer chaque bit décodé comme
+une sortie \texttt{VAR\_OUTPUT} séparée (\texttt{BOOL} par
+\texttt{BOOL}). Regrouper ces champs dans un \textbf{type structuré}
+dédié, \texttt{THmiInputs}, présente plusieurs avantages concrets :
+\begin{itemize}
+    \item un \textbf{seul} paramètre suffit pour transmettre l'ensemble
+    des informations à une autre partie du programme (une fonction qui
+    gère le mode automatique n'a besoin que d'un argument
+    \texttt{THmiInputs}, pas d'une dizaine de \texttt{BOOL} séparés) ;
+    \item ajouter un nouveau champ (un futur bouton-poussoir) ne change ni
+    la signature du bloc ni celle des fonctions qui consomment
+    \texttt{THmiInputs} : seul le corps de \texttt{FB\_ReadHmi} est
+    modifié ;
+    \item le type documente, par ses noms de champs, la signification de
+    chaque information -- contrairement à un tableau de bits anonyme.
+\end{itemize}
+\end{UPSTIinfor}
+
 \begin{UPSTIinfor}{Attention au sens des contacts}
 Certains champs de \texttt{THmiInputs} correspondent à des contacts à
 ouverture (ex. \texttt{m\_nixStopRequest}, \texttt{m\_nixEmptyTank0}) :
@@ -39,6 +91,37 @@ de \texttt{THmiOutputs} (\texttt{m\_qToR} pour les voyants du pupitre,
 \texttt{FB\_WriteHmi} se charge de reconstituer, à partir de ces champs,
 l'objet brut \texttt{TToHmi} qui sera réellement écrit par le coupleur
 vers le M221.
+
+\begin{center}
+\begin{tabular}{|l|l|p{7.3cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
+\hline
+\texttt{Enable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
+conversion à ce cycle. \\
+\hline
+\texttt{Outputs} & \texttt{VAR\_INPUT}, \texttt{THmiOutputs} & Objet
+sémantique renseigné par le programme applicatif. \\
+\hline
+\texttt{OUT} & \texttt{VAR\_OUTPUT}, \texttt{TToHmi} & Objet brut produit
+par le bloc, à écrire par le coupleur vers le M221. \\
+\hline
+\texttt{Error} & \texttt{VAR\_OUTPUT}, \texttt{BOOL} & Signale une
+erreur de conversion. \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Exemple d'appel} (section exécutée en fin de cycle) :
+
+\begin{lstlisting}
+InstWriteHmi(
+    Enable  := TRUE,
+    Outputs := hmiOutputsScara,
+    OUT     => toHmiScara,
+    Error   => errorWriteHmi
+);
+\end{lstlisting}
 
 \begin{UPSTIidee}{Trois temps, toujours dans le même ordre}
 On retrouve, dans l'ordre, les trois étapes suivantes :

@@ -1,0 +1,54 @@
+\section{Rappel : fonctions et blocs fonctionnels}
+\label{secRappelBlocsFonctionnels}
+
+Les chaînes de conversion étudiées dans ce document reposent sur des
+\textbf{blocs fonctionnels} (\emph{function blocks}, norme IEC~61131-3).
+Avant d'aller plus loin, il est utile d'en rappeler la nature exacte et de
+la comparer à celle d'une simple fonction.
+
+\begin{UPSTIinfor}{Fonction ou bloc fonctionnel ?}
+\begin{description}
+    \item[Fonction] Ne possède \textbf{aucune mémoire} entre deux appels :
+    son résultat ne dépend que des arguments fournis à l'appel en cours.
+    Elle ne peut retourner qu'une seule valeur (éventuellement composée),
+    directement, par son nom.
+    \item[Bloc fonctionnel] Est \textbf{instancié} (une variable, de type
+    bloc fonctionnel, doit être déclarée) et \textbf{conserve un état}
+    entre deux appels successifs : fronts montants mémorisés, étapes d'une
+    temporisation, dernière erreur rencontrée... Il peut exposer plusieurs
+    sorties simultanément (\texttt{VAR\_OUTPUT}) et, pour les blocs étudiés
+    ici, des paramètres \texttt{VAR\_IN\_OUT} qu'il lit \emph{et} modifie.
+\end{description}
+\end{UPSTIinfor}
+
+Tous les blocs rencontrés dans ce document et dans les TP suivants sont
+des blocs fonctionnels, pour une raison commune : ils ont besoin de
+mémoriser un état entre deux cycles de l'automate (un bloc \texttt{MC\_}
+doit savoir s'il a déjà démarré le mouvement demandé ; \texttt{FB\_ReadHmi}
+doit pouvoir détecter un front sur un bouton-poussoir). Une fonction, sans
+mémoire, ne le permettrait pas.
+
+\begin{UPSTIactivite}[4][Fonction ou bloc fonctionnel ?][][][TD]
+\UPSTIquestion{Pour chacun des traitements suivants, préciser s'il doit
+être réalisé par une \textbf{fonction} ou par un \textbf{bloc fonctionnel},
+et justifier en une phrase à partir du critère de mémorisation d'état.
+\begin{enumerate}
+    \item Convertir une température exprimée en degrés Celsius en degrés
+    Fahrenheit.
+    \item Détecter le front montant d'une entrée booléenne.
+    \item Calculer la racine carrée d'une valeur réelle.
+    \item Temporiser l'activation d'une sortie de 2~secondes après le
+    passage à \texttt{TRUE} d'une entrée.
+    \item Décoder l'objet brut \texttt{TFromHmi} en objet
+    \texttt{THmiInputs}.
+    \item Compter le nombre de fronts montants reçus sur une entrée depuis
+    la mise sous tension de l'automate.
+\end{enumerate}}
+\end{UPSTIactivite}
+
+\UPSTIremarque[Préfixes de bibliothèque]{Les blocs fonctionnels utilisés
+sur la cellule suivent une convention de préfixe selon leur origine :
+\texttt{VAL\_} pour la bibliothèque \texttt{uniVALplc} du robot,
+\texttt{MC\_} pour les blocs \texttt{Motion Control} conformes au standard
+PLCopen, \texttt{FB\_} pour les blocs maison de l'application (document
+\texttt{00\_conventions\_nommage}, section « Blocs fonctionnels »).}
