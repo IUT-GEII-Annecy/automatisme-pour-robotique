@@ -50,3 +50,21 @@ Les deux familles partagent le \textbf{même} objet \texttt{AxesGroup}
 \texttt{MC\_} de connaître l'état lu par \texttt{VAL\_ReadAxesGroup} et de
 préparer une commande qui sera transmise par \texttt{VAL\_WriteAxesGroup}.
 \end{UPSTIinfor}
+
+\begin{UPSTIactivite}[4][Client, serveur et familles de blocs][][][TD]
+\UPSTIquestion{Pour chacun des blocs suivants, indiquer s'il appartient à
+la famille \texttt{VAL\_} (spécifique \texttt{uniVALplc}) ou à la famille
+\texttt{MC\_} (PLCopen), et s'il est exécuté côté client (M340) ou côté
+serveur (CS9) : \texttt{VAL\_ReadWriteIO}, \texttt{MC\_GroupPower},
+\texttt{VAL\_ShiftPoint}, \texttt{MC\_GroupReset},
+\texttt{MC\_MoveLinearAbsolute}.}
+\UPSTIquadrillage{4}
+
+\UPSTIquestion{Après une intervention de maintenance, l'automate M340
+communique bien avec la baie CS9 (bits de santé du coupleur
+\texttt{NOC\_ETHIP\_ROBOT} corrects), mais le robot n'exécute aucune des
+commandes envoyées. Citer les deux points de configuration, indépendants
+du programme automate, à vérifier en priorité, et expliquer pour chacun
+la conséquence d'un mauvais réglage.}
+\UPSTIquadrillage{4}
+\end{UPSTIactivite}

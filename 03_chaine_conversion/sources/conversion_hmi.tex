@@ -46,7 +46,8 @@ premier met à jour son champ \texttt{m\_Inputs}, le second lit son champ
 \textbf{Paramètre} & \textbf{Sens / type} & \textbf{Rôle} \\
 \hline
 \texttt{xEnable} & \texttt{VAR\_INPUT}, \texttt{BOOL} & Active la
-conversion à ce cycle (en général, toujours \texttt{TRUE}). \\
+conversion à ce cycle (en TP, conditionnée aux bits de santé de la
+liaison avec le M221 et avec la CS9). \\
 \hline
 \texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
 Objet du robot (section~\ref{secConversionRobot}), nécessaire au bloc
@@ -72,7 +73,8 @@ des objets qu'on lui transmet.
 
 \begin{lstlisting}
 InstReadHmi(
-    xEnable   := TRUE,
+    xEnable   := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0
+                 AND NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].1,
     AxesGroup := staeubliRobotScara,
     fromHmi   := fromHmiScara,
     hmi       := hmiScara
@@ -143,7 +145,8 @@ produit par le bloc, à écrire par le coupleur vers le M221. \\
 
 \begin{lstlisting}
 InstWriteHmi(
-    xEnable   := TRUE,
+    xEnable   := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0
+                 AND NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].1,
     AxesGroup := staeubliRobotScara,
     hmi       := hmiScara,
     toHmi     => toHmiScara
@@ -162,6 +165,30 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
     physiquement.
 \end{enumerate}
 \end{UPSTIidee}
+
+\begin{UPSTIactivite}[4][Exploiter l'objet \texttt{hmiScara}][][][TD]
+\UPSTIquestion{L'opérateur appuie sur le bouton-poussoir « Arrêt demandé »
+du pupitre (champ \texttt{m\_nixStopRequest}, contact à ouverture
+\emph{NC}). Quelle valeur prend alors
+\texttt{hmiScara.m\_Inputs.m\_nixStopRequest} après l'appel de
+\texttt{FB\_ReadHmi} ? Écrire en ST l'affectation d'une variable
+\texttt{xArretDemande} (\texttt{BOOL}) valant \texttt{TRUE} lorsque
+l'arrêt est demandé.}
+\UPSTIquadrillage{2.5}
+
+\UPSTIquestion{On souhaite allumer le voyant « Arrêt demandé » du pupitre
+(champ \texttt{m\_nqxLightStopRequest} du type \texttt{THmiQTOR}).
+Donner le chemin complet du champ à renseigner à partir de l'objet
+\texttt{hmiScara}, puis indiquer quel bloc doit être appelé ensuite pour
+que l'ordre parvienne effectivement au M221, et via quel objet brut.}
+\UPSTIquadrillage{3}
+
+\UPSTIquestion{Justifier pourquoi le paramètre \texttt{hmi} est passé en
+\texttt{VAR\_IN\_OUT} aux deux blocs \texttt{FB\_ReadHmi} et
+\texttt{FB\_WriteHmi}, alors que \texttt{toHmi} n'est qu'une
+\texttt{VAR\_OUTPUT} de \texttt{FB\_WriteHmi}.}
+\UPSTIquadrillage{3}
+\end{UPSTIactivite}
 
 \UPSTIremarque[Lien avec la préparation du TP]{
 C'est précisément ce que demande l'activité « Déclaration des objets

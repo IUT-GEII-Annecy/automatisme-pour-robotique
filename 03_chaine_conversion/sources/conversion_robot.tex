@@ -28,8 +28,8 @@ qu'à travers les blocs \texttt{VAL\_ReadAxesGroup} et
 à ce cycle. \\
 \hline
 \texttt{AxesGroup} & \texttt{VAR\_IN\_OUT}, \texttt{T\_StaeubliRobot} &
-Objet sémantique partagé, dont le sous-objet \texttt{Status} est mis à
-jour par le bloc (voir remarque ci-dessous sur le \texttt{VAR\_IN\_OUT}). \\
+Objet sémantique partagé, dont les sous-objets \texttt{Status} et
+\texttt{CommandInterface} sont mis à jour par le bloc (voir remarque ci-dessous sur le \texttt{VAR\_IN\_OUT}). \\
 \hline
 \texttt{IN} & \texttt{VAR\_IN\_OUT}, \texttt{T\_FromRobot} & Objet brut,
 chevauchant la zone \texttt{\%MW} image des données reçues de la CS9. \\
@@ -47,7 +47,7 @@ absence de rafraîchissement de \texttt{IN} dans le délai attendu. \\
 
 \begin{lstlisting}
 InstReadAxesGroup(
-    Enable    := TRUE,
+    Enable    := NOC_ETHIP_ROBOT_IN.HEALTH_BITS_IN[0].0,
     AxesGroup := staeubliRobotScara,
     IN        := fromRobotScara
 );
@@ -72,14 +72,16 @@ par le programme applicatif puis transmises par
 \hline
 \texttt{CommandInterface} & Interface utilisée en interne par les blocs
 \texttt{MC\_} (mouvement, mise sous puissance...) pour transmettre leurs
-propres requêtes au serveur. \\
+propres requêtes au serveur ; elle est aussi actualisée en lecture par
+\texttt{VAL\_ReadAxesGroup}. \\
 \hline
 \end{tabular}
 \end{center}
 
 \begin{UPSTIinfor}{Le bit de vie (\texttt{Heartbeat} / \texttt{LifebitPeriod})}
-\texttt{Status.Heartbeat} (lu) et \texttt{Command.LifebitPeriod} (écrit,
-compris entre 100~et~1000~ms) forment un mécanisme de bit de vie entre
+\texttt{Status.Heartbeat} (lu, de type \texttt{UINT}) et
+\texttt{Command.LifebitPeriod} (écrit, de type \texttt{TIME}, compris
+entre 100~et~1000~ms, valeur initiale \texttt{T\#200ms}) forment un mécanisme de bit de vie entre
 l'automate et le serveur \texttt{uniVALplc} : c'est un moyen
 supplémentaire, propre à \texttt{uniVALplc}, de surveiller la liaison --
 distinct des bits de santé du coupleur NOC déjà rencontrés en TP1.
@@ -164,6 +166,29 @@ On retrouve, dans l'ordre, les trois étapes suivantes :
     exécuté du cycle, après tous les blocs \texttt{MC\_}.
 \end{enumerate}
 \end{UPSTIidee}
+
+\begin{UPSTIactivite}[4][Lire l'état et commander via \texttt{staeubliRobotScara}][][][TD]
+\UPSTIquestion{Pour chacune des informations suivantes, indiquer le
+sous-objet de \texttt{staeubliRobotScara} concerné (\texttt{Status} ou
+\texttt{Command}), si le programme applicatif la lit ou l'écrit, et quel
+bloc \texttt{VAL\_} assure son transfert avec la CS9 : le robot est en
+mouvement (\texttt{IsMoving}) ; la vitesse de consigne du moniteur
+(\texttt{OverrideCmd}) ; la position articulaire courante
+(\texttt{JointPos}) ; la période du bit de vie (\texttt{LifebitPeriod}).}
+\UPSTIquadrillage{4}
+
+\UPSTIquestion{Le champ \texttt{Command.OperationModeCmd} (\texttt{UINT})
+code le mode de marche demandé : 0~=~invalide, 1~=~manuel, 3~=~auto,
+4~=~commande à distance (\emph{extAut}). Écrire en ST les deux
+affectations qui demandent le mode « commande à distance » et une période
+de bit de vie de 500~ms.}
+\UPSTIquadrillage{2.5}
+
+\UPSTIquestion{Un étudiant place l'appel de \texttt{MC\_GroupPower}
+\textbf{après} celui de \texttt{VAL\_WriteAxesGroup} dans le cycle.
+Expliquer la conséquence sur la transmission de sa requête au robot.}
+\UPSTIquadrillage{3}
+\end{UPSTIactivite}
 
 \UPSTIremarque[Lien avec la préparation du TP]{
 C'est précisément ce que demande l'activité « Déclaration des objets
