@@ -42,7 +42,8 @@ absence de rafraîchissement de \texttt{IN} dans le délai attendu. \\
 \end{tabular}
 \end{center}
 
-\textbf{Exemple d'appel} (section exécutée en tout début de cycle) :
+\textbf{Exemple d'appel}, dans la section \texttt{ReadEthIpRobot}
+(première section exécutée du cycle) :
 
 \begin{lstlisting}
 InstReadAxesGroup(
@@ -87,7 +88,7 @@ supplémentaire, propre à \texttt{uniVALplc}, de surveiller la liaison --
 distinct des bits de santé du coupleur NOC, présentés en section~\ref{secConversionHmi}.
 C'est le \textbf{seul} champ de \texttt{Command} que le programme écrit
 lui-même en TP : une unique affectation, au premier cycle en RUN, dans la
-section d'initialisation du GEMMA (le TP~3 impose \texttt{t\#150ms}).
+section d'initialisation du GEMMA, \texttt{GM\_GmmaPre} (le TP~3 impose \texttt{t\#150ms}).
 \end{UPSTIinfor}
 
 \subsection{Donner des ordres au robot}
@@ -149,8 +150,8 @@ timeout détecté par le bloc. \\
 \end{tabular}
 \end{center}
 
-\textbf{Exemple d'appel} (section exécutée en toute fin de cycle, après
-tous les blocs \texttt{MC\_}) :
+\textbf{Exemple d'appel}, dans la section \texttt{WriteEthIpRobot}
+(dernière section exécutée du cycle, après tous les blocs \texttt{MC\_}) :
 
 \begin{lstlisting}
 InstWriteAxesGroup(

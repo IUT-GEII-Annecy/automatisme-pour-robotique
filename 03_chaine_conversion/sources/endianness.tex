@@ -45,20 +45,21 @@ Le contrôleur CS9 du robot encode les données échangées via le serveur
 l'automate client de la cellule est un \textbf{M340 de Schneider}
 (processeur little endian), l'option \textbf{\emph{Little Endian}} a été
 sélectionnée lors de l'installation du serveur \texttt{uniVALplc} sur la
-baie CS9 : sans cette configuration, tous les champs numériques
-multi-octets de \texttt{T\_StaeubliRobot} (vitesses, positions
-cartésiennes, compteurs...) seraient mal interprétés par le programme
-Control Expert, même si les blocs \texttt{VAL\_ReadAxesGroup} et
-\texttt{VAL\_WriteAxesGroup} sont correctement appelés.
+baie CS9 : sans cette configuration, toutes les données numériques
+multi-octets échangées avec le robot (vitesses, positions cartésiennes,
+compteurs...) seraient mal interprétées par le programme Control Expert,
+même si les blocs de conversion du robot (présentés en
+section~\ref{secConversionRobot}) sont correctement appelés.
 \end{UPSTIinfor}
 
 \begin{UPSTIactivite}[4][Lecture d'une valeur multi-octets][][][TD]
-\UPSTIquestion{Le champ \texttt{Status.Heartbeat} de
-\texttt{T\_StaeubliRobot} est de type \texttt{UINT}, codé sur 2~octets.
+\UPSTIquestion{Le robot transmet à l'automate un compteur, nommé
+\texttt{Heartbeat}, de type \texttt{UINT} (entier non signé codé sur
+2~octets).
 Le coupleur \texttt{NOC\_ETHIP\_ROBOT} reçoit, dans l'ordre, les deux
 octets \texttt{0x64} puis \texttt{0x00}. Sachant que le serveur
 \texttt{uniVALplc} a été configuré en \emph{little endian}, calculer la
-valeur numérique (en décimal) de \texttt{Status.Heartbeat}.}
+valeur numérique (en décimal) de \texttt{Heartbeat}.}
 \UPSTIquadrillage{2.5}
 
 \begin{UPSTIcorrectionP}{Corrigé}
@@ -71,7 +72,7 @@ $6\times16+4 = \mathbf{100}$.
 \UPSTIquestion{Un collègue, en reprenant la configuration du serveur sur
 une autre cellule, laisse par erreur l'option \emph{Big Endian}. Quelle
 valeur le programme Control Expert lirait-il alors pour
-\texttt{Status.Heartbeat}, à partir des mêmes octets \texttt{0x64} puis
+\texttt{Heartbeat}, à partir des mêmes octets \texttt{0x64} puis
 \texttt{0x00} ? Ce défaut de configuration serait-il facile à détecter au
 premier démarrage de la cellule ? Justifier.}
 \UPSTIquadrillage{3.5}
@@ -82,14 +83,12 @@ poids \textbf{fort} : le programme lirait \texttt{0x6400}, soit
 $100\times256 = \mathbf{25\,600}$.
 
 Ce défaut est \textbf{difficile à détecter} au premier démarrage : chaque
-octet est correctement reçu, les bits de santé du coupleur
-\texttt{NOC\_ETHIP\_ROBOT} restent à \texttt{TRUE} et les blocs
-\texttt{VAL\_ReadAxesGroup}/\texttt{VAL\_WriteAxesGroup} sont appelés
-normalement : aucune erreur de communication n'est signalée. Seules des
+octet est correctement reçu et la liaison réseau avec le robot reste
+établie : aucune erreur de communication n'est signalée. Seules des
 valeurs numériques \textbf{incohérentes} trahissent le problème (par
 exemple une position cartésienne lue sans rapport avec celle affichée sur
 le pendant du robot, une vitesse absurde) -- encore faut-il penser à les
-comparer. Un champ comme \texttt{Heartbeat}, dont la valeur absolue n'a
+comparer. Un compteur comme \texttt{Heartbeat}, dont la valeur absolue n'a
 pas de signification pour l'opérateur, ne permet pas à lui seul de s'en
 apercevoir.
 \end{UPSTIcorrectionP}

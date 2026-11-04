@@ -41,7 +41,9 @@ mémorisation d'état :
     \texttt{xResult : BOOL} ;
     \item \texttt{MC\_GroupReset}, déclenché sur front montant de son
     entrée \texttt{Execute} ;
-    \item \texttt{VAL\_ReadAxesGroup} ;
+    \item \texttt{TON}, temporisateur standard IEC~61131-3, dont la sortie
+    \texttt{Q} passe à \texttt{TRUE} lorsque son entrée \texttt{IN} est restée
+    à \texttt{TRUE} pendant au moins la durée \texttt{PT} ;
     \item la détection du front montant du bouton « Arrêt demandé » du
     pupitre.
 \end{enumerate}}
@@ -57,13 +59,13 @@ mémorisation d'état :
     \item \texttt{MC\_GroupReset} est un \textbf{bloc fonctionnel} : pour
     ne réagir qu'au \textbf{front montant} d'\texttt{Execute}, il doit
     mémoriser la valeur d'\texttt{Execute} au cycle précédent (et l'état
-    d'avancement \texttt{Busy}/\texttt{Done}) -- d'où l'instance
+    d'avancement de sa requête) -- d'où l'instance
     \texttt{InstGroupResetD2} à réserver.
-    \item \texttt{VAL\_ReadAxesGroup} est un \textbf{bloc fonctionnel}
-    (instance \texttt{InstReadAxesGroup}) : il expose plusieurs sorties
-    (\texttt{Error}, \texttt{ErrorID}, \texttt{Timeout}) et sa sortie
-    \texttt{Timeout} suppose de mémoriser depuis combien de temps
-    \texttt{IN} n'a pas été rafraîchi.
+    \item \texttt{TON} est un \textbf{bloc fonctionnel} : pour savoir si
+    \texttt{IN} est à \texttt{TRUE} depuis au moins \texttt{PT}, il doit
+    mémoriser d'un cycle à l'autre le temps écoulé depuis lequel
+    \texttt{IN} est à \texttt{TRUE} -- une fonction, qui ne voit que la
+    valeur courante de \texttt{IN}, en serait incapable.
     \item La détection de front montant est un \textbf{bloc fonctionnel}
     (\texttt{R\_TRIG}) : détecter un front, c'est comparer la valeur
     courante à celle du cycle précédent, qui doit donc être mémorisée.

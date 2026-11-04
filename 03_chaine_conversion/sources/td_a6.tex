@@ -73,7 +73,8 @@ notion de front, le bras reste sous/hors puissance tant que
 \texttt{MC\_GroupInterrupt} et \texttt{MC\_GroupContinue} suivent le
 squelette commun (\texttt{Execute}, \texttt{AxesGroup}, \texttt{Busy},
 \texttt{Done}, \texttt{Error}) : le premier arrête le mouvement en cours
-\emph{sans} vider la pile de commandes, le second relance l'exécution de
+\emph{sans} vider la pile de commandes (contrairement à
+\texttt{MC\_GroupStop}, qui la vide), le second relance l'exécution de
 cette pile.
 
 \UPSTIremarque[Objet \texttt{TCtrlStatusGroup}]{Par souci de lisibilité,
